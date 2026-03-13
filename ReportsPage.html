@@ -13,7 +13,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f4f8;min-height:100vh
 .hdr p{color:#93c5fd;font-size:10px;letter-spacing:1px;margin-top:1px}
 .geo-dot{width:8px;height:8px;border-radius:50%;background:#94a3b8;display:inline-block;margin-right:4px}
 .geo-dot.ok{background:#22c55e}
-.geo-dot.loading{background:#f59e0b;animation:pulse .8s ease-in-out infinite alternate}
+.geo-dot.loading{background:#f59e0b;animation:pulse .8s ease-in-out infe alternate}
 @keyframes pulse{from{opacity:.4}to{opacity:1}}
 .kpis{display:flex;gap:8px;padding:10px 14px;flex-wrap:wrap;background:white;border-bottom:1px solid #e2e8f0}
 .kpi{flex:1;min-width:100px;background:#f8fafc;border-radius:8px;padding:8px 12px;border-left:3px solid #2563eb}
@@ -170,32 +170,21 @@ function setGeo(s,t){
 
 function initGeo(){
   setGeo("loading","Connecting...");
-
   if(typeof api==="undefined"){
     setGeo("ok","Dev Mode");
     loadData();
     return;
   }
-
-  // ★ api exists — save it and go straight to loadData (no blocking Group/User calls)
   GEO_API = api;
   setGeo("ok","dynasty_communications");
   loadData();
-
-  // Load Groups/Drivers in background (non-blocking)
   try{
     api.call("Get",{typeName:"Group"},function(gs){
-      const validGroups=(gs||[]).filter(g=>g.id&&!["GroupCompanyId","GroupEverythingId","GroupNothingId"].includes(g.id)&&!g.id.startsWith("Group"));
       const sel=document.getElementById("f-grp");
-      validGroups.sort((a,b)=>(a.name||"").localeCompare(b.name||"")).forEach(g=>{
-        sel.innerHTML+=`<option value="${g.id}">${g.name||g.id}</option>`;
-      });
+      (gs||[]).filter(g=>g.id&&!["GroupCompanyId","GroupEverythingId","GroupNothingId"].includes(g.id)&&!g.id.startsWith("Group")).sort((a,b)=>(a.name||"").localeCompare(b.name||"")).forEach(g=>{sel.innerHTML+=`<option value="${g.id}">${g.name||g.id}</option>`;});
     },function(){});
-    api.call("Get",{typeName:"User",search:{isActive:true}},function(us){
-      DRIVERS=(us||[]).filter(u=>!u.isSystemUser);
-      popDrv("all");
-    },function(){});
-  }catch(e){ console.warn("Background api calls failed:",e); }
+    api.call("Get",{typeName:"User",search:{isActive:true}},function(us){DRIVERS=(us||[]).filter(u=>!u.isSystemUser);popDrv("all");},function(){});
+  }catch(e){}
 }
 
 function onGrpChange(){
