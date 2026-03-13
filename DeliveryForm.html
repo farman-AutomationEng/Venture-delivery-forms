@@ -16,16 +16,16 @@
 <!-- Driver Bar -->
 <div class="dbar" id="dbar">
   <div class="dav" id="dav">?</div>
-  <div style="flex:1"><div class="dnm" id="dnm">Loading...</div><div class="dmt" id="dmt"></div></div>
+  <div class="dbar-flex"><div class="dnm" id="dnm">Loading...</div><div class="dmt" id="dmt"></div></div>
   <span class="dgrp" id="dgrp"></span>
 </div>
 
 <!-- Tabs -->
 <div class="tabs-wrap">
   <div class="tabs">
-    <button class="tab active" onclick="swT(0,this)"><span class="ti">📋</span>Delivery</button>
-    <button class="tab" onclick="swT(1,this)"><span class="ti">🧾</span>Invoice</button>
-    <button class="tab" onclick="swT(2,this)"><span class="ti">🔩</span>Parts</button>
+    <button class="tab active" data-tab="0"><span class="ti">📋</span>Delivery</button>
+    <button class="tab" data-tab="1"><span class="ti">🧾</span>Invoice</button>
+    <button class="tab" data-tab="2"><span class="ti">🔩</span>Parts</button>
   </div>
 </div>
 
@@ -34,16 +34,16 @@
   <!-- ★ SUCCESS SCREEN -->
   <div class="succ" id="succ">
     <div class="si">✓</div>
-    <h2 style="font-size:22px;margin-bottom:8px;color:#1e293b">Submitted!</h2>
-    <p style="color:#64748b;font-size:13px">Saved to MyGeotab • Sheet updated • Email sent</p>
+    <h2 class="succ-title">Submitted!</h2>
+    <p class="succ-sub">Saved to MyGeotab • Sheet updated • Email sent</p>
     <div class="rid" id="riddisp">—</div>
-    <button class="btn bp" style="max-width:200px;margin:0 auto;display:block" onclick="resetF()">+ New Form</button>
+    <button class="btn bp btn-new" onclick="resetF()">+ New Form</button>
   </div>
 
   <!-- TAB 0: DELIVERY -->
   <div id="t0">
     <div class="notice">⚠️ <strong>Inspect all merchandise.</strong> Damages not replaced unless noted at delivery.</div>
-    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#475569">
+    <div class="from-box">
       <strong>FROM:</strong> Venture Trailers • 5301 North Point Blvd, Baltimore MD 21219
     </div>
     <div class="g2">
@@ -85,27 +85,27 @@
 
     <div class="sec"><span>🔧</span><h3>Parts Condition</h3></div>
     <div class="tw">
-      <table><thead><tr><th>Part</th><th>Model</th><th style="text-align:center">Dmg</th><th style="text-align:center">Short</th><th>Notes</th></tr></thead>
+      <table><thead><tr><th>Part</th><th>Model</th><th class="tc">Dmg</th><th class="tc">Short</th><th>Notes</th></tr></thead>
       <tbody id="ptb"></tbody></table>
     </div>
 
-    <div class="notice" style="margin-bottom:10px">
-      <label class="ci" style="font-size:13px;font-weight:700"><input type="checkbox" id="ck-ac"> ACCEPTED — product accepted as is, except where noted.</label>
+    <div class="notice notice-mb">
+      <label class="ci ci-lg"><input type="checkbox" id="ck-ac"> ACCEPTED — product accepted as is, except where noted.</label>
     </div>
-    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;margin-bottom:14px">
-      <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:8px">Received "You and Your Trailer" booklets?</div>
+    <div class="bk-box">
+      <div class="bk-lbl">Received "You and Your Trailer" booklets?</div>
       <div class="pills"><div class="pill" id="py" onclick="setBk('Y')">✅ Yes</div><div class="pill" id="pn" onclick="setBk('N')">❌ No</div></div>
     </div>
-    <div class="f" style="margin-bottom:14px"><label>Comments</label><textarea id="ds-cm" placeholder="Any notes..."></textarea></div>
+    <div class="f mb14"><label>Comments</label><textarea id="ds-cm" placeholder="Any notes..."></textarea></div>
 
     <div class="sec"><span>✍️</span><h3>Signatures</h3></div>
     <div class="g2">
       <div>
-        <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:6px">Driver</div>
+        <div class="sig-lbl">Driver</div>
         <div class="sw" id="sig-driver-wrap"><canvas id="sig-driver"></canvas><div class="sph">Sign here ✍️</div><button class="scl" onclick="clrS('sig-driver')">Clear</button><div class="sok" id="sig-driver-ok">✓ Signed</div></div>
       </div>
       <div>
-        <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:6px">Consignee (Dealer)</div>
+        <div class="sig-lbl">Consignee (Dealer)</div>
         <div class="sw" id="sig-consignee-wrap"><canvas id="sig-consignee"></canvas><div class="sph">Sign here ✍️</div><button class="scl" onclick="clrS('sig-consignee')">Clear</button><div class="sok" id="sig-consignee-ok">✓ Signed</div></div>
       </div>
     </div>
@@ -116,21 +116,21 @@
   </div>
 
   <!-- TAB 1: INVOICE -->
-  <div id="t1" style="display:none">
-    <div style="display:flex;justify-content:space-between;align-items:center;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px 16px;margin-bottom:16px">
-      <div><div style="font-weight:900;font-size:16px">VENTURE TRAILERS, INC.</div><div style="font-size:10px;color:#64748b;margin-top:2px">5301 North Point Blvd • Baltimore MD 21219</div></div>
-      <div style="background:white;border:2px solid #e2e8f0;border-radius:8px;padding:8px 14px;font-size:20px;font-weight:900;color:#0078D4">INVOICE</div>
+  <div id="t1" class="tab-hidden">
+    <div class="inv-hdr">
+      <div><div class="inv-company">VENTURE TRAILERS, INC.</div><div class="inv-addr">5301 North Point Blvd • Baltimore MD 21219</div></div>
+      <div class="inv-badge">INVOICE</div>
     </div>
     <div class="g2">
       <div class="f"><label>Acct No.</label><input id="ia" value="3818"></div>
       <div class="f"><label>Date</label><input type="date" id="id"></div>
       <div class="f fc"><label>Invoice #</label><input id="ino" placeholder="132993"></div>
     </div>
-    <div class="g2" style="margin-top:10px">
+    <div class="g2 mt10">
       <div class="f"><label>Bill To</label><textarea id="ibt" placeholder="Company&#10;Address&#10;City, State ZIP"></textarea></div>
       <div class="f"><label>Ship To</label><textarea id="ist" placeholder="Company&#10;Address&#10;City, State ZIP"></textarea></div>
     </div>
-    <div class="g2" style="margin-top:10px">
+    <div class="g2 mt10">
       <div class="f"><label>PO #</label><input id="ipo"></div>
       <div class="f"><label>Terms</label><input id="itr" value="Due on receipt"></div>
       <div class="f"><label>Sales Order</label><input id="iso"></div>
@@ -138,21 +138,21 @@
     </div>
     <div class="sec"><span>📦</span><h3>Line Items</h3></div>
     <div class="tw"><table><thead><tr><th>Item</th><th>Qty</th><th>Description</th><th>Unit Price</th><th>Total</th><th></th></tr></thead><tbody id="itb"></tbody></table></div>
-    <button onclick="addIR()" style="padding:8px 12px;background:#E8F4FD;border:1.5px dashed #7BBFDB;border-radius:7px;color:#0078D4;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:14px">+ Add Line</button>
-    <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
-      <div style="background:white;border:1.5px solid #e2e8f0;border-radius:10px;padding:14px 16px;min-width:200px">
-        <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:12px;color:#64748b"><span>Shipping</span><input id="ish" style="width:80px;text-align:right;padding:3px 6px;border:1.5px solid #e2e8f0;border-radius:5px;font-size:12px" oninput="calcT()"></div>
-        <div style="border-top:2px solid #1e3a8a;padding-top:8px;display:flex;justify-content:space-between;font-size:15px;font-weight:900;color:#00263E"><span>Amount Due</span><span id="itot">$0.00</span></div>
+    <button class="btn-add" onclick="addIR()">+ Add Line</button>
+    <div class="totals-wrap">
+      <div class="totals-box">
+        <div class="totals-row"><span>Shipping</span><input id="ish" class="ish-input" oninput="calcT()"></div>
+        <div class="totals-due"><span>Amount Due</span><span id="itot">$0.00</span></div>
       </div>
     </div>
     <div class="sa"><button class="btn bs">💾 Draft</button><button class="btn bp" onclick="subInv()">📤 Submit Invoice</button></div>
   </div>
 
   <!-- TAB 2: LOOSE PARTS -->
-  <div id="t2" style="display:none">
-    <div style="text-align:center;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin-bottom:16px">
-      <div style="font-weight:900;font-size:18px;letter-spacing:2px">VENTURE TRAILERS</div>
-      <div style="font-weight:800;font-size:12px;color:#00263E;letter-spacing:2px;margin-top:3px">LOOSE PARTS CHECK-IN</div>
+  <div id="t2" class="tab-hidden">
+    <div class="lp-hdr">
+      <div class="lp-company">VENTURE TRAILERS</div>
+      <div class="lp-sub">LOOSE PARTS CHECK-IN</div>
     </div>
     <div class="g2">
       <div class="f"><label>Sales Order #</label><input id="ls"></div>
@@ -163,18 +163,18 @@
       <div class="f"><label>Date</label><input type="date" id="ldt"></div>
     </div>
     <div class="sec"><span>🔩</span><h3>Parts List</h3></div>
-    <div class="tw"><table><thead><tr><th>Loc</th><th>Qty</th><th>Part</th><th style="text-align:center">Pulled</th><th style="text-align:center">Loaded</th><th style="text-align:center">N/C</th><th style="text-align:center">COD</th><th></th></tr></thead><tbody id="ltb"></tbody></table></div>
-    <button onclick="addLR()" style="padding:8px 12px;background:#E8F4FD;border:1.5px dashed #7BBFDB;border-radius:7px;color:#0078D4;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:14px">+ Add Row</button>
-    <div class="f" style="margin-bottom:14px"><label>Comments</label><textarea id="lc"></textarea></div>
-    <div class="notice nred" style="text-align:center;font-weight:800">⚠️ MUST BE COMPLETED AT TIME OF DELIVERY</div>
-    <div class="sec" style="margin-top:14px"><span>✍️</span><h3>Signatures</h3></div>
+    <div class="tw"><table><thead><tr><th>Loc</th><th>Qty</th><th>Part</th><th class="tc">Pulled</th><th class="tc">Loaded</th><th class="tc">N/C</th><th class="tc">COD</th><th></th></tr></thead><tbody id="ltb"></tbody></table></div>
+    <button class="btn-add" onclick="addLR()">+ Add Row</button>
+    <div class="f mb14"><label>Comments</label><textarea id="lc"></textarea></div>
+    <div class="notice nred notice-center">⚠️ MUST BE COMPLETED AT TIME OF DELIVERY</div>
+    <div class="sec mt14"><span>✍️</span><h3>Signatures</h3></div>
     <div class="g2">
       <div>
-        <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:6px">Driver</div>
+        <div class="sig-lbl">Driver</div>
         <div class="sw" id="sig-lpd-wrap"><canvas id="sig-lpd"></canvas><div class="sph">Sign here ✍️</div><button class="scl" onclick="clrS('sig-lpd')">Clear</button><div class="sok" id="sig-lpd-ok">✓ Signed</div></div>
       </div>
       <div>
-        <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:6px">Authorized Receiver</div>
+        <div class="sig-lbl">Authorized Receiver</div>
         <div class="sw" id="sig-lpr-wrap"><canvas id="sig-lpr"></canvas><div class="sph">Sign here ✍️</div><button class="scl" onclick="clrS('sig-lpr')">Clear</button><div class="sok" id="sig-lpr-ok">✓ Signed</div></div>
       </div>
     </div>
@@ -251,6 +251,7 @@ function setDrv(info){
 }
 
 window.onload=function(){
+  initTabs();
   const td=new Date().toISOString().split("T")[0];
   document.querySelectorAll('input[type="date"]').forEach(i=>i.value=td);
   document.getElementById("dbadge").textContent="📅 "+new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
@@ -263,22 +264,34 @@ window.onload=function(){
 
 // ★ Tab switch
 function swT(n,btn){
-  // Hide success screen first
   document.getElementById("succ").style.display="none";
-  // Show correct tab
   [0,1,2].forEach(i=>{
     const el=document.getElementById("t"+i);
-    if(el) el.style.display=i===n?"block":"none";
+    if(el){ el.style.display=i===n?"block":"none"; }
   });
   document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));
   btn.classList.add("active");
+}
+
+// Tab listeners — touchend + click, Geotab Drive iframe fix
+function initTabs(){
+  document.querySelectorAll(".tab[data-tab]").forEach(function(btn){
+    var n = parseInt(btn.getAttribute("data-tab"));
+    function handler(e){
+      e.preventDefault();
+      e.stopPropagation();
+      swT(n, btn);
+    }
+    btn.addEventListener("touchend", handler, {passive:false});
+    btn.addEventListener("click", handler);
+  });
 }
 
 function buildPT(){
   const tb=document.getElementById("ptb");tb.innerHTML="";
   PARTS.forEach(p=>{
     const tr=document.createElement("tr");
-    tr.innerHTML=`<td style="padding:5px 7px;font-weight:600;white-space:nowrap;font-size:11px">${p}</td><td><input type="text" placeholder="Model"></td><td class="tc"><input type="checkbox" class="cbt"></td><td class="tc"><input type="checkbox" class="cbt"></td><td><input type="text" placeholder="Notes"></td>`;
+    tr.innerHTML=`<td class="pt-name">${p}</td><td><input type="text" placeholder="Model"></td><td class="tc"><input type="checkbox" class="cbt"></td><td class="tc"><input type="checkbox" class="cbt"></td><td><input type="text" placeholder="Notes"></td>`;
     tb.appendChild(tr);
   });
 }
@@ -287,7 +300,7 @@ let irc=0;
 function addIR(){
   irc++;const id="ir"+irc;
   const tr=document.createElement("tr");tr.id=id;
-  tr.innerHTML=`<td><input type="text" style="width:80px"></td><td><input type="number" value="1" style="width:44px"></td><td><input type="text" style="min-width:150px"></td><td><input type="text" style="width:80px" oninput="calcT()"></td><td><input type="text" style="width:80px" oninput="calcT()"></td><td><button onclick="document.getElementById('${id}').remove();calcT()" style="background:transparent;border:none;cursor:pointer;color:#94a3b8;font-size:16px">✕</button></td>`;
+  tr.innerHTML=`<td><input type="text" class="ir-item"></td><td><input type="number" value="1" class="ir-qty"></td><td><input type="text" class="ir-desc"></td><td><input type="text" class="ir-price" oninput="calcT()"></td><td><input type="text" class="ir-price" oninput="calcT()"></td><td><button onclick="document.getElementById('${id}').remove();calcT()" class="btn-rm">✕</button></td>`;
   document.getElementById("itb").appendChild(tr);
 }
 function calcT(){
@@ -300,7 +313,7 @@ let lrc=0;
 function addLR(){
   lrc++;const id="lr"+lrc;
   const tr=document.createElement("tr");tr.id=id;
-  tr.innerHTML=`<td><input type="text" style="width:50px"></td><td><input type="text" style="width:38px"></td><td><input type="text" style="min-width:140px" placeholder="Part"></td><td class="tc"><input type="checkbox" class="cbt"></td><td class="tc"><input type="checkbox" class="cbt"></td><td class="tc"><input type="checkbox" class="cbt"></td><td class="tc"><input type="checkbox" class="cbt"></td><td><button onclick="document.getElementById('${id}').remove()" style="background:transparent;border:none;cursor:pointer;color:#94a3b8;font-size:16px">✕</button></td>`;
+  tr.innerHTML=`<td><input type="text" class="lr-loc"></td><td><input type="text" class="lr-qty"></td><td><input type="text" class="lr-part" placeholder="Part"></td><td class="tc"><input type="checkbox" class="cbt"></td><td class="tc"><input type="checkbox" class="cbt"></td><td class="tc"><input type="checkbox" class="cbt"></td><td class="tc"><input type="checkbox" class="cbt"></td><td><button onclick="document.getElementById('${id}').remove()" class="btn-rm">✕</button></td>`;
   document.getElementById("ltb").appendChild(tr);
 }
 
