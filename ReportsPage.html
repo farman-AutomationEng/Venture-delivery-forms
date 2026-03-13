@@ -13,7 +13,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f4f8;min-height:100vh
 .hdr p{color:#93c5fd;font-size:10px;letter-spacing:1px;margin-top:1px}
 .geo-dot{width:8px;height:8px;border-radius:50%;background:#94a3b8;display:inline-block;margin-right:4px}
 .geo-dot.ok{background:#22c55e}
-.geo-dot.loading{background:#f59e0b;animation:pulse .8s ease-in-out infe alternate}
+.geo-dot.loading{background:#f59e0b;animation:pulse .8s ease-in-out infinite alternate}
 @keyframes pulse{from{opacity:.4}to{opacity:1}}
 .kpis{display:flex;gap:8px;padding:10px 14px;flex-wrap:wrap;background:white;border-bottom:1px solid #e2e8f0}
 .kpi{flex:1;min-width:100px;background:#f8fafc;border-radius:8px;padding:8px 12px;border-left:3px solid #2563eb}
@@ -157,34 +157,55 @@ tbody td{padding:7px 9px;vertical-align:middle}
 </div>
 
 <script>
-// ★ CONFIG
-const API_URL = "https://script.google.com/macros/s/AKfycbz47-vTLl6L00t4bBNzeWu0hf85RdZWQEBJLfk-ferQ3KAdXWk_yfWtpNgml4-I1382-w/exec";
+// ============================================================
+// VENTURE DELIVERY REPORTS — ReportsPage.html
+// Architecture: geotab.addin lifecycle → api.call(AddInData)
+// MyGeotab injects api via initialize/focus — NOT a global var
+// ============================================================
 
-let ALL=[], FILT=[], DRIVERS=[], SK="date", SD=-1, PG=1, GEO_API=null;
+let ALL=[], FILT=[], DRIVERS=[], SK="date", SD=-1, PG=1;
+let _api = null; // stored from lifecycle methods
 const PP=25;
+const ADDIN_ID = "aVentureTrlrDelivForms01";
 
-function setGeo(s,t){
-  document.getElementById("geo-txt").innerHTML=`<span class="geo-dot ${s}" style="width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px;background:${s==='ok'?'#22c55e':s==='loading'?'#f59e0b':'#94a3b8'}"></span>${t}`;
+// ── Geotab Add-In Entry Point (REQUIRED) ──────────────────────
+// MyGeotab calls initialize() then focus() — passing api object
+// This is the ONLY correct way to receive api in an external URL add-in
+geotab.addin.ventureReports = function() {
+  return {
+    initialize: function(api, state, callback) {
+      _api = api;
+      setGeo("ok", "dynasty_communications");
+      // Load groups & drivers in background
+      api.call("Get", {typeName:"Group"}, function(gs) {
+        const sel = document.getElementById("f-grp");
+        const valid = (gs||[]).filter(g => g.id && !["GroupCompanyId","GroupEverythingId","GroupNothingId"].includes(g.id) && !g.id.startsWith("Group"));
+        valid.sort((a,b) => (a.name||"").localeCompare(b.name||"")).forEach(g => {
+          sel.innerHTML += `<option value="${g.id}">${g.name||g.id}</option>`;
+        });
+      }, function(){});
+      api.call("Get", {typeName:"User", search:{isActive:true}}, function(us) {
+        DRIVERS = (us||[]).filter(u => !u.isSystemUser);
+        popDrv("all");
+      }, function(){});
+      callback();
+    },
+    focus: function(api, state) {
+      _api = api;
+      loadData();
+    },
+    blur: function(api, state) {}
+  };
+};
+
+// ── Dev mode fallback (when opened outside MyGeotab) ─────────
+// geotab global won't exist outside MyGeotab — show empty state
+if (typeof geotab === "undefined") {
+  window._devMode = true;
 }
 
-
-function initGeo(){
-  setGeo("loading","Connecting...");
-  if(typeof api==="undefined"){
-    setGeo("ok","Dev Mode");
-    loadData();
-    return;
-  }
-  GEO_API = api;
-  setGeo("ok","dynasty_communications");
-  loadData();
-  try{
-    api.call("Get",{typeName:"Group"},function(gs){
-      const sel=document.getElementById("f-grp");
-      (gs||[]).filter(g=>g.id&&!["GroupCompanyId","GroupEverythingId","GroupNothingId"].includes(g.id)&&!g.id.startsWith("Group")).sort((a,b)=>(a.name||"").localeCompare(b.name||"")).forEach(g=>{sel.innerHTML+=`<option value="${g.id}">${g.name||g.id}</option>`;});
-    },function(){});
-    api.call("Get",{typeName:"User",search:{isActive:true}},function(us){DRIVERS=(us||[]).filter(u=>!u.isSystemUser);popDrv("all");},function(){});
-  }catch(e){}
+function setGeo(s,t){
+  document.getElementById("geo-txt").innerHTML=`<span style="width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px;background:${s==='ok'?'#22c55e':s==='loading'?'#f59e0b':'#94a3b8'}"></span>${t}`;
 }
 
 function onGrpChange(){
@@ -200,73 +221,46 @@ function popDrv(gid){
   });
 }
 
-// ★ Dual-mode: api.call (MyGeotab) OR fetch (dev/standalone)
-async function loadData(){
+// ── Load Data via api.call(AddInData) — NO fetch, NO CORS ─────
+function loadData(){
   showLoad();
   hideErr();
   const f=getF();
 
-  // ── MODE 1: MyGeotab API direct (no CORS/CSP issues) ──
-  if(GEO_API){
-    let addInDone = false;
-    // ★ Timeout: if AddInData call hangs > 8s, fall back to fetch
-    const addInTimer = setTimeout(function(){
-      if(!addInDone){
-        addInDone = true;
-        console.warn("AddInData timeout — falling back to fetch");
-        GEO_API = null; // disable api mode
-        loadData();     // retry in fetch mode
-      }
-    }, 8000);
-
-    GEO_API.call("Get",{typeName:"AddInData",search:{addInId:"aVentureTrlrDelivForms01"}},
-      function(rows){
-        if(addInDone) return;
-        addInDone = true;
-        clearTimeout(addInTimer);
-        let parsed=(rows||[]).map(r=>{
-          try{ return typeof r.details==="string"?JSON.parse(r.details):r.details; }
-          catch(e){ return null; }
-        }).filter(Boolean);
-        // client-side filters
-        if(f.fromDate) parsed=parsed.filter(r=>r.date&&r.date>=f.fromDate);
-        if(f.toDate)   parsed=parsed.filter(r=>r.date&&r.date<=f.toDate);
-        if(f.driverId&&f.driverId!=="all") parsed=parsed.filter(r=>r.driverId===f.driverId||r.driver===f.driverId);
-        if(f.formType&&f.formType!=="all") parsed=parsed.filter(r=>r.formType===f.formType);
-        if(f.status&&f.status!=="all")     parsed=parsed.filter(r=>r.status===f.status);
-        ALL=parsed; applyLocal();
-      },
-      function(err){
-        if(addInDone) return;
-        addInDone = true;
-        clearTimeout(addInTimer);
-        console.error("AddInData error:",err);
-        // fallback to fetch on error
-        GEO_API = null;
-        loadData();
-      }
-    );
+  if(!_api){
+    // No api — dev mode or not yet initialized
+    if(window._devMode){
+      setGeo("ok","Dev Mode");
+      ALL=[];
+      applyLocal();
+    } else {
+      setGeo("loading","Waiting for MyGeotab...");
+    }
     return;
   }
 
-  // ── MODE 2: Dev/standalone — fetch from Apps Script ──
-  const params=new URLSearchParams({action:"reports"});
-  if(f.fromDate) params.set("fromDate",f.fromDate);
-  if(f.toDate)   params.set("toDate",f.toDate);
-  if(f.groupId&&f.groupId!=="all")   params.set("groupId",f.groupId);
-  if(f.driverId&&f.driverId!=="all") params.set("driverId",f.driverId);
-  if(f.formType&&f.formType!=="all") params.set("formType",f.formType);
-  if(f.status&&f.status!=="all")     params.set("status",f.status);
-  try{
-    const resp=await fetch(API_URL+"?"+params.toString(),{method:"GET",redirect:"follow"});
-    if(!resp.ok) throw new Error("HTTP "+resp.status);
-    const result=await resp.json();
-    if(result.success){ ALL=result.data||[]; applyLocal(); }
-    else showErr("Unable to load data. Please try again later.");
-  }catch(e){
-    showErr("Unable to load data. Please check your connection and try again.");
-    console.error(e);
-  }
+  // ✅ CORRECT: api.call to AddInData — runs on MyGeotab's domain, no CSP issues
+  _api.call("Get",
+    { typeName:"AddInData", search:{ addInId: ADDIN_ID } },
+    function(rows){
+      let parsed = (rows||[]).map(r => {
+        try { return typeof r.details==="string" ? JSON.parse(r.details) : r.details; }
+        catch(e){ return null; }
+      }).filter(Boolean);
+      // Client-side filters
+      if(f.fromDate) parsed=parsed.filter(r=>r.date&&r.date>=f.fromDate);
+      if(f.toDate)   parsed=parsed.filter(r=>r.date&&r.date<=f.toDate);
+      if(f.driverId&&f.driverId!=="all") parsed=parsed.filter(r=>r.driverId===f.driverId||r.driver===f.driverId);
+      if(f.formType&&f.formType!=="all") parsed=parsed.filter(r=>r.formType===f.formType);
+      if(f.status&&f.status!=="all")     parsed=parsed.filter(r=>r.status===f.status);
+      ALL=parsed;
+      applyLocal();
+    },
+    function(err){
+      console.error("AddInData Get error:", err);
+      showErr("Error loading data: " + (err.message||err));
+    }
+  );
 }
 
 function getF(){
@@ -409,7 +403,15 @@ window.onload=function(){
   document.getElementById("f-to").value=td.toISOString().split("T")[0];
   document.getElementById("dbadge").textContent="📅 "+td.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
   document.getElementById("f-inv").addEventListener("keydown",e=>{if(e.key==="Enter")applyLocal();});
-  initGeo();
+
+  // Dev mode: if opened outside MyGeotab (no geotab global), show empty state
+  if(typeof geotab === "undefined"){
+    setGeo("ok","Dev Mode");
+    ALL=[];
+    applyLocal();
+  }
+  // ✅ If inside MyGeotab: geotab.addin.ventureReports lifecycle fires automatically
+  //    MyGeotab calls initialize() → focus() → loadData() — no manual init needed
 };
 </script>
 </body>
