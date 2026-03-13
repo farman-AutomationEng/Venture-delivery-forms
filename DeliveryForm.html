@@ -281,7 +281,7 @@ tbody td.tc{text-align:center}
 // VENTURE TRAILERS — DeliveryForm.html
 // Submit via api.call("Add", AddInData) — no fetch, no CORS
 // ============================================================
-const ADDIN_ID = "aVentureTrlrDelivForms01";
+const ADDIN_ID = "azXOKPvAnSnyIdUK2xZutWA";
 const PARTS = ["Tail Light-R","Tail Light-L","Tail Light-Lens","Marker Light","Tag Bracket","Tongue Jack","Winch Stand","Rollers","Bunks","Fenders","Tires","Actuator","Frame Rails","Tongue"];
 let bklt="", SS={};
 const DRV={name:"",userId:"",email:"",groupId:"",groupName:"",groups:[],vehicleId:"",vehicleName:"",plate:""};
@@ -475,7 +475,7 @@ function submitToAPI(data){
       return;
     }
     _api.call("Add",
-      { typeName:"AddInData", entity:{ addInId: ADDIN_ID, details: data } },
+      { typeName:"AddInData", entity:{ addInId: ADDIN_ID, groups:[{id:"GroupCompanyId"}], details: data } },
       function(id){
         resolve({ success:true, recordId: id });
       },
