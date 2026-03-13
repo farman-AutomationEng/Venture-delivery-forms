@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>Venture Trailers — Delivery Form</title>
 <link rel="stylesheet" href="styles.css">
+<style>
+.f input.err,.f select.err,.f textarea.err{border-color:#DE350B !important;box-shadow:0 0 0 3px rgba(222,53,11,.12) !important;background:#FFF8F7}
+</style>
 </head>
 <body>
 
@@ -285,17 +288,14 @@ function swT(n,btn){
   btn.classList.add("active");
 }
 
-// Tab listeners — touchend + click, Geotab Drive iframe fix
+// Tab listeners — pointerdown works on touch + mouse + Geotab Drive iframe
 function initTabs(){
   document.querySelectorAll(".tab[data-tab]").forEach(function(btn){
     var n = parseInt(btn.getAttribute("data-tab"));
-    function handler(e){
+    btn.addEventListener("pointerdown", function(e){
       e.preventDefault();
-      e.stopPropagation();
       swT(n, btn);
-    }
-    btn.addEventListener("touchend", handler, {passive:false});
-    btn.addEventListener("click", handler);
+    });
   });
 }
 
@@ -469,9 +469,26 @@ function submitToAPI(data){
   });
 }
 
+// ── Validation — red border on empty required fields ──────
+function validate(fields){
+  var ok=true;
+  fields.forEach(function(id){
+    var el=document.getElementById(id); if(!el)return;
+    if(!el.value.trim()){
+      el.classList.add("err"); ok=false;
+      el.addEventListener("input",function(){el.classList.remove("err");},{once:true});
+    } else { el.classList.remove("err"); }
+  });
+  if(!ok){
+    var first=document.querySelector(".err");
+    if(first) first.scrollIntoView({behavior:"smooth",block:"center"});
+  }
+  return ok;
+}
+
 async function subDelivery(){
+  if(!validate(["ds-dt","ds-inv","ds-dlr"]))return;
   const data=collectD();
-  if(!data.invoiceNo||!data.dealer){alert("Invoice # aur Dealer name required!");return;}
   const btn=document.getElementById("subbtn");
   btn.innerHTML='<span class="sp"></span>Submitting...';btn.disabled=true;
   try{
