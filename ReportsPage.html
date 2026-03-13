@@ -171,40 +171,31 @@ function setGeo(s,t){
 function initGeo(){
   setGeo("loading","Connecting...");
 
-  // ★ Timeout fallback: if api.call hangs > 5s, go to fetch mode
-  const geoTimer = setTimeout(function(){
-    console.warn("MyGeotab api timeout — switching to fetch mode");
-    setGeo("ok","Connected");
-    loadData();
-  }, 5000);
-
   if(typeof api==="undefined"){
-    clearTimeout(geoTimer);
     setGeo("ok","Dev Mode");
     loadData();
     return;
   }
 
-  GEO_API = api; // save for loadData to use
+  // ★ api exists — save it and go straight to loadData (no blocking Group/User calls)
+  GEO_API = api;
+  setGeo("ok","dynasty_communications");
+  loadData();
 
-  api.call("Get",{typeName:"Group"},function(gs){
-    clearTimeout(geoTimer);
-    const validGroups=(gs||[]).filter(g=>g.id&&!["GroupCompanyId","GroupEverythingId","GroupNothingId"].includes(g.id)&&!g.id.startsWith("Group"));
-    const sel=document.getElementById("f-grp");
-    validGroups.sort((a,b)=>(a.name||"").localeCompare(b.name||"")).forEach(g=>{
-      sel.innerHTML+=`<option value="${g.id}">${g.name||g.id}</option>`;
-    });
+  // Load Groups/Drivers in background (non-blocking)
+  try{
+    api.call("Get",{typeName:"Group"},function(gs){
+      const validGroups=(gs||[]).filter(g=>g.id&&!["GroupCompanyId","GroupEverythingId","GroupNothingId"].includes(g.id)&&!g.id.startsWith("Group"));
+      const sel=document.getElementById("f-grp");
+      validGroups.sort((a,b)=>(a.name||"").localeCompare(b.name||"")).forEach(g=>{
+        sel.innerHTML+=`<option value="${g.id}">${g.name||g.id}</option>`;
+      });
+    },function(){});
     api.call("Get",{typeName:"User",search:{isActive:true}},function(us){
       DRIVERS=(us||[]).filter(u=>!u.isSystemUser);
       popDrv("all");
-      setGeo("ok","dynasty_communications");
-      loadData();
-    },function(){setGeo("ok","Connected");loadData();});
-  },function(){
-    clearTimeout(geoTimer);
-    setGeo("ok","Connected");
-    loadData();
-  });
+    },function(){});
+  }catch(e){ console.warn("Background api calls failed:",e); }
 }
 
 function onGrpChange(){
@@ -228,8 +219,22 @@ async function loadData(){
 
   // ── MODE 1: MyGeotab API direct (no CORS/CSP issues) ──
   if(GEO_API){
+    let addInDone = false;
+    // ★ Timeout: if AddInData call hangs > 8s, fall back to fetch
+    const addInTimer = setTimeout(function(){
+      if(!addInDone){
+        addInDone = true;
+        console.warn("AddInData timeout — falling back to fetch");
+        GEO_API = null; // disable api mode
+        loadData();     // retry in fetch mode
+      }
+    }, 8000);
+
     GEO_API.call("Get",{typeName:"AddInData",search:{addInId:"aVentureTrlrDelivForms01"}},
       function(rows){
+        if(addInDone) return;
+        addInDone = true;
+        clearTimeout(addInTimer);
         let parsed=(rows||[]).map(r=>{
           try{ return typeof r.details==="string"?JSON.parse(r.details):r.details; }
           catch(e){ return null; }
@@ -243,8 +248,13 @@ async function loadData(){
         ALL=parsed; applyLocal();
       },
       function(err){
+        if(addInDone) return;
+        addInDone = true;
+        clearTimeout(addInTimer);
         console.error("AddInData error:",err);
-        showErr("Unable to load data. Please try again later.");
+        // fallback to fetch on error
+        GEO_API = null;
+        loadData();
       }
     );
     return;
