@@ -160,21 +160,35 @@ tbody td{padding:7px 9px;vertical-align:middle}
 // ★ CONFIG
 const API_URL = "https://script.google.com/macros/s/AKfycbz47-vTLl6L00t4bBNzeWu0hf85RdZWQEBJLfk-ferQ3KAdXWk_yfWtpNgml4-I1382-w/exec";
 
-let ALL=[], FILT=[], DRIVERS=[], SK="date", SD=-1, PG=1;
+let ALL=[], FILT=[], DRIVERS=[], SK="date", SD=-1, PG=1, GEO_API=null;
 const PP=25;
 
 function setGeo(s,t){
   document.getElementById("geo-txt").innerHTML=`<span class="geo-dot ${s}" style="width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px;background:${s==='ok'?'#22c55e':s==='loading'?'#f59e0b':'#94a3b8'}"></span>${t}`;
 }
 
+
 function initGeo(){
   setGeo("loading","Connecting...");
+
+  // ★ Timeout fallback: if api.call hangs > 5s, go to fetch mode
+  const geoTimer = setTimeout(function(){
+    console.warn("MyGeotab api timeout — switching to fetch mode");
+    setGeo("ok","Connected");
+    loadData();
+  }, 5000);
+
   if(typeof api==="undefined"){
+    clearTimeout(geoTimer);
     setGeo("ok","Dev Mode");
     loadData();
     return;
   }
+
+  GEO_API = api; // save for loadData to use
+
   api.call("Get",{typeName:"Group"},function(gs){
+    clearTimeout(geoTimer);
     const validGroups=(gs||[]).filter(g=>g.id&&!["GroupCompanyId","GroupEverythingId","GroupNothingId"].includes(g.id)&&!g.id.startsWith("Group"));
     const sel=document.getElementById("f-grp");
     validGroups.sort((a,b)=>(a.name||"").localeCompare(b.name||"")).forEach(g=>{
@@ -186,7 +200,11 @@ function initGeo(){
       setGeo("ok","dynasty_communications");
       loadData();
     },function(){setGeo("ok","Connected");loadData();});
-  },function(){setGeo("ok","Connected");loadData();});
+  },function(){
+    clearTimeout(geoTimer);
+    setGeo("ok","Connected");
+    loadData();
+  });
 }
 
 function onGrpChange(){
@@ -202,34 +220,52 @@ function popDrv(gid){
   });
 }
 
-// ★ Fixed fetch with redirect:follow
+// ★ Dual-mode: api.call (MyGeotab) OR fetch (dev/standalone)
 async function loadData(){
   showLoad();
   hideErr();
   const f=getF();
+
+  // ── MODE 1: MyGeotab API direct (no CORS/CSP issues) ──
+  if(GEO_API){
+    GEO_API.call("Get",{typeName:"AddInData",search:{addInId:"aVentureTrlrDelivForms01"}},
+      function(rows){
+        let parsed=(rows||[]).map(r=>{
+          try{ return typeof r.details==="string"?JSON.parse(r.details):r.details; }
+          catch(e){ return null; }
+        }).filter(Boolean);
+        // client-side filters
+        if(f.fromDate) parsed=parsed.filter(r=>r.date&&r.date>=f.fromDate);
+        if(f.toDate)   parsed=parsed.filter(r=>r.date&&r.date<=f.toDate);
+        if(f.driverId&&f.driverId!=="all") parsed=parsed.filter(r=>r.driverId===f.driverId||r.driver===f.driverId);
+        if(f.formType&&f.formType!=="all") parsed=parsed.filter(r=>r.formType===f.formType);
+        if(f.status&&f.status!=="all")     parsed=parsed.filter(r=>r.status===f.status);
+        ALL=parsed; applyLocal();
+      },
+      function(err){
+        console.error("AddInData error:",err);
+        showErr("Unable to load data. Please try again later.");
+      }
+    );
+    return;
+  }
+
+  // ── MODE 2: Dev/standalone — fetch from Apps Script ──
   const params=new URLSearchParams({action:"reports"});
   if(f.fromDate) params.set("fromDate",f.fromDate);
   if(f.toDate)   params.set("toDate",f.toDate);
-  if(f.groupId  && f.groupId!=="all")  params.set("groupId",f.groupId);
-  if(f.driverId && f.driverId!=="all") params.set("driverId",f.driverId);
-  if(f.formType && f.formType!=="all") params.set("formType",f.formType);
-  if(f.status   && f.status!=="all")   params.set("status",f.status);
-
+  if(f.groupId&&f.groupId!=="all")   params.set("groupId",f.groupId);
+  if(f.driverId&&f.driverId!=="all") params.set("driverId",f.driverId);
+  if(f.formType&&f.formType!=="all") params.set("formType",f.formType);
+  if(f.status&&f.status!=="all")     params.set("status",f.status);
   try{
-    const resp = await fetch(API_URL+"?"+params.toString(), {
-      method: "GET",
-      redirect: "follow",
-    });
+    const resp=await fetch(API_URL+"?"+params.toString(),{method:"GET",redirect:"follow"});
     if(!resp.ok) throw new Error("HTTP "+resp.status);
-    const result = await resp.json();
-    if(result.success){
-      ALL = result.data || [];
-      applyLocal();
-    } else {
-      showErr("Unable to load data. Please try again later.");
-    }
-  } catch(e){
-    showErr("Unable to load data. Please check your internet connection and try again.");
+    const result=await resp.json();
+    if(result.success){ ALL=result.data||[]; applyLocal(); }
+    else showErr("Unable to load data. Please try again later.");
+  }catch(e){
+    showErr("Unable to load data. Please check your connection and try again.");
     console.error(e);
   }
 }
