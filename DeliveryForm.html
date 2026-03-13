@@ -277,31 +277,58 @@ tbody td.tc{text-align:center}
 </div><!-- /card -->
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbz47-vTLl6L00t4bBNzeWu0hf85RdZWQEBJLfk-ferQ3KAdXWk_yfWtpNgml4-I1382-w/exec";
+// ============================================================
+// VENTURE TRAILERS — DeliveryForm.html
+// Submit via api.call("Add", AddInData) — no fetch, no CORS
+// ============================================================
+const ADDIN_ID = "aVentureTrlrDelivForms01";
 const PARTS = ["Tail Light-R","Tail Light-L","Tail Light-Lens","Marker Light","Tag Bracket","Tongue Jack","Winch Stand","Rollers","Bunks","Fenders","Tires","Actuator","Frame Rails","Tongue"];
 let bklt="", SS={};
 const DRV={name:"",userId:"",email:"",groupId:"",groupName:"",groups:[],vehicleId:"",vehicleName:"",plate:""};
+let _api = null;
 
-// ★ Driver load from Geotab
-function loadDriver(){
-  if(typeof api==="undefined"){return;}
-  api.getSession(function(sess){
-    if(!sess)return;
-    api.call("Get",{typeName:"User",search:{userName:sess.userName}},function(us){
-      if(!us||!us.length)return;
-      const u=us[0];
-      const info={name:((u.firstName||"")+" "+(u.lastName||"")).trim(),userId:u.id||"",email:u.name||sess.userName,groups:(u.companyGroups||[]).map(g=>g.id),groupId:(u.companyGroups&&u.companyGroups[0])?u.companyGroups[0].id:"",vehicleId:"",vehicleName:"",plate:""};
-      if(info.groupId){
-        api.call("Get",{typeName:"Group",search:{id:info.groupId}},function(gs){
-          info.groupName=(gs&&gs[0])?gs[0].name||"":"";
-          api.call("Get",{typeName:"DeviceStatusInfo",search:{userSearch:{name:sess.userName}}},function(dsi){
-            if(dsi&&dsi[0]&&dsi[0].device){info.vehicleId=dsi[0].device.id||"";info.vehicleName=dsi[0].device.name||"";info.plate=dsi[0].device.licensePlate||"";}
-            setDrv(info);
-          },function(){setDrv(info);});
-        },function(){setDrv(info);});
-      } else {setDrv(info);}
-    },function(e){console.error("Driver load error:",e);});
-  });
+// ── Geotab Add-In Entry Point ──────────────────────────────
+// MyGeotab injects api via initialize() — this is the ONLY correct way
+if (typeof geotab !== "undefined") {
+  geotab.addin.ventureDelivery = function() {
+    return {
+      initialize: function(api, state, callback) {
+        _api = api;
+        api.getSession(function(sess) {
+          if(!sess){ callback(); return; }
+          api.call("Get",{typeName:"User",search:{userName:sess.userName}},function(us){
+            if(!us||!us.length){ callback(); return; }
+            const u = us[0];
+            const info = {
+              name: ((u.firstName||"")+" "+(u.lastName||"")).trim(),
+              userId: u.id||"",
+              email: u.name||sess.userName,
+              groups: (u.companyGroups||[]).map(g=>g.id),
+              groupId: (u.companyGroups&&u.companyGroups[0])?u.companyGroups[0].id:"",
+              vehicleId:"", vehicleName:"", plate:""
+            };
+            if(info.groupId){
+              api.call("Get",{typeName:"Group",search:{id:info.groupId}},function(gs){
+                info.groupName=(gs&&gs[0])?gs[0].name||"":"";
+                api.call("Get",{typeName:"DeviceStatusInfo",search:{userSearch:{name:sess.userName}}},function(dsi){
+                  if(dsi&&dsi[0]&&dsi[0].device){
+                    info.vehicleId=dsi[0].device.id||"";
+                    info.vehicleName=dsi[0].device.name||"";
+                    info.plate=dsi[0].device.licensePlate||"";
+                  }
+                  setDrv(info); callback();
+                },function(){setDrv(info);callback();});
+              },function(){setDrv(info);callback();});
+            } else { setDrv(info); callback(); }
+          },function(e){console.error("Driver load error:",e);callback();});
+        });
+      },
+      focus: function(api, state) { _api = api; },
+      blur:  function(api, state) {}
+    };
+  };
+} else {
+  window._devMode = true;
 }
 
 function setDrv(info){
@@ -329,7 +356,8 @@ window.onload=function(){
   buildPT();addIR();addIR();
   for(let i=0;i<10;i++)addLR();
   ["sig-driver","sig-consignee","sig-lpd","sig-lpr"].forEach(initSig);
-  loadDriver();
+  // ✅ Driver loaded via geotab.addin.ventureDelivery initialize() lifecycle
+  // Dev mode: no driver info available
 };
 
 // ★ Tab switch
@@ -438,9 +466,24 @@ function collectD(){
   };
 }
 
-async function submitToAPI(data){
-  const resp=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
-  return await resp.json();
+function submitToAPI(data){
+  // ✅ api.call("Add", AddInData) — runs on my.geotab.com domain, no CORS/CSP issues
+  return new Promise(function(resolve, reject){
+    if(!_api){
+      // Dev mode fallback — can't submit without api
+      reject(new Error("Not connected to MyGeotab. Please open this form from Geotab Drive."));
+      return;
+    }
+    _api.call("Add",
+      { typeName:"AddInData", entity:{ addInId: ADDIN_ID, details: data } },
+      function(id){
+        resolve({ success:true, recordId: id });
+      },
+      function(err){
+        reject(new Error(err.message||JSON.stringify(err)));
+      }
+    );
+  });
 }
 
 async function subDelivery(){
