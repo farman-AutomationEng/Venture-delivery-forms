@@ -5,90 +5,64 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Venture Delivery Reports</title>
 <style>
-:root{--blue:#1e3a8a;--blue2:#2563eb;--green:#16a34a;--red:#dc2626;--gray:#64748b;--border:#e2e8f0;--bg:#f0f4f8}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);min-height:100vh;color:#1e293b;font-size:13px}
-
-/* ★ API URL */
-/* const API_URL = ... neeche script mein hai */
-
-.hdr{background:linear-gradient(135deg,var(--blue),var(--blue2));padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
-.hdr h1{color:white;font-size:15px;font-weight:900}
-.hdr p{color:#93c5fd;font-size:10px;letter-spacing:1px;margin-top:2px}
-.geo-dot{width:8px;height:8px;border-radius:50%;background:#94a3b8;display:inline-block;margin-right:5px}
-.geo-dot.ok{background:#22c55e;box-shadow:0 0 6px rgba(34,197,94,.5)}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f4f8;min-height:100vh;color:#1e293b;font-size:13px}
+.hdr{background:#1e3a8a;padding:11px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.hdr h1{color:white;font-size:14px;font-weight:900}
+.hdr p{color:#93c5fd;font-size:10px;letter-spacing:1px;margin-top:1px}
+.geo-dot{width:8px;height:8px;border-radius:50%;background:#94a3b8;display:inline-block;margin-right:4px}
+.geo-dot.ok{background:#22c55e}
 .geo-dot.loading{background:#f59e0b;animation:pulse .8s ease-in-out infinite alternate}
 @keyframes pulse{from{opacity:.4}to{opacity:1}}
-
-/* KPI */
-.kpis{display:flex;gap:10px;padding:12px 16px;flex-wrap:wrap;background:white;border-bottom:1px solid var(--border)}
-.kpi{flex:1;min-width:110px;background:#f8fafc;border-radius:10px;padding:10px 14px;border-left:3px solid var(--blue2)}
-.kpi.g{border-left-color:var(--green)}.kpi.r{border-left-color:var(--red)}.kpi.y{border-left-color:#f59e0b}
-.kv{font-size:20px;font-weight:900;color:#1e293b;line-height:1}
-.kl{font-size:10px;color:var(--gray);margin-top:3px;font-weight:600}
-
-/* Filters */
-.filters{background:white;padding:10px 16px;display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;border-bottom:1px solid var(--border)}
+.kpis{display:flex;gap:8px;padding:10px 14px;flex-wrap:wrap;background:white;border-bottom:1px solid #e2e8f0}
+.kpi{flex:1;min-width:100px;background:#f8fafc;border-radius:8px;padding:8px 12px;border-left:3px solid #2563eb}
+.kpi.g{border-left-color:#16a34a}.kpi.r{border-left-color:#dc2626}.kpi.y{border-left-color:#f59e0b}
+.kv{font-size:18px;font-weight:900;color:#1e293b;line-height:1}
+.kl{font-size:10px;color:#64748b;margin-top:2px;font-weight:600}
+.filters{background:white;padding:9px 14px;display:flex;flex-wrap:wrap;gap:7px;align-items:flex-end;border-bottom:1px solid #e2e8f0}
 .ff{display:flex;flex-direction:column;gap:3px}
-.ff label{font-size:9px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.6px}
-.ff input,.ff select{padding:6px 9px;border:1.5px solid var(--border);border-radius:7px;font-size:12px;font-family:inherit;color:#1e293b;background:white;outline:none}
-.ff input:focus,.ff select:focus{border-color:var(--blue2)}
-.btn{padding:7px 14px;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
-.bp{background:var(--blue2);color:white}.bp:hover{background:#1d4ed8}
-.bg{background:#f1f5f9;color:var(--gray);border:1.5px solid var(--border)}.bg:hover{background:var(--border)}
-.bn{background:var(--green);color:white}
-
-/* Table */
-.tbl-wrap{background:white;margin:12px 16px;border-radius:10px;border:1px solid var(--border);overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06)}
-.tbl-head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:6px}
-.tbl-head h2{font-size:13px;font-weight:800}
+.ff label{font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px}
+.ff input,.ff select{padding:6px 8px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;font-family:inherit;color:#1e293b;background:white;outline:none;-webkit-appearance:none}
+.ff input:focus,.ff select:focus{border-color:#2563eb}
+.btn{padding:6px 12px;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.bp{background:#2563eb;color:white}.bg2{background:#f1f5f9;color:#64748b;border:1.5px solid #e2e8f0}.bn{background:#16a34a;color:white}
+.tbl-wrap{background:white;margin:10px 14px;border-radius:8px;border:1px solid #e2e8f0;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.tbl-head{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-bottom:1px solid #e2e8f0;flex-wrap:wrap;gap:5px}
+.tbl-head h2{font-size:12px;font-weight:800}
 .tbl-scroll{overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:700px}
-thead tr{background:var(--blue)}
-thead th{padding:9px 10px;text-align:left;color:white;font-size:11px;font-weight:700;white-space:nowrap;cursor:pointer;user-select:none}
+table{width:100%;border-collapse:collapse;min-width:650px}
+thead tr{background:#1e3a8a}
+thead th{padding:8px 9px;text-align:left;color:white;font-size:10px;font-weight:700;white-space:nowrap;cursor:pointer;user-select:none}
 thead th:hover{background:#1e40af}
 tbody tr{border-bottom:1px solid #f1f5f9;cursor:pointer;transition:background .1s}
 tbody tr:hover{background:#eff6ff}
 tbody tr.dmg{background:#fff7ed}
-tbody tr.dmg:hover{background:#ffedd5}
-tbody td{padding:8px 10px;vertical-align:middle}
-.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap}
+tbody td{padding:7px 9px;vertical-align:middle}
+.badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:8px;font-size:10px;font-weight:700}
 .bg-green{background:#dcfce7;color:#15803d}.bg-blue{background:#dbeafe;color:#1d4ed8}
-.bg-red{background:#fee2e2;color:#dc2626}.bg-yellow{background:#fef9c3;color:#a16207}
-.bg-gray{background:#f1f5f9;color:#475569}
-.drv-name{font-weight:700;color:#1e293b;font-size:12px}
-.drv-grp{font-size:10px;color:var(--blue2);font-weight:600;margin-top:1px}
-
-/* Empty/Loading */
-.empty{display:flex;flex-direction:column;align-items:center;padding:40px 20px;color:var(--gray)}
-.sp{border:3px solid var(--border);border-top:3px solid var(--blue2);border-radius:50%;width:28px;height:28px;animation:spin .7s linear infinite;margin-bottom:10px}
+.bg-red{background:#fee2e2;color:#dc2626}.bg-yellow{background:#fef9c3;color:#a16207}.bg-gray{background:#f1f5f9;color:#475569}
+.drv-name{font-weight:700;font-size:12px}.drv-grp{font-size:10px;color:#2563eb;font-weight:600;margin-top:1px}
+.empty{display:flex;flex-direction:column;align-items:center;padding:36px 16px;color:#64748b}
+.sp{border:3px solid #e2e8f0;border-top:3px solid #2563eb;border-radius:50%;width:26px;height:26px;animation:spin .7s linear infinite;margin-bottom:8px}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-/* Detail panel */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:none}
-.panel{position:fixed;right:0;top:0;bottom:0;width:380px;max-width:95vw;background:white;box-shadow:-6px 0 24px rgba(0,0,0,.15);overflow-y:auto;z-index:201;display:none;animation:slidein .2s}
+.panel{position:fixed;right:0;top:0;bottom:0;width:360px;max-width:95vw;background:white;box-shadow:-4px 0 20px rgba(0,0,0,.15);overflow-y:auto;z-index:201;display:none;animation:slidein .2s}
 @keyframes slidein{from{transform:translateX(100%)}to{transform:translateX(0)}}
-.ph{background:linear-gradient(135deg,var(--blue),var(--blue2));padding:16px 18px;position:sticky;top:0;z-index:10}
-.ph h3{color:white;font-size:14px;font-weight:800}.ph p{color:#93c5fd;font-size:11px;margin-top:2px}
-.pcl{position:absolute;right:14px;top:14px;background:rgba(255,255,255,.2);border:none;color:white;font-size:16px;cursor:pointer;border-radius:5px;width:28px;height:28px;display:flex;align-items:center;justify-content:center}
-.pb{padding:16px}
-.psec{margin-bottom:14px}
-.psec h4{font-size:10px;font-weight:800;color:var(--gray);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;padding-bottom:5px;border-bottom:1px solid var(--border)}
+.ph{background:#1e3a8a;padding:14px 16px;position:sticky;top:0;z-index:10}
+.ph h3{color:white;font-size:13px;font-weight:800}.ph p{color:#93c5fd;font-size:10px;margin-top:2px}
+.pcl{position:absolute;right:12px;top:12px;background:rgba(255,255,255,.2);border:none;color:white;font-size:15px;cursor:pointer;border-radius:4px;width:26px;height:26px;display:flex;align-items:center;justify-content:center}
+.pb{padding:14px}
+.psec{margin-bottom:12px}
+.psec h4{font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px;padding-bottom:4px;border-bottom:1px solid #e2e8f0}
 .pr{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #f8fafc}
-.pr .l{color:var(--gray);font-size:11px}.pr .v{font-weight:700;font-size:11px;color:#1e293b;text-align:right}
-.dcard{background:linear-gradient(135deg,#eff6ff,#dbeafe);border-radius:8px;padding:10px 12px;margin-bottom:12px;border:1px solid #bfdbfe}
-.dcard .dn{font-size:14px;font-weight:900;color:var(--blue)}
-.dcard .dm{font-size:11px;color:#2563eb;margin-top:2px}
-.dcard .dg{display:inline-block;background:var(--blue2);color:white;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;margin-top:5px}
-
-/* Pagination */
-.pag{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#f8fafc;border-top:1px solid var(--border);font-size:11px;color:var(--gray);flex-wrap:wrap;gap:6px}
-.pbtns{display:flex;gap:3px}
-.pb2{padding:3px 9px;border:1.5px solid var(--border);border-radius:5px;background:white;font-size:11px;cursor:pointer;font-weight:600;color:var(--gray)}
-.pb2.active{background:var(--blue2);border-color:var(--blue2);color:white}
+.pr .l{color:#64748b;font-size:11px}.pr .v{font-weight:700;font-size:11px;color:#1e293b;text-align:right;max-width:200px;word-break:break-word}
+.dcard{background:#eff6ff;border-radius:7px;padding:9px 11px;margin-bottom:10px;border:1px solid #bfdbfe}
+.pag{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;background:#f8fafc;border-top:1px solid #e2e8f0;font-size:11px;color:#64748b;flex-wrap:wrap;gap:5px}
+.pbtns{display:flex;gap:2px}
+.pb2{padding:3px 8px;border:1.5px solid #e2e8f0;border-radius:4px;background:white;font-size:11px;cursor:pointer;font-weight:600;color:#64748b}
+.pb2.active{background:#2563eb;border-color:#2563eb;color:white}
 .pb2:disabled{opacity:.4;cursor:not-allowed}
-
-.toast{position:fixed;bottom:20px;right:20px;background:#1e293b;color:white;padding:9px 16px;border-radius:8px;font-size:12px;font-weight:600;box-shadow:0 6px 20px rgba(0,0,0,.2);z-index:300;display:none}
+.err-box{background:#fff1f2;border:1px solid #fda4af;border-radius:8px;padding:12px 14px;margin:10px 14px;font-size:12px;color:#9f1239;display:none}
 </style>
 </head>
 <body>
@@ -96,15 +70,11 @@ tbody td{padding:8px 10px;vertical-align:middle}
 <div class="hdr">
   <div>
     <h1>📊 Venture Delivery Reports</h1>
-    <p id="geo-txt"><span class="geo-dot loading" id="geo-dot"></span>Connecting...</p>
+    <p id="geo-txt"><span class="geo-dot loading"></span>Connecting...</p>
   </div>
-  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-    <span style="background:rgba(255,255,255,.15);color:white;font-size:10px;font-weight:700;padding:3px 9px;border-radius:15px" id="dbadge"></span>
-    <button class="btn bp" style="font-size:11px;padding:5px 12px" onclick="openForm()">+ New Form</button>
-  </div>
+  <span style="background:rgba(255,255,255,.15);color:white;font-size:10px;font-weight:700;padding:3px 8px;border-radius:12px" id="dbadge"></span>
 </div>
 
-<!-- KPI -->
 <div class="kpis">
   <div class="kpi"><div class="kv" id="k1">—</div><div class="kl">Total Deliveries</div></div>
   <div class="kpi g"><div class="kv" id="k2">—</div><div class="kl">Total COD</div></div>
@@ -112,22 +82,20 @@ tbody td{padding:8px 10px;vertical-align:middle}
   <div class="kpi y"><div class="kv" id="k4">—</div><div class="kl">Drivers</div></div>
 </div>
 
-<!-- Filters -->
+<div class="err-box" id="errbox"></div>
+
 <div class="filters">
   <div class="ff"><label>From</label><input type="date" id="f-from"></div>
   <div class="ff"><label>To</label><input type="date" id="f-to"></div>
-  <div class="ff">
-    <label>Group <span style="color:#22c55e">⚡</span></label>
+  <div class="ff"><label>Group</label>
     <select id="f-grp" onchange="onGrpChange()">
       <option value="all">All Groups</option>
     </select>
   </div>
-  <div class="ff">
-    <label>Driver <span style="color:#22c55e">⚡</span></label>
+  <div class="ff"><label>Driver</label>
     <select id="f-drv"><option value="all">All Drivers</option></select>
   </div>
-  <div class="ff">
-    <label>Type</label>
+  <div class="ff"><label>Type</label>
     <select id="f-type">
       <option value="all">All Types</option>
       <option value="delivery_sheet">📋 Delivery</option>
@@ -135,34 +103,32 @@ tbody td{padding:8px 10px;vertical-align:middle}
       <option value="loose_parts">🔩 Parts</option>
     </select>
   </div>
-  <div class="ff">
-    <label>Status</label>
+  <div class="ff"><label>Status</label>
     <select id="f-sta">
       <option value="all">All Status</option>
       <option value="Submitted">Submitted</option>
       <option value="Signed">Signed</option>
     </select>
   </div>
-  <div class="ff"><label>Invoice #</label><input id="f-inv" placeholder="132993" style="width:90px"></div>
-  <div style="display:flex;gap:6px;align-items:flex-end">
+  <div class="ff"><label>Invoice #</label><input id="f-inv" placeholder="132993" style="width:85px"></div>
+  <div style="display:flex;gap:5px;align-items:flex-end">
     <button class="btn bp" onclick="loadData()">🔍 Search</button>
-    <button class="btn bg" onclick="resetF()">↺</button>
+    <button class="btn bg2" onclick="resetF()">↺</button>
     <button class="btn bn" onclick="exportCSV()">⬇ CSV</button>
   </div>
 </div>
 
-<!-- Table -->
 <div class="tbl-wrap">
   <div class="tbl-head">
-    <h2>Delivery Records <span id="rcnt" style="font-weight:400;color:var(--gray)"></span></h2>
-    <button class="btn bg" style="font-size:11px" onclick="loadData()">↺ Refresh</button>
+    <h2>Delivery Records <span id="rcnt" style="font-weight:400;color:#64748b"></span></h2>
+    <button class="btn bg2" style="font-size:11px" onclick="loadData()">↺ Refresh</button>
   </div>
   <div class="tbl-scroll">
     <table>
       <thead><tr>
         <th onclick="srt('date')">Date ↕</th>
         <th onclick="srt('invoiceNo')">Invoice # ↕</th>
-        <th onclick="srt('formType')">Type</th>
+        <th>Type</th>
         <th onclick="srt('driverName')">Driver ↕</th>
         <th onclick="srt('dealer')">Dealer ↕</th>
         <th onclick="srt('codAmount')">COD ↕</th>
@@ -180,7 +146,6 @@ tbody td{padding:8px 10px;vertical-align:middle}
   </div>
 </div>
 
-<!-- Detail Panel -->
 <div class="overlay" id="ov" onclick="closeP()"></div>
 <div class="panel" id="panel">
   <div class="ph">
@@ -190,117 +155,107 @@ tbody td{padding:8px 10px;vertical-align:middle}
   <div class="pb" id="pbody"></div>
 </div>
 
-<div class="toast" id="toast"></div>
-
 <script>
-// ★ APPS SCRIPT URL
+// ★ CONFIG
 const API_URL = "https://script.google.com/macros/s/AKfycbz47-vTLl6L00t4bBNzeWu0hf85RdZWQEBJLfk-ferQ3KAdXWk_yfWtpNgml4-I1382-w/exec";
-const FORM_URL = "https://farman-automationeng.github.io/Venture-delivery-forms/DeliveryForm.html";
 
-let ALL=[], FILT=[], GROUPS=[], DRIVERS=[], SK="date", SD=-1, PG=1;
+let ALL=[], FILT=[], DRIVERS=[], SK="date", SD=-1, PG=1;
 const PP=25;
 
-// ★ MyGeotab api se groups+drivers load
+function setGeo(s,t){
+  document.getElementById("geo-txt").innerHTML=`<span class="geo-dot ${s}" style="width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px;background:${s==='ok'?'#22c55e':s==='loading'?'#f59e0b':'#94a3b8'}"></span>${t}`;
+}
+
 function initGeo(){
   setGeo("loading","Connecting...");
   if(typeof api==="undefined"){
     setGeo("ok","Dev Mode");
-    setMockGeoData();
     loadData();
     return;
   }
   api.call("Get",{typeName:"Group"},function(gs){
-    GROUPS=(gs||[]).filter(g=>g.id&&!g.id.startsWith("Group")||["GroupCompanyId"].includes(g.id)?false:true);
-    // Actually keep non-system groups
-    GROUPS=(gs||[]).filter(g=>g.id&&g.id!=="GroupCompanyId"&&g.id!=="GroupEverythingId"&&g.id!=="GroupNothingId"&&!g.id.startsWith("Group"));
-    const gs2=document.getElementById("f-grp");
-    GROUPS.sort((a,b)=>(a.name||"").localeCompare(b.name||"")).forEach(g=>{
-      gs2.innerHTML+=`<option value="${g.id}">${g.name||g.id}</option>`;
+    const validGroups=(gs||[]).filter(g=>g.id&&!["GroupCompanyId","GroupEverythingId","GroupNothingId"].includes(g.id)&&!g.id.startsWith("Group"));
+    const sel=document.getElementById("f-grp");
+    validGroups.sort((a,b)=>(a.name||"").localeCompare(b.name||"")).forEach(g=>{
+      sel.innerHTML+=`<option value="${g.id}">${g.name||g.id}</option>`;
     });
     api.call("Get",{typeName:"User",search:{isActive:true}},function(us){
       DRIVERS=(us||[]).filter(u=>!u.isSystemUser);
       popDrv("all");
       setGeo("ok","dynasty_communications");
       loadData();
-    },function(){setGeo("ok","dynasty_communications");loadData();});
+    },function(){setGeo("ok","Connected");loadData();});
   },function(){setGeo("ok","Connected");loadData();});
 }
 
-function setGeo(s,t){
-  document.getElementById("geo-dot").className="geo-dot "+s;
-  document.getElementById("geo-txt").innerHTML=`<span class="geo-dot ${s}" id="geo-dot"></span>${t}`;
-}
-
 function onGrpChange(){
-  const gid=document.getElementById("f-grp").value;
-  popDrv(gid);
+  popDrv(document.getElementById("f-grp").value);
 }
-
 function popDrv(gid){
   const sel=document.getElementById("f-drv");
   sel.innerHTML='<option value="all">All Drivers</option>';
-  let drv=DRIVERS;
-  if(gid!=="all") drv=DRIVERS.filter(u=>(u.companyGroups||[]).some(g=>g.id===gid));
+  let drv=gid==="all"?DRIVERS:DRIVERS.filter(u=>(u.companyGroups||[]).some(g=>g.id===gid));
   drv.sort((a,b)=>((a.firstName||"")+" "+(a.lastName||"")).localeCompare((b.firstName||"")+" "+(b.lastName||""))).forEach(u=>{
     const nm=((u.firstName||"")+" "+(u.lastName||"")).trim()||u.name||u.id;
     sel.innerHTML+=`<option value="${u.id}">${nm}</option>`;
   });
 }
 
-function setMockGeoData(){
-  GROUPS=[{id:"b9999",name:"Baltimore Fleet"},{id:"b8888",name:"Virginia Fleet"}];
-  DRIVERS=[{id:"b1111",firstName:"Marcus",lastName:"Thompson",companyGroups:[{id:"b9999"}]},{id:"b2222",firstName:"James",lastName:"Davis",companyGroups:[{id:"b9999"}]}];
-  const gs=document.getElementById("f-grp");
-  GROUPS.forEach(g=>gs.innerHTML+=`<option value="${g.id}">${g.name}</option>`);
-  popDrv("all");
-}
-
-// ★ Fetch data from Apps Script via GET
+// ★ Fixed fetch with redirect:follow
 async function loadData(){
   showLoad();
+  hideErr();
   const f=getF();
-  const params=new URLSearchParams({action:"reports",...Object.fromEntries(Object.entries(f).filter(([k,v])=>v&&v!=="all"))});
+  const params=new URLSearchParams({action:"reports"});
+  if(f.fromDate) params.set("fromDate",f.fromDate);
+  if(f.toDate)   params.set("toDate",f.toDate);
+  if(f.groupId  && f.groupId!=="all")  params.set("groupId",f.groupId);
+  if(f.driverId && f.driverId!=="all") params.set("driverId",f.driverId);
+  if(f.formType && f.formType!=="all") params.set("formType",f.formType);
+  if(f.status   && f.status!=="all")   params.set("status",f.status);
+
   try{
-    const resp=await fetch(API_URL+"?"+params);
-    const result=await resp.json();
+    const resp = await fetch(API_URL+"?"+params.toString(), {
+      method: "GET",
+      redirect: "follow",
+    });
+    if(!resp.ok) throw new Error("HTTP "+resp.status);
+    const result = await resp.json();
     if(result.success){
-      ALL=result.data||[];
+      ALL = result.data || [];
       applyLocal();
     } else {
-      showErr("API error: "+result.message);
+      showErr("Unable to load data. Please try again later.");
     }
-  }catch(e){
-    showErr("Network error — check API URL");
+  } catch(e){
+    showErr("Unable to load data. Please check your internet connection and try again.");
     console.error(e);
   }
 }
 
 function getF(){
   return{
-    fromDate:document.getElementById("f-from")?.value||"",
-    toDate:document.getElementById("f-to")?.value||"",
-    groupId:document.getElementById("f-grp")?.value||"all",
-    driverId:document.getElementById("f-drv")?.value||"all",
-    formType:document.getElementById("f-type")?.value||"all",
-    status:document.getElementById("f-sta")?.value||"all",
+    fromDate: document.getElementById("f-from")?.value||"",
+    toDate:   document.getElementById("f-to")?.value||"",
+    groupId:  document.getElementById("f-grp")?.value||"all",
+    driverId: document.getElementById("f-drv")?.value||"all",
+    formType: document.getElementById("f-type")?.value||"all",
+    status:   document.getElementById("f-sta")?.value||"all",
   };
 }
 
 function applyLocal(){
-  const invQ=(document.getElementById("f-inv")?.value||"").trim().toLowerCase();
-  FILT=ALL.filter(r=>!invQ||(r.invoiceNo||"").toLowerCase().includes(invQ));
+  const q=(document.getElementById("f-inv")?.value||"").trim().toLowerCase();
+  FILT=ALL.filter(r=>!q||(r.invoiceNo||"").toLowerCase().includes(q));
   sortR(); updateKPI(); PG=1; renderT();
 }
 
 function resetF(){
   const td=new Date().toISOString().split("T")[0];
-  const fm=new Date();fm.setDate(1);
+  const fm=new Date(); fm.setDate(1);
   document.getElementById("f-from").value=fm.toISOString().split("T")[0];
   document.getElementById("f-to").value=td;
-  document.getElementById("f-grp").value="all";
-  document.getElementById("f-drv").value="all";
-  document.getElementById("f-type").value="all";
-  document.getElementById("f-sta").value="all";
+  ["f-grp","f-drv","f-type","f-sta"].forEach(id=>document.getElementById(id).value="all");
   document.getElementById("f-inv").value="";
   popDrv("all");
   loadData();
@@ -316,27 +271,30 @@ function updateKPI(){
   document.getElementById("k1").textContent=FILT.length;
   document.getElementById("k2").textContent="$"+cod.toLocaleString("en-US",{maximumFractionDigits:0});
   document.getElementById("k3").textContent=dmg;
-  document.getElementById("k4").textContent=drvs;
+  document.getElementById("k4").textContent=drvs||"—";
 }
 
 function renderT(){
   const tb=document.getElementById("tbody");
-  document.getElementById("rcnt").textContent="("+FILT.length+" records)";
-  if(!FILT.length){tb.innerHTML=`<tr><td colspan="8"><div class="empty"><div style="font-size:32px;margin-bottom:8px">📭</div><div style="font-weight:700">No deliveries found</div><div style="font-size:11px;margin-top:4px">Adjust date range or filters</div></div></td></tr>`;renderPag();return;}
+  document.getElementById("rcnt").textContent="("+FILT.length+")";
+  if(!FILT.length){
+    tb.innerHTML=`<tr><td colspan="8"><div class="empty"><div style="font-size:28px;margin-bottom:6px">📭</div><div style="font-weight:700">No deliveries found</div></div></td></tr>`;
+    renderPag(); return;
+  }
   const sl=FILT.slice((PG-1)*PP,PG*PP);
   tb.innerHTML=sl.map(r=>{
     const dm=r.damaged||r.shortShipped;
     const iss=[r.damaged&&"⚠️ Dmg",r.shortShipped&&"📦 Short"].filter(Boolean).join(" ");
-    const tb2={delivery_sheet:'<span class="badge bg-blue">📋</span>',invoice:'<span class="badge bg-gray">🧾</span>',loose_parts:'<span class="badge bg-yellow">🔩</span>'}[r.formType]||r.formType||"—";
+    const tb2={delivery_sheet:'<span class="badge bg-blue">📋</span>',invoice:'<span class="badge bg-gray">🧾</span>',loose_parts:'<span class="badge bg-yellow">🔩</span>'}[r.formType]||"—";
     const sb={Submitted:'<span class="badge bg-blue">Submitted</span>',Signed:'<span class="badge bg-green">✅ Signed</span>',Pending:'<span class="badge bg-yellow">⏳ Pending</span>'}[r.status]||`<span class="badge bg-gray">${r.status||"—"}</span>`;
     return`<tr class="${dm?"dmg":""}" onclick="openD('${r.id}')">
       <td style="white-space:nowrap;font-weight:600">${r.date||"—"}</td>
-      <td style="font-weight:800;color:var(--blue2)">${r.invoiceNo||"—"}</td>
+      <td style="font-weight:800;color:#2563eb">${r.invoiceNo||"—"}</td>
       <td>${tb2}</td>
       <td><div class="drv-name">${r.driverName||"—"}</div><div class="drv-grp">${r.driverGroupName||""}</div></td>
       <td>${r.dealer||"—"}</td>
-      <td style="font-weight:700;color:var(--green)">$${(parseFloat(r.codAmount)||0).toFixed(2)}</td>
-      <td>${iss?`<span style="font-size:11px;color:var(--red);font-weight:700">${iss}</span>`:'<span style="color:#94a3b8">—</span>'}</td>
+      <td style="font-weight:700;color:#16a34a">$${(parseFloat(r.codAmount)||0).toFixed(2)}</td>
+      <td>${iss?`<span style="font-size:11px;color:#dc2626;font-weight:700">${iss}</span>`:'<span style="color:#94a3b8">—</span>'}</td>
       <td>${sb}</td>
     </tr>`;
   }).join("");
@@ -347,47 +305,45 @@ function renderPag(){
   const tot=FILT.length,pgs=Math.ceil(tot/PP);
   const s=Math.min((PG-1)*PP+1,tot),e=Math.min(PG*PP,tot);
   document.getElementById("pinfo").textContent=tot?`${s}–${e} of ${tot}`:"";
-  const pb=document.getElementById("pbtns");pb.innerHTML="";
+  const pb=document.getElementById("pbtns"); pb.innerHTML="";
   if(pgs<=1)return;
-  const mk=(lbl,pg,act,dis)=>{const b=document.createElement("button");b.className="pb2"+(act?" active":"");b.textContent=lbl;b.disabled=dis;if(!dis)b.onclick=()=>{PG=pg;renderT();};pb.appendChild(b);};
+  const mk=(l,p,act,dis)=>{const b=document.createElement("button");b.className="pb2"+(act?" active":"");b.textContent=l;b.disabled=dis;if(!dis)b.onclick=()=>{PG=p;renderT();};pb.appendChild(b);};
   mk("‹",PG-1,false,PG===1);
   for(let p=Math.max(1,PG-2);p<=Math.min(pgs,PG+2);p++)mk(p,p,p===PG,false);
   mk("›",PG+1,false,PG===pgs);
 }
 
 function openD(id){
-  const r=ALL.find(x=>x.id===id);if(!r)return;
+  const r=ALL.find(x=>x.id===id); if(!r)return;
   document.getElementById("ptitle").textContent="Invoice #"+(r.invoiceNo||"—");
   document.getElementById("psub").textContent=(r.formType||"")+" • "+(r.date||"");
   const parts=(r.parts||[]).filter(p=>p.part);
   document.getElementById("pbody").innerHTML=`
     <div class="dcard">
-      <div style="font-size:10px;font-weight:700;color:#1d4ed8;text-transform:uppercase;margin-bottom:6px">👤 Driver</div>
-      <div class="dn">${r.driverName||"Unknown"}</div>
-      <div class="dm">${r.driverEmail||""}</div>
-      <span class="dg">📍 ${r.driverGroupName||"No Group"}</span>
-      ${r.vehicleName?`<span class="dg" style="margin-left:5px">🚛 ${r.vehicleName}</span>`:""}
+      <div style="font-size:10px;font-weight:700;color:#1d4ed8;margin-bottom:5px">👤 DRIVER</div>
+      <div style="font-size:14px;font-weight:900;color:#1e3a8a">${r.driverName||"Unknown"}</div>
+      <div style="font-size:11px;color:#2563eb;margin-top:1px">${r.driverEmail||""}</div>
+      <span style="background:#1e3a8a;color:white;font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;margin-top:5px;display:inline-block">📍 ${r.driverGroupName||"No Group"}</span>
+      ${r.vehicleName?`<span style="background:#1e3a8a;color:white;font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;margin:5px 0 0 5px;display:inline-block">🚛 ${r.vehicleName}</span>`:""}
     </div>
     <div class="psec"><h4>📋 Delivery</h4>
       ${dr("Date",r.date)}${dr("Invoice #",r.invoiceNo)}${dr("Dealer",r.dealer)}
       ${dr("Contact",r.dealerContact)}${dr("Phone",r.dealerPhone)}
       ${dr("COD","$"+(parseFloat(r.codAmount)||0).toFixed(2))}
       ${dr("Payment",r.paymentType)}${dr("Booklets",r.booklets)}${dr("Status",r.status)}
-      ${dr("Damaged?",r.damaged?"⚠️ YES":"No")}${dr("Short Shipped?",r.shortShipped?"📦 YES":"No")}
+      ${dr("Damaged?",r.damaged?"⚠️ YES":"No")}${dr("Short?",r.shortShipped?"📦 YES":"No")}
       ${r.damagedParts&&r.damagedParts.length?dr("Damaged Parts",r.damagedParts.join(", ")):""}
     </div>
-    ${r.comments?`<div class="psec"><h4>💬 Comments</h4><div style="background:#f8fafc;border-radius:7px;padding:9px;font-size:12px">${r.comments}</div></div>`:""}
+    ${r.comments?`<div class="psec"><h4>💬 Comments</h4><div style="background:#f8fafc;border-radius:6px;padding:8px;font-size:12px">${r.comments}</div></div>`:""}
     ${parts.length?`<div class="psec"><h4>🔧 Parts (${parts.length})</h4>
       <table style="width:100%;border-collapse:collapse;font-size:11px">
-        <tr style="background:#f1f5f9"><th style="padding:5px 7px;text-align:left">Part</th><th>Model</th><th>Dmg</th><th>Short</th></tr>
-        ${parts.map(p=>`<tr style="border-bottom:1px solid #f8fafc;${(p.damaged||p.shortShipped)?"background:#fff7ed":""}"><td style="padding:4px 7px">${p.part}</td><td>${p.model||"—"}</td><td>${p.damaged?"⚠️":"—"}</td><td>${p.shortShipped?"📦":"—"}</td></tr>`).join("")}
+        <tr style="background:#f1f5f9"><th style="padding:4px 6px;text-align:left">Part</th><th>Model</th><th>Dmg</th><th>Short</th></tr>
+        ${parts.map(p=>`<tr style="border-bottom:1px solid #f8fafc;${(p.damaged||p.shortShipped)?"background:#fff7ed":""}"><td style="padding:3px 6px">${p.part}</td><td>${p.model||"—"}</td><td>${p.damaged?"⚠️":"—"}</td><td>${p.shortShipped?"📦":"—"}</td></tr>`).join("")}
       </table></div>`:""}
     <div class="psec"><h4>🔗 System</h4>
-      ${dr("MyGeotab ID","<span style='font-family:monospace;font-size:10px'>"+(r.id||"—")+"</span>",true)}
+      ${dr("MyGeotab ID",`<span style='font-family:monospace;font-size:10px'>${r.id||"—"}</span>`,true)}
       ${dr("Saved At",r.savedAt?new Date(r.savedAt).toLocaleString("en-US"):"")}
-    </div>
-    <button class="btn bn" style="width:100%;margin-top:8px" onclick="exportOne('${r.id}')">⬇ Export This Record</button>
-  `;
+    </div>`;
   document.getElementById("ov").style.display="block";
   document.getElementById("panel").style.display="block";
 }
@@ -395,22 +351,24 @@ function dr(l,v,raw=false){return`<div class="pr"><span class="l">${l}</span><sp
 function closeP(){document.getElementById("ov").style.display="none";document.getElementById("panel").style.display="none";}
 
 function exportCSV(){
-  if(!FILT.length){toast("No data!");return;}
-  const hdrs=["Date","Invoice #","Type","Driver","Driver Email","Group","Driver ID","Vehicle","Dealer","COD","Payment","Status","Damaged?","Short?","Damaged Parts","Comments","Saved At"];
-  const rows=FILT.map(r=>[r.date,r.invoiceNo,r.formType,r.driverName,r.driverEmail,r.driverGroupName,r.driverUserId,r.vehicleName,r.dealer,r.codAmount,r.paymentType,r.status,r.damaged?"YES":"No",r.shortShipped?"YES":"No",(r.damagedParts||[]).join("; "),r.comments,r.savedAt].map(v=>`"${(v||"").toString().replace(/"/g,'""')}"`));
-  const csv=[hdrs.join(","),...rows.map(r=>r.join(","))].join("\n");
+  if(!FILT.length){alert("No data!");return;}
+  const h=["Date","Invoice #","Type","Driver","Driver Email","Group","Vehicle","Dealer","COD","Payment","Status","Damaged?","Short?","Damaged Parts","Comments","Saved At"];
+  const rows=FILT.map(r=>[r.date,r.invoiceNo,r.formType,r.driverName,r.driverEmail,r.driverGroupName,r.vehicleName,r.dealer,r.codAmount,r.paymentType,r.status,r.damaged?"YES":"No",r.shortShipped?"YES":"No",(r.damagedParts||[]).join("; "),r.comments,r.savedAt].map(v=>`"${(v||"").toString().replace(/"/g,'""')}"`));
+  const csv=[h.join(","),...rows.map(r=>r.join(","))].join("\n");
   const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
   a.download="venture_"+new Date().toISOString().split("T")[0]+".csv";a.click();
-  toast("✅ "+FILT.length+" records exported");
 }
-function exportOne(id){const bk=FILT;FILT=[ALL.find(x=>x.id===id)].filter(Boolean);exportCSV();FILT=bk;}
-function openForm(){window.open(FORM_URL,"_blank");}
+
 function showLoad(){document.getElementById("tbody").innerHTML=`<tr><td colspan="8"><div class="empty"><div class="sp"></div><div>Loading from MyGeotab...</div></div></td></tr>`;}
-function showErr(m){document.getElementById("tbody").innerHTML=`<tr><td colspan="8"><div class="empty"><div style="font-size:28px;margin-bottom:8px">⚠️</div><div style="font-weight:700">${m}</div></div></td></tr>`;}
-function toast(m){const t=document.getElementById("toast");t.textContent=m;t.style.display="block";setTimeout(()=>t.style.display="none",2500);}
+function showErr(m){
+  document.getElementById("errbox").style.display="block";
+  document.getElementById("errbox").textContent="⚠️ "+m;
+  document.getElementById("tbody").innerHTML=`<tr><td colspan="8"><div class="empty"><div style="font-size:28px;margin-bottom:6px">⚠️</div><div style="font-weight:700">Error loading data</div></div></td></tr>`;
+}
+function hideErr(){document.getElementById("errbox").style.display="none";}
 
 window.onload=function(){
-  const td=new Date(),fm=new Date();fm.setDate(1);
+  const td=new Date(),fm=new Date(); fm.setDate(1);
   document.getElementById("f-from").value=fm.toISOString().split("T")[0];
   document.getElementById("f-to").value=td.toISOString().split("T")[0];
   document.getElementById("dbadge").textContent="📅 "+td.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
