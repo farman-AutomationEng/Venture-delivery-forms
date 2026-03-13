@@ -203,6 +203,8 @@ if (typeof geotab !== "undefined") {
         _api = api;
         api.getSession(function(sess) {
           if(!sess){ callback(); return; }
+          // 🔍 DEBUG — delete after testing
+          alert("Session userName: " + sess.userName + "\nDatabase: " + (sess.database||"?") + "\nServer: " + (sess.path||"?"));
           api.call("Get",{typeName:"User",search:{userName:sess.userName}},function(us){
             if(!us||!us.length){ callback(); return; }
             const u = us[0];
@@ -320,16 +322,73 @@ function initSig(id){
   const c=document.getElementById(id);if(!c)return;
   const ctx=c.getContext("2d");
   SS[id]={drawing:false,signed:false};
-  function rsz(){const r=c.parentElement.getBoundingClientRect();c.width=r.width||300;c.height=100;}
-  rsz();window.addEventListener("resize",rsz);
-  const pos=e=>{const r=c.getBoundingClientRect(),s=e.touches?e.touches[0]:e;return{x:s.clientX-r.left,y:s.clientY-r.top};};
-  c.addEventListener("mousedown",e=>{SS[id].drawing=true;const p=pos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);});
-  c.addEventListener("mousemove",e=>{if(!SS[id].drawing)return;ctx.lineWidth=2.5;ctx.lineCap="round";ctx.strokeStyle="#1e293b";const p=pos(e);ctx.lineTo(p.x,p.y);ctx.stroke();});
-  c.addEventListener("mouseup",()=>mkS(id));
+
+  // ── Resize: handle DPR for crisp mobile rendering ──
+  function rsz(){
+    const dpr=window.devicePixelRatio||1;
+    const wrap=c.parentElement;
+    const w=wrap.clientWidth||wrap.offsetWidth||300;
+    const h=120;
+    c.width=w*dpr;
+    c.height=h*dpr;
+    c.style.width=w+"px";
+    c.style.height=h+"px";
+    ctx.scale(dpr,dpr);
+  }
+  // Delay rsz to ensure DOM is laid out in iframe
+  setTimeout(rsz,100);
+  window.addEventListener("resize",rsz);
+
+  // ── Get touch/mouse position relative to canvas ──
+  function pos(e){
+    const r=c.getBoundingClientRect();
+    const src=e.touches?e.touches[0]:e;
+    return{
+      x:(src.clientX-r.left)*(c.width/(r.width*(window.devicePixelRatio||1))),
+      y:(src.clientY-r.top)*(c.height/(r.height*(window.devicePixelRatio||1)))
+    };
+  }
+
+  function draw(p){
+    ctx.lineWidth=2.5;
+    ctx.lineCap="round";
+    ctx.lineJoin="round";
+    ctx.strokeStyle="#1e293b";
+    ctx.lineTo(p.x,p.y);
+    ctx.stroke();
+  }
+
+  // ── Mouse events ──
+  c.addEventListener("mousedown",e=>{
+    e.preventDefault();
+    SS[id].drawing=true;
+    const p=pos(e);
+    ctx.beginPath();ctx.moveTo(p.x,p.y);
+  });
+  c.addEventListener("mousemove",e=>{
+    if(!SS[id].drawing)return;
+    draw(pos(e));
+  });
+  c.addEventListener("mouseup",()=>{if(SS[id].drawing)mkS(id);SS[id].drawing=false;});
   c.addEventListener("mouseleave",()=>{SS[id].drawing=false;});
-  c.addEventListener("touchstart",e=>{e.preventDefault();SS[id].drawing=true;const p=pos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);},{passive:false});
-  c.addEventListener("touchmove",e=>{e.preventDefault();if(!SS[id].drawing)return;ctx.lineWidth=2.5;ctx.lineCap="round";ctx.strokeStyle="#1e293b";const p=pos(e);ctx.lineTo(p.x,p.y);ctx.stroke();},{passive:false});
-  c.addEventListener("touchend",()=>mkS(id));
+
+  // ── Touch events ──
+  c.addEventListener("touchstart",e=>{
+    e.preventDefault();
+    SS[id].drawing=true;
+    const p=pos(e);
+    ctx.beginPath();ctx.moveTo(p.x,p.y);
+  },{passive:false});
+  c.addEventListener("touchmove",e=>{
+    e.preventDefault();
+    if(!SS[id].drawing)return;
+    draw(pos(e));
+  },{passive:false});
+  c.addEventListener("touchend",e=>{
+    e.preventDefault();
+    if(SS[id].drawing)mkS(id);
+    SS[id].drawing=false;
+  },{passive:false});
 }
 function mkS(id){
   SS[id].drawing=false;SS[id].signed=true;
