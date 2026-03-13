@@ -203,30 +203,22 @@ if (typeof geotab !== "undefined") {
         _api = api;
         api.getSession(function(sess) {
           if(!sess){ callback(); return; }
-          // 🔍 DEBUG — delete after testing
-          alert("Session userName: " + sess.userName + "\nDatabase: " + (sess.database||"?") + "\nServer: " + (sess.path||"?"));
           api.call("Get",{typeName:"User",search:{userName:sess.userName}},function(us){
             if(!us||!us.length){ callback(); return; }
             const u = us[0];
             const info = {
-              name: ((u.firstName||"")+" "+(u.lastName||"")).trim(),
+              name: ((u.firstName||"")+" "+(u.lastName||"")).trim()||sess.userName,
               userId: u.id||"",
               email: u.name||sess.userName,
               groups: (u.companyGroups||[]).map(g=>g.id),
               groupId: (u.companyGroups&&u.companyGroups[0])?u.companyGroups[0].id:"",
+              groupName: "",
               vehicleId:"", vehicleName:"", plate:""
             };
             if(info.groupId){
               api.call("Get",{typeName:"Group",search:{id:info.groupId}},function(gs){
                 info.groupName=(gs&&gs[0])?gs[0].name||"":"";
-                api.call("Get",{typeName:"DeviceStatusInfo",search:{userSearch:{name:sess.userName}}},function(dsi){
-                  if(dsi&&dsi[0]&&dsi[0].device){
-                    info.vehicleId=dsi[0].device.id||"";
-                    info.vehicleName=dsi[0].device.name||"";
-                    info.plate=dsi[0].device.licensePlate||"";
-                  }
-                  setDrv(info); callback();
-                },function(){setDrv(info);callback();});
+                setDrv(info); callback();
               },function(){setDrv(info);callback();});
             } else { setDrv(info); callback(); }
           },function(e){console.error("Driver load error:",e);callback();});
