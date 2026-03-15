@@ -157,6 +157,29 @@ function initUI() {
     initSig("sig-lpd");
     initSig("sig-lpr");
   }, 300);
+
+  // ✅ iOS WebView fix: checkboxes inside <label> don't respond to touch
+  // Manually toggle on touchend
+  fixCheckboxes();
+}
+
+function fixCheckboxes() {
+  var labels = document.querySelectorAll("label.ci");
+  for (var i=0; i<labels.length; i++) {
+    (function(lbl) {
+      lbl.addEventListener("touchend", function(e) {
+        e.preventDefault();
+        var cb = lbl.querySelector('input[type="checkbox"]');
+        if (cb) {
+          cb.checked = !cb.checked;
+          // Trigger change event so any listeners fire
+          var evt = document.createEvent("Event");
+          evt.initEvent("change", true, true);
+          cb.dispatchEvent(evt);
+        }
+      }, {passive: false});
+    })(labels[i]);
+  }
 }
 
 // ── Event helper: click + touchend ───────────────────────
