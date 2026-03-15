@@ -302,7 +302,9 @@ function initSig(id) {
   function rsz() {
     var dpr = window.devicePixelRatio||1;
     var w = c.parentElement.clientWidth||c.parentElement.offsetWidth||300;
-    var h = 120;
+    // Responsive height based on screen width
+    var sw = window.innerWidth||300;
+    var h = sw <= 360 ? 120 : sw <= 480 ? 130 : sw <= 768 ? 150 : 160;
     c.width=w*dpr; c.height=h*dpr;
     c.style.width=w+"px"; c.style.height=h+"px";
     ctx.setTransform(1,0,0,1,0,0); ctx.scale(dpr,dpr);
