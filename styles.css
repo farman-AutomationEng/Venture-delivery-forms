@@ -267,3 +267,7 @@ tr.row-link:hover td{background:#EFF6FF !important}
 .ci-row{display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer;font-size:13px;color:#374151}
 .ci-row span{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .ci-row input[type="checkbox"]{width:18px;height:18px;accent-color:#0078D4;cursor:pointer;flex-shrink:0}
+
+/* ── Payment type rows ── */
+.pay-row{display:flex;align-items:center;gap:10px;padding:6px 2px;font-size:13px;color:#374151;cursor:pointer;min-height:36px}
+.pay-row input[type="checkbox"]{width:22px;height:22px;accent-color:#0078D4;cursor:pointer;flex-shrink:0;margin:0}
