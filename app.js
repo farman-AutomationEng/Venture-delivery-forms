@@ -335,15 +335,15 @@ function getSigBase64(id) {
   var c = document.getElementById(id);
   if (!c || !SS[id] || !SS[id].signed) return "";
   try {
-    // Create small canvas for compression (150x50)
+    // 400x120 canvas — clear enough to read, small enough to store
     var small = document.createElement("canvas");
-    small.width = 150; small.height = 50;
+    small.width = 400; small.height = 120;
     var ctx = small.getContext("2d");
     ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, 150, 50);
-    ctx.drawImage(c, 0, 0, 150, 50);
-    // JPEG quality 0.25 = very small file ~1-2KB
-    return small.toDataURL("image/jpeg", 0.25);
+    ctx.fillRect(0, 0, 400, 120);
+    ctx.drawImage(c, 0, 0, 400, 120);
+    // JPEG quality 0.6 = ~6-10KB, readable signature
+    return small.toDataURL("image/jpeg", 0.6);
   } catch(e) { return ""; }
 }
 
