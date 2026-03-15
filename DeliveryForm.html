@@ -2,13 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Venture Trailers — Delivery Form</title>
-<!-- ✅ External CSS — required for MyGeotab CSP compliance -->
-<!-- MyGeotab blocks <style> tags, but allows external <link> stylesheets -->
 <link rel="stylesheet" href="https://farman-automationeng.github.io/Venturedeliveryforms/styles.css">
 </head>
-<body>
+<!-- ontouchstart="" on body = CRITICAL iOS WebView fix — enables click events -->
+<body ontouchstart="">
 
 <div class="hdr">
   <div><h1>VENTURE TRAILERS</h1><p>ELECTRONIC DELIVERY SYSTEM</p></div>
@@ -22,10 +21,10 @@
 </div>
 
 <div class="tabs-wrap">
-  <div class="tabs">
-    <button class="tab active" id="tab0" onclick="swT(0)"><span class="ti">📋</span>Delivery</button>
-    <button class="tab" id="tab1" onclick="swT(1)"><span class="ti">🧾</span>Invoice</button>
-    <button class="tab" id="tab2" onclick="swT(2)"><span class="ti">🔩</span>Parts</button>
+  <div class="tabs" id="tabs">
+    <button class="tab active" id="tab0"><span class="ti">📋</span>Delivery</button>
+    <button class="tab" id="tab1"><span class="ti">🧾</span>Invoice</button>
+    <button class="tab" id="tab2"><span class="ti">🔩</span>Parts</button>
   </div>
 </div>
 
@@ -36,7 +35,7 @@
     <h2 class="succ-title">Submitted!</h2>
     <p class="succ-sub">Saved to MyGeotab • Email will be sent shortly</p>
     <div class="rid" id="riddisp">—</div>
-    <button class="btn bp btn-new" onclick="resetF()">+ New Form</button>
+    <button class="btn bp btn-new" id="btnNew">+ New Form</button>
   </div>
 
   <!-- TAB 0: DELIVERY -->
@@ -87,8 +86,8 @@
     <div class="bk-box">
       <div class="bk-lbl">Received "You and Your Trailer" booklets?</div>
       <div class="pills">
-        <div class="pill" id="py" onclick="setBk('Y')">✅ Yes</div>
-        <div class="pill" id="pn" onclick="setBk('N')">❌ No</div>
+        <div class="pill" id="py">✅ Yes</div>
+        <div class="pill" id="pn">❌ No</div>
       </div>
     </div>
     <div class="f mb14"><label>Comments</label><textarea id="ds-cm" placeholder="Any notes..."></textarea></div>
@@ -96,16 +95,26 @@
     <div class="g2">
       <div>
         <div class="sig-lbl">Driver</div>
-        <div class="sw" id="sig-driver-wrap"><canvas id="sig-driver"></canvas><div class="sph">Sign here ✍️</div><button class="scl" onclick="clrS('sig-driver')">Clear</button><div class="sok" id="sig-driver-ok">✓ Signed</div></div>
+        <div class="sw" id="sig-driver-wrap">
+          <canvas id="sig-driver"></canvas>
+          <div class="sph" id="sph-driver">Sign here ✍️</div>
+          <button class="scl" id="clr-driver">Clear</button>
+          <div class="sok" id="sig-driver-ok">✓ Signed</div>
+        </div>
       </div>
       <div>
         <div class="sig-lbl">Consignee (Dealer)</div>
-        <div class="sw" id="sig-consignee-wrap"><canvas id="sig-consignee"></canvas><div class="sph">Sign here ✍️</div><button class="scl" onclick="clrS('sig-consignee')">Clear</button><div class="sok" id="sig-consignee-ok">✓ Signed</div></div>
+        <div class="sw" id="sig-consignee-wrap">
+          <canvas id="sig-consignee"></canvas>
+          <div class="sph" id="sph-consignee">Sign here ✍️</div>
+          <button class="scl" id="clr-consignee">Clear</button>
+          <div class="sok" id="sig-consignee-ok">✓ Signed</div>
+        </div>
       </div>
     </div>
     <div class="sa">
-      <button class="btn bs">💾 Draft</button>
-      <button class="btn bp" id="subbtn" onclick="subDelivery()">📤 Submit & Send to Dealer</button>
+      <button class="btn bs" id="btnDraft">💾 Draft</button>
+      <button class="btn bp" id="subbtn">📤 Submit & Send to Dealer</button>
     </div>
   </div>
 
@@ -132,14 +141,14 @@
     </div>
     <div class="sec"><span>📦</span><h3>Line Items</h3></div>
     <div class="tw"><table><thead><tr><th>Item</th><th>Qty</th><th>Description</th><th>Unit Price</th><th>Total</th><th></th></tr></thead><tbody id="itb"></tbody></table></div>
-    <button class="btn-add" onclick="addIR()">+ Add Line</button>
+    <button class="btn-add" id="btnAddIR">+ Add Line</button>
     <div class="totals-wrap">
       <div class="totals-box">
         <div class="totals-row"><span>Shipping</span><input id="ish" class="ish-input" oninput="calcT()"></div>
         <div class="totals-due"><span>Amount Due</span><span id="itot">$0.00</span></div>
       </div>
     </div>
-    <div class="sa"><button class="btn bs">💾 Draft</button><button class="btn bp" onclick="subInv()">📤 Submit Invoice</button></div>
+    <div class="sa"><button class="btn bs">💾 Draft</button><button class="btn bp" id="btnSubInv">📤 Submit Invoice</button></div>
   </div>
 
   <!-- TAB 2: LOOSE PARTS -->
@@ -158,39 +167,43 @@
     </div>
     <div class="sec"><span>🔩</span><h3>Parts List</h3></div>
     <div class="tw"><table><thead><tr><th>Loc</th><th>Qty</th><th>Part</th><th class="tc">Pulled</th><th class="tc">Loaded</th><th class="tc">N/C</th><th class="tc">COD</th><th></th></tr></thead><tbody id="ltb"></tbody></table></div>
-    <button class="btn-add" onclick="addLR()">+ Add Row</button>
+    <button class="btn-add" id="btnAddLR">+ Add Row</button>
     <div class="f mb14"><label>Comments</label><textarea id="lc"></textarea></div>
     <div class="notice nred notice-center">⚠️ MUST BE COMPLETED AT TIME OF DELIVERY</div>
     <div class="sec mt14"><span>✍️</span><h3>Signatures</h3></div>
     <div class="g2">
       <div>
         <div class="sig-lbl">Driver</div>
-        <div class="sw" id="sig-lpd-wrap"><canvas id="sig-lpd"></canvas><div class="sph">Sign here ✍️</div><button class="scl" onclick="clrS('sig-lpd')">Clear</button><div class="sok" id="sig-lpd-ok">✓ Signed</div></div>
+        <div class="sw" id="sig-lpd-wrap">
+          <canvas id="sig-lpd"></canvas>
+          <div class="sph" id="sph-lpd">Sign here ✍️</div>
+          <button class="scl" id="clr-lpd">Clear</button>
+          <div class="sok" id="sig-lpd-ok">✓ Signed</div>
+        </div>
       </div>
       <div>
         <div class="sig-lbl">Authorized Receiver</div>
-        <div class="sw" id="sig-lpr-wrap"><canvas id="sig-lpr"></canvas><div class="sph">Sign here ✍️</div><button class="scl" onclick="clrS('sig-lpr')">Clear</button><div class="sok" id="sig-lpr-ok">✓ Signed</div></div>
+        <div class="sw" id="sig-lpr-wrap">
+          <canvas id="sig-lpr"></canvas>
+          <div class="sph" id="sph-lpr">Sign here ✍️</div>
+          <button class="scl" id="clr-lpr">Clear</button>
+          <div class="sok" id="sig-lpr-ok">✓ Signed</div>
+        </div>
       </div>
     </div>
-    <div class="sa"><button class="btn bs">💾 Draft</button><button class="btn bp" onclick="subParts()">📤 Submit Parts Form</button></div>
+    <div class="sa"><button class="btn bs">💾 Draft</button><button class="btn bp" id="btnSubParts">📤 Submit Parts Form</button></div>
   </div>
 
 </div>
 
 <script>
 // ============================================================
-// VENTURE TRAILERS — DeliveryForm.html v2.3 FINAL
-//
-// CSP Rules (confirmed from research):
-//   ✅ External <link> CSS — ALLOWED
-//   ✅ Inline <script> tags — ALLOWED
-//   ✅ onclick="" handlers — ALLOWED
-//   ✅ element.style.prop = val — ALLOWED
-//   ❌ <style> tags — BLOCKED by CSP
-//   ❌ style="" attributes — BLOCKED by CSP
-//   ❌ @import google fonts — BLOCKED
-//
-// Drive mobile cache: only refreshes on LOGOUT → LOGIN
+// VENTURE TRAILERS — DeliveryForm v2.4 FINAL
+// KEY FIXES:
+// 1. ontouchstart="" on body  — iOS WebView click enable fix
+// 2. addEventListener touchstart+click on all buttons
+// 3. canvas touch-action:none set via JS (CSP safe)
+// 4. External CSS only (no <style> tag — CSP blocks it)
 // ============================================================
 var ADDIN_ID = "azXOKPvAnSnyIdUK2xZutWA";
 var PARTS = ["Tail Light-R","Tail Light-L","Tail Light-Lens","Marker Light","Tag Bracket","Tongue Jack","Winch Stand","Rollers","Bunks","Fenders","Tires","Actuator","Frame Rails","Tongue"];
@@ -198,33 +211,44 @@ var bklt = "", SS = {};
 var DRV = {name:"",userId:"",email:"",groupId:"",groupName:"",groups:[],vehicleId:"",vehicleName:"",plate:""};
 var _api = null;
 
+// ── Helper: add both touchstart and click ────────────────
+function addTap(el, fn) {
+  if (!el) return;
+  var fired = false;
+  el.addEventListener("touchstart", function(e) {
+    fired = true;
+    e.preventDefault();
+    fn(e);
+  }, {passive: false});
+  el.addEventListener("click", function(e) {
+    if (fired) { fired = false; return; }
+    fn(e);
+  });
+}
+
 // ── Geotab lifecycle ──────────────────────────────────────
 if (typeof geotab !== "undefined") {
   geotab.addin.ventureDelivery = function() {
     return {
-      initialize: function(api, state, callback) {
+      initialize: function(api, state, cb) {
         _api = api;
-        // Try Drive native method first, then fallback to standard API
         if (api.mobile && api.mobile.exists && api.mobile.exists()) {
           api.mobile.user.get().then(function(drivers) {
             if (drivers && drivers.length) {
               var d = drivers[0];
               var info = {
                 name: ((d.firstName||"")+" "+(d.lastName||"")).trim() || d.name || "",
-                userId: d.id || "",
-                email: d.name || "",
+                userId: d.id||"", email: d.name||"",
                 groups: (d.companyGroups||[]).map(function(g){return g.id;}),
                 groupId: (d.companyGroups&&d.companyGroups[0]) ? d.companyGroups[0].id : "",
                 groupName: "",
                 vehicleId: (state&&state.device) ? state.device : "",
                 vehicleName: "", plate: ""
               };
-              loadGroupName(api, info, callback);
-            } else { fallbackGetUser(api, callback); }
-          }).catch(function() { fallbackGetUser(api, callback); });
-        } else {
-          fallbackGetUser(api, callback);
-        }
+              loadGroup(api, info, cb);
+            } else { fallback(api, cb); }
+          }).catch(function(){ fallback(api, cb); });
+        } else { fallback(api, cb); }
       },
       focus: function(api) { _api = api; },
       blur: function() {}
@@ -232,34 +256,33 @@ if (typeof geotab !== "undefined") {
   };
 }
 
-function loadGroupName(api, info, callback) {
+function loadGroup(api, info, cb) {
   if (info.groupId) {
-    api.call("Get", {typeName:"Group", search:{id:info.groupId}}, function(gs) {
+    api.call("Get", {typeName:"Group",search:{id:info.groupId}}, function(gs) {
       info.groupName = (gs&&gs[0]) ? (gs[0].name||"") : "";
-      setDrv(info); callback();
-    }, function() { setDrv(info); callback(); });
-  } else { setDrv(info); callback(); }
+      setDrv(info); cb();
+    }, function(){ setDrv(info); cb(); });
+  } else { setDrv(info); cb(); }
 }
 
-function fallbackGetUser(api, callback) {
+function fallback(api, cb) {
   api.getSession(function(sess) {
-    if (!sess) { callback(); return; }
-    api.call("Get", {typeName:"User", search:{userName:sess.userName}}, function(us) {
-      if (!us||!us.length) { callback(); return; }
+    if (!sess) { cb(); return; }
+    api.call("Get", {typeName:"User",search:{userName:sess.userName}}, function(us) {
+      if (!us||!us.length) { cb(); return; }
       var u = us[0];
       var fn = ((u.firstName||"")+" "+(u.lastName||"")).trim();
       if (!fn) {
-        var base = (sess.userName||"").split("@")[0];
-        fn = base.replace(/[._]/g," ").replace(/\b\w/g,function(c){return c.toUpperCase();}).trim() || sess.userName;
+        fn = (sess.userName||"").split("@")[0].replace(/[._]/g," ").replace(/\b\w/g,function(c){return c.toUpperCase();}).trim() || sess.userName;
       }
       var info = {
-        name: fn, userId: u.id||"", email: u.name||sess.userName,
-        groups: (u.companyGroups||[]).map(function(g){return g.id;}),
-        groupId: (u.companyGroups&&u.companyGroups[0]) ? u.companyGroups[0].id : "",
-        groupName: "", vehicleId: "", vehicleName: "", plate: ""
+        name:fn, userId:u.id||"", email:u.name||sess.userName,
+        groups:(u.companyGroups||[]).map(function(g){return g.id;}),
+        groupId:(u.companyGroups&&u.companyGroups[0])?u.companyGroups[0].id:"",
+        groupName:"", vehicleId:"", vehicleName:"", plate:""
       };
-      loadGroupName(api, info, callback);
-    }, function(e) { console.error("User load error:", e); callback(); });
+      loadGroup(api, info, cb);
+    }, function(e){ console.error("User error:",e); cb(); });
   });
 }
 
@@ -269,50 +292,74 @@ function setDrv(info) {
   DRV.groups=info.groups||[]; DRV.vehicleId=info.vehicleId||"";
   DRV.vehicleName=info.vehicleName||""; DRV.plate=info.plate||"";
   if (info.vehicleId) {
-    var db = document.getElementById("dbar");
-    db.style.display = "flex";
-    var init = info.name.split(" ").map(function(w){return w[0]||"";}).join("").toUpperCase().slice(0,2)||"D";
-    document.getElementById("dav").textContent = init;
-    document.getElementById("dnm").textContent = info.name;
-    document.getElementById("dmt").textContent = (info.email||"")+(info.vehicleName?" • "+info.vehicleName:"");
-    document.getElementById("dgrp").textContent = "📍 "+(info.groupName||"No Group");
+    var db=document.getElementById("dbar"); db.style.display="flex";
+    var init=info.name.split(" ").map(function(w){return w[0]||"";}).join("").toUpperCase().slice(0,2)||"D";
+    document.getElementById("dav").textContent=init;
+    document.getElementById("dnm").textContent=info.name;
+    document.getElementById("dmt").textContent=(info.email||"")+(info.vehicleName?" • "+info.vehicleName:"");
+    document.getElementById("dgrp").textContent="📍 "+(info.groupName||"No Group");
   }
-  var g = function(id){return document.getElementById(id);};
-  if(g("ds-drv")) g("ds-drv").value = info.name||"";
-  if(g("ds-grp")) g("ds-grp").value = info.groupName||"";
-  if(g("ds-vid")) g("ds-vid").value = info.vehicleId||"";
-  if(g("ds-vnm")) g("ds-vnm").value = info.vehicleName||"";
+  var g=function(id){return document.getElementById(id);};
+  if(g("ds-drv"))g("ds-drv").value=info.name||"";
+  if(g("ds-grp"))g("ds-grp").value=info.groupName||"";
+  if(g("ds-vid"))g("ds-vid").value=info.vehicleId||"";
+  if(g("ds-vnm"))g("ds-vnm").value=info.vehicleName||"";
 }
 
 // ── Tab switch ────────────────────────────────────────────
 function swT(n) {
-  document.getElementById("succ").style.display = "none";
+  document.getElementById("succ").style.display="none";
   for (var i=0; i<3; i++) {
-    var el = document.getElementById("t"+i);
-    if (el) el.style.display = (i===n) ? "block" : "none";
-    var tb = document.getElementById("tab"+i);
-    if (tb) tb.className = "tab"+(i===n?" active":"");
+    var el=document.getElementById("t"+i);
+    if(el) el.style.display=(i===n)?"block":"none";
+    var tb=document.getElementById("tab"+i);
+    if(tb) tb.className="tab"+(i===n?" active":"");
   }
 }
 
 // ── Init ──────────────────────────────────────────────────
 window.onload = function() {
-  var td = new Date().toISOString().split("T")[0];
-  var inputs = document.querySelectorAll('input[type="date"]');
-  for (var i=0; i<inputs.length; i++) inputs[i].value = td;
-  document.getElementById("dbadge").textContent = "📅 "+new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+  var td=new Date().toISOString().split("T")[0];
+  var inputs=document.querySelectorAll('input[type="date"]');
+  for(var i=0;i<inputs.length;i++) inputs[i].value=td;
+  document.getElementById("dbadge").textContent="📅 "+new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+
   buildPT(); addIR(); addIR();
-  for (var j=0; j<10; j++) addLR();
-  initSig("sig-driver"); initSig("sig-consignee");
-  initSig("sig-lpd"); initSig("sig-lpr");
+  for(var j=0;j<10;j++) addLR();
+
+  // ✅ Attach ALL button events with touchstart+click
+  addTap(document.getElementById("tab0"), function(){ swT(0); });
+  addTap(document.getElementById("tab1"), function(){ swT(1); });
+  addTap(document.getElementById("tab2"), function(){ swT(2); });
+  addTap(document.getElementById("subbtn"), subDelivery);
+  addTap(document.getElementById("btnSubInv"), subInv);
+  addTap(document.getElementById("btnSubParts"), subParts);
+  addTap(document.getElementById("btnNew"), resetF);
+  addTap(document.getElementById("btnDraft"), function(){});
+  addTap(document.getElementById("btnAddIR"), addIR);
+  addTap(document.getElementById("btnAddLR"), addLR);
+  addTap(document.getElementById("clr-driver"), function(){ clrS("sig-driver"); });
+  addTap(document.getElementById("clr-consignee"), function(){ clrS("sig-consignee"); });
+  addTap(document.getElementById("clr-lpd"), function(){ clrS("sig-lpd"); });
+  addTap(document.getElementById("clr-lpr"), function(){ clrS("sig-lpr"); });
+  addTap(document.getElementById("py"), function(){ setBk("Y"); });
+  addTap(document.getElementById("pn"), function(){ setBk("N"); });
+
+  // ✅ Init signatures after short delay (DOM layout settle)
+  setTimeout(function() {
+    initSig("sig-driver");
+    initSig("sig-consignee");
+    initSig("sig-lpd");
+    initSig("sig-lpr");
+  }, 300);
 };
 
 // ── Parts table ───────────────────────────────────────────
 function buildPT() {
-  var tb = document.getElementById("ptb"); tb.innerHTML = "";
-  for (var i=0; i<PARTS.length; i++) {
-    var tr = document.createElement("tr");
-    tr.innerHTML = '<td class="pt-name">'+PARTS[i]+'</td><td><input type="text" placeholder="Model"></td><td class="tc"><input type="checkbox" class="cbt"></td><td class="tc"><input type="checkbox" class="cbt"></td><td><input type="text" placeholder="Notes"></td>';
+  var tb=document.getElementById("ptb"); tb.innerHTML="";
+  for(var i=0;i<PARTS.length;i++){
+    var tr=document.createElement("tr");
+    tr.innerHTML='<td class="pt-name">'+PARTS[i]+'</td><td><input type="text" placeholder="Model"></td><td class="tc"><input type="checkbox" class="cbt"></td><td class="tc"><input type="checkbox" class="cbt"></td><td><input type="text" placeholder="Notes"></td>';
     tb.appendChild(tr);
   }
 }
@@ -321,11 +368,12 @@ var irc=0;
 function addIR() {
   irc++; var id="ir"+irc;
   var tr=document.createElement("tr"); tr.id=id;
-  tr.innerHTML='<td><input type="text" class="ir-item"></td><td><input type="number" value="1" class="ir-qty"></td><td><input type="text" class="ir-desc"></td><td><input type="text" class="ir-price" oninput="calcT()"></td><td><input type="text" class="ir-price" oninput="calcT()"></td><td><button class="btn-rm" onclick="rmRow(\''+id+'\');calcT()">✕</button></td>';
+  tr.innerHTML='<td><input type="text" class="ir-item"></td><td><input type="number" value="1" class="ir-qty"></td><td><input type="text" class="ir-desc"></td><td><input type="text" class="ir-price" oninput="calcT()"></td><td><input type="text" class="ir-price" oninput="calcT()"></td><td><button class="btn-rm" id="rm-'+id+'">✕</button></td>';
   document.getElementById("itb").appendChild(tr);
+  addTap(document.getElementById("rm-"+id), function(){ rmRow(id); calcT(); });
 }
 function calcT() {
-  var s=0, rows=document.querySelectorAll("#itb tr");
+  var s=0,rows=document.querySelectorAll("#itb tr");
   for(var i=0;i<rows.length;i++){var t=rows[i].querySelector("td:nth-child(5) input");if(t)s+=parseFloat(t.value)||0;}
   var sh=parseFloat(document.getElementById("ish").value)||0;
   document.getElementById("itot").textContent="$"+(s+sh).toFixed(2);
@@ -335,10 +383,11 @@ var lrc=0;
 function addLR() {
   lrc++; var id="lr"+lrc;
   var tr=document.createElement("tr"); tr.id=id;
-  tr.innerHTML='<td><input type="text" class="lr-loc"></td><td><input type="text" class="lr-qty"></td><td><input type="text" class="lr-part" placeholder="Part"></td><td class="tc"><input type="checkbox" class="cbt"></td><td class="tc"><input type="checkbox" class="cbt"></td><td class="tc"><input type="checkbox" class="cbt"></td><td class="tc"><input type="checkbox" class="cbt"></td><td><button class="btn-rm" onclick="rmRow(\''+id+'\')">✕</button></td>';
+  tr.innerHTML='<td><input type="text" class="lr-loc"></td><td><input type="text" class="lr-qty"></td><td><input type="text" class="lr-part" placeholder="Part"></td><td class="tc"><input type="checkbox" class="cbt"></td><td class="tc"><input type="checkbox" class="cbt"></td><td class="tc"><input type="checkbox" class="cbt"></td><td class="tc"><input type="checkbox" class="cbt"></td><td><button class="btn-rm" id="rm-'+id+'">✕</button></td>';
   document.getElementById("ltb").appendChild(tr);
+  addTap(document.getElementById("rm-"+id), function(){ rmRow(id); });
 }
-function rmRow(id) { var el=document.getElementById(id); if(el) el.parentNode.removeChild(el); }
+function rmRow(id){ var el=document.getElementById(id); if(el) el.parentNode.removeChild(el); }
 
 function setBk(v) {
   bklt=v;
@@ -351,30 +400,64 @@ function initSig(id) {
   var c=document.getElementById(id); if(!c) return;
   var ctx=c.getContext("2d");
   SS[id]={drawing:false,signed:false};
+
+  // ✅ Set touch-action via JS (CSP blocks <style> tags)
+  c.style.touchAction="none";
+  c.style.webkitUserSelect="none";
+  c.style.userSelect="none";
+  c.parentElement.style.touchAction="none";
+
   function rsz() {
     var dpr=window.devicePixelRatio||1;
-    var w=c.parentElement.clientWidth||c.parentElement.offsetWidth||300, h=120;
+    var w=c.parentElement.clientWidth||c.parentElement.offsetWidth||300;
+    var h=120;
     c.width=w*dpr; c.height=h*dpr;
     c.style.width=w+"px"; c.style.height=h+"px";
-    ctx.setTransform(1,0,0,1,0,0); ctx.scale(dpr,dpr);
+    ctx.setTransform(1,0,0,1,0,0);
+    ctx.scale(dpr,dpr);
   }
-  setTimeout(rsz,200); window.addEventListener("resize",rsz);
+  setTimeout(rsz, 100);
+  window.addEventListener("resize", rsz);
+
   function getXY(e) {
-    var r=c.getBoundingClientRect(), src=e.touches?e.touches[0]:e;
+    var r=c.getBoundingClientRect();
+    var src=e.touches?e.touches[0]:e;
     return {x:src.clientX-r.left, y:src.clientY-r.top};
   }
-  function startDraw(e) { e.preventDefault(); SS[id].drawing=true; var p=getXY(e); ctx.beginPath(); ctx.moveTo(p.x,p.y); }
-  function moveDraw(e) { e.preventDefault(); if(!SS[id].drawing) return; var p=getXY(e); ctx.lineWidth=2.5; ctx.lineCap="round"; ctx.lineJoin="round"; ctx.strokeStyle="#1e293b"; ctx.lineTo(p.x,p.y); ctx.stroke(); }
-  function endDraw(e) { if(e) e.preventDefault(); if(SS[id].drawing) mkS(id); SS[id].drawing=false; }
-  c.addEventListener("mousedown",startDraw); c.addEventListener("mousemove",moveDraw);
-  c.addEventListener("mouseup",endDraw); c.addEventListener("mouseleave",function(){SS[id].drawing=false;});
-  c.addEventListener("touchstart",startDraw,{passive:false}); c.addEventListener("touchmove",moveDraw,{passive:false}); c.addEventListener("touchend",endDraw,{passive:false});
+  function startDraw(e) {
+    e.preventDefault(); e.stopPropagation();
+    SS[id].drawing=true;
+    var p=getXY(e); ctx.beginPath(); ctx.moveTo(p.x,p.y);
+  }
+  function moveDraw(e) {
+    e.preventDefault(); e.stopPropagation();
+    if(!SS[id].drawing) return;
+    var p=getXY(e);
+    ctx.lineWidth=2.5; ctx.lineCap="round"; ctx.lineJoin="round"; ctx.strokeStyle="#1e293b";
+    ctx.lineTo(p.x,p.y); ctx.stroke();
+  }
+  function endDraw(e) {
+    e.preventDefault(); e.stopPropagation();
+    if(SS[id].drawing) mkS(id);
+    SS[id].drawing=false;
+  }
+  // Mouse
+  c.addEventListener("mousedown", startDraw, false);
+  c.addEventListener("mousemove", moveDraw, false);
+  c.addEventListener("mouseup", endDraw, false);
+  c.addEventListener("mouseleave", function(){ SS[id].drawing=false; }, false);
+  // Touch — passive:false required to call preventDefault
+  c.addEventListener("touchstart", startDraw, {passive:false});
+  c.addEventListener("touchmove", moveDraw, {passive:false});
+  c.addEventListener("touchend", endDraw, {passive:false});
+  c.addEventListener("touchcancel", function(){ SS[id].drawing=false; }, {passive:false});
 }
+
 function mkS(id) {
   SS[id].signed=true;
   var wrap=document.getElementById(id+"-wrap"); if(wrap) wrap.className="sw ok";
   var ok=document.getElementById(id+"-ok"); if(ok) ok.style.display="block";
-  var ph=document.querySelector("#"+id+"-wrap .sph"); if(ph) ph.style.display="none";
+  var ph=document.getElementById("sph-"+id.replace("sig-","")); if(ph) ph.style.display="none";
 }
 function clrS(id) {
   var c=document.getElementById(id); if(!c) return;
@@ -383,30 +466,26 @@ function clrS(id) {
   SS[id]={drawing:false,signed:false};
   var wrap=document.getElementById(id+"-wrap"); if(wrap) wrap.className="sw";
   var ok=document.getElementById(id+"-ok"); if(ok) ok.style.display="none";
-  var ph=document.querySelector("#"+id+"-wrap .sph"); if(ph) ph.style.display="block";
+  var ph=document.getElementById("sph-"+id.replace("sig-","")); if(ph) ph.style.display="block";
 }
 
-function gv(id) { var el=document.getElementById(id); return el?(el.value||"").trim():""; }
-function gc(id) { var el=document.getElementById(id); return el?!!el.checked:false; }
+function gv(id){var el=document.getElementById(id);return el?(el.value||"").trim():"";}
+function gc(id){var el=document.getElementById(id);return el?!!el.checked:false;}
 
-// ── Validation — JS style (CSP allows element.style.prop) ─
 function validate(fields) {
   var ok=true;
-  for(var i=0;i<fields.length;i++) {
+  for(var i=0;i<fields.length;i++){
     var el=document.getElementById(fields[i]); if(!el) continue;
-    if(!el.value.trim()) {
-      el.style.borderColor="#DE350B";
-      el.style.boxShadow="0 0 0 3px rgba(222,53,11,.15)";
-      el.style.background="#FFF8F7";
+    if(!el.value.trim()){
+      el.style.borderColor="#DE350B"; el.style.boxShadow="0 0 0 3px rgba(222,53,11,.15)"; el.style.background="#FFF8F7";
       ok=false;
-      (function(elem){ elem.addEventListener("input",function fix(){elem.style.borderColor="";elem.style.boxShadow="";elem.style.background="";elem.removeEventListener("input",fix);}); })(el);
+      (function(e){ e.addEventListener("input",function f(){e.style.borderColor="";e.style.boxShadow="";e.style.background="";e.removeEventListener("input",f);}); })(el);
     } else { el.style.borderColor=""; el.style.boxShadow=""; el.style.background=""; }
   }
-  if(!ok) { var first=document.querySelector('[style*="DE350B"]'); if(first) first.scrollIntoView({behavior:"smooth",block:"center"}); }
+  if(!ok){var f=document.querySelector('[style*="DE350B"]');if(f)f.scrollIntoView({behavior:"smooth",block:"center"});}
   return ok;
 }
 
-// ── Collect data ──────────────────────────────────────────
 function collectD() {
   var parts=[],dmg=[],rows=document.querySelectorAll("#ptb tr");
   for(var i=0;i<rows.length;i++){
@@ -417,22 +496,22 @@ function collectD() {
     if(dm) dmg.push(pt);
     parts.push({part:pt,model:c[1].querySelector("input")?c[1].querySelector("input").value:"",damaged:dm,shortShipped:sh,notes:c[4].querySelector("input")?c[4].querySelector("input").value:""});
   }
-  var ptypes=[];
-  if(gc("ck-cod"))ptypes.push("COD"); if(gc("ck-fp"))ptypes.push("Floor Plan");
-  if(gc("ck-pt"))ptypes.push("Parts"); if(gc("ck-rv"))ptypes.push("Return to Vendor"); if(gc("ck-wn"))ptypes.push("Warranty");
-  return {formType:"delivery_sheet",invoiceNo:gv("ds-inv"),dealer:gv("ds-dlr"),dealerAddress:gv("ds-adr")+" "+gv("ds-cty"),dealerContact:gv("ds-cnt"),dealerPhone:gv("ds-ph"),dealerEmail:gv("ds-em"),date:gv("ds-dt"),codAmount:parseFloat(gv("ds-cod"))||0,paymentType:ptypes.join(", "),accepted:gc("ck-ac"),booklets:bklt,comments:gv("ds-cm"),driverSigned:SS["sig-driver"]?SS["sig-driver"].signed:false,consigneeSigned:SS["sig-consignee"]?SS["sig-consignee"].signed:false,damaged:dmg.length>0,damagedParts:dmg,parts:parts,status:"Submitted",driverName:DRV.name,driverUserId:DRV.userId,driverEmail:DRV.email,driverGroupId:DRV.groupId,driverGroupName:DRV.groupName,driverGroups:DRV.groups,vehicleId:DRV.vehicleId,vehicleName:DRV.vehicleName,vehicleLicensePlate:DRV.plate};
+  var pt=[];
+  if(gc("ck-cod"))pt.push("COD"); if(gc("ck-fp"))pt.push("Floor Plan");
+  if(gc("ck-pt"))pt.push("Parts"); if(gc("ck-rv"))pt.push("Return to Vendor"); if(gc("ck-wn"))pt.push("Warranty");
+  return {formType:"delivery_sheet",invoiceNo:gv("ds-inv"),dealer:gv("ds-dlr"),dealerAddress:gv("ds-adr")+" "+gv("ds-cty"),dealerContact:gv("ds-cnt"),dealerPhone:gv("ds-ph"),dealerEmail:gv("ds-em"),date:gv("ds-dt"),codAmount:parseFloat(gv("ds-cod"))||0,paymentType:pt.join(", "),accepted:gc("ck-ac"),booklets:bklt,comments:gv("ds-cm"),driverSigned:SS["sig-driver"]?SS["sig-driver"].signed:false,consigneeSigned:SS["sig-consignee"]?SS["sig-consignee"].signed:false,damaged:dmg.length>0,damagedParts:dmg,parts:parts,status:"Submitted",driverName:DRV.name,driverUserId:DRV.userId,driverEmail:DRV.email,driverGroupId:DRV.groupId,driverGroupName:DRV.groupName,driverGroups:DRV.groups,vehicleId:DRV.vehicleId,vehicleName:DRV.vehicleName,vehicleLicensePlate:DRV.plate};
 }
 
-function submitToAPI(data,onSuccess,onError) {
-  if(!_api){onError(new Error("Not connected to MyGeotab."));return;}
-  _api.call("Add",{typeName:"AddInData",entity:{addInId:ADDIN_ID,groups:[{id:"GroupCompanyId"}],details:data}},function(id){onSuccess(id);},function(err){onError(new Error(err.message||JSON.stringify(err)));});
+function submitToAPI(data,onOk,onErr) {
+  if(!_api){onErr(new Error("Not connected to MyGeotab."));return;}
+  _api.call("Add",{typeName:"AddInData",entity:{addInId:ADDIN_ID,groups:[{id:"GroupCompanyId"}],details:data}},function(id){onOk(id);},function(e){onErr(new Error(e.message||JSON.stringify(e)));});
 }
 
 function subDelivery() {
   if(!validate(["ds-dt","ds-inv","ds-dlr"])) return;
   var data=collectD(), btn=document.getElementById("subbtn");
   btn.innerHTML='<span class="sp"></span>Submitting...'; btn.disabled=true;
-  submitToAPI(data,function(id){btn.innerHTML="📤 Submit & Send to Dealer";btn.disabled=false;showSucc(id);},function(e){btn.innerHTML="📤 Submit & Send to Dealer";btn.disabled=false;alert("Error: "+e.message);});
+  submitToAPI(data, function(id){btn.innerHTML="📤 Submit & Send to Dealer";btn.disabled=false;showSucc(id);}, function(e){btn.innerHTML="📤 Submit & Send to Dealer";btn.disabled=false;alert("Error: "+e.message);});
 }
 function subInv() {
   var data={formType:"invoice",invoiceNo:gv("ino"),date:gv("id"),acctNo:gv("ia"),billTo:gv("ibt"),shipTo:gv("ist"),po:gv("ipo"),terms:gv("itr"),salesOrder:gv("iso"),shippingMethod:gv("ism"),dealer:gv("ibt").split("\n")[0],driverName:DRV.name,driverGroupName:DRV.groupName,driverUserId:DRV.userId,driverGroupId:DRV.groupId,status:"Submitted"};
@@ -444,7 +523,6 @@ function subParts() {
   var data={formType:"loose_parts",salesOrder:gv("ls"),invoiceNo:gv("li"),pl:gv("lpl"),trk:gv("lt"),dealer:gv("ld"),date:gv("ldt"),comments:gv("lc"),driverSigned:SS["sig-lpd"]?SS["sig-lpd"].signed:false,receiverSigned:SS["sig-lpr"]?SS["sig-lpr"].signed:false,driverName:DRV.name,driverGroupName:DRV.groupName,driverUserId:DRV.userId,driverGroupId:DRV.groupId,vehicleId:DRV.vehicleId,vehicleName:DRV.vehicleName,parts:rows,status:"Submitted"};
   submitToAPI(data,function(id){showSucc(id);},function(e){alert(e.message);});
 }
-
 function showSucc(id) {
   for(var i=0;i<3;i++){var el=document.getElementById("t"+i);if(el)el.style.display="none";}
   document.getElementById("riddisp").textContent="MyGeotab ID: "+(id||"—");
@@ -455,8 +533,6 @@ function resetF() {
   document.getElementById("succ").style.display="none"; swT(0);
   clrS("sig-driver");clrS("sig-consignee");clrS("sig-lpd");clrS("sig-lpr");
   bklt="";document.getElementById("py").className="pill";document.getElementById("pn").className="pill";
-  var errs=document.querySelectorAll('[style*="DE350B"]');
-  for(var i=0;i<errs.length;i++){errs[i].style.borderColor="";errs[i].style.boxShadow="";errs[i].style.background="";}
 }
 </script>
 </body>
