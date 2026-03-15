@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="x-ua-compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Venture Trailers — Delivery Form</title>
+<link rel="stylesheet" href="https://farman-automationeng.github.io/Venturedeliveryforms/styles.css">
+<script src="https://farman-automationeng.github.io/Venturedeliveryforms/app.js"></script>
+</head>
+<body>
+
+<!-- ✅ Exactly like official Geotab samples: div hidden by default, shown in focus() -->
+<div id="vt-app" style="display:none">
+
+<div class="hdr">
+  <div><h1>VENTURE TRAILERS</h1><p>ELECTRONIC DELIVERY SYSTEM</p></div>
+  <span class="dbadge" id="dbadge"></span>
+</div>
+
+<div class="dbar" id="dbar">
+  <div class="dav" id="dav">?</div>
+  <div class="dbar-flex"><div class="dnm" id="dnm"></div><div class="dmt" id="dmt"></div></div>
+  <span class="dgrp" id="dgrp"></span>
+</div>
+
+<div class="tabs-wrap">
+  <div class="tabs">
+    <button class="tab active" id="tab0"><span class="ti">📋</span>Delivery</button>
+    <button class="tab" id="tab1"><span class="ti">🧾</span>Invoice</button>
+    <button class="tab" id="tab2"><span class="ti">🔩</span>Parts</button>
+  </div>
+</div>
+
+<div class="card">
+
+  <div class="succ" id="succ">
+    <div class="si">✓</div>
+    <h2 class="succ-title">Submitted!</h2>
+    <p class="succ-sub">Saved to MyGeotab • Email will be sent shortly</p>
+    <div class="rid" id="riddisp">—</div>
+    <button class="btn bp btn-new" id="btnNew">+ New Form</button>
+  </div>
+
+  <!-- TAB 0: DELIVERY -->
+  <div id="t0">
+    <div class="notice">⚠️ <strong>Inspect all merchandise.</strong> Damages not replaced unless noted at delivery.</div>
+    <div class="from-box"><strong>FROM:</strong> Venture Trailers • 5301 North Point Blvd, Baltimore MD 21219</div>
+    <div class="g2">
+      <div class="f"><label>Date *</label><input type="date" id="ds-dt"></div>
+      <div class="f"><label>Invoice No. *</label><input id="ds-inv" placeholder="132993"></div>
+    </div>
+    <div class="sec"><span>🏪</span><h3>Consigned To</h3></div>
+    <div class="g2">
+      <div class="f fc"><label>Dealer Name *</label><input id="ds-dlr" placeholder="Blue Mountain Marine"></div>
+      <div class="f fc"><label>Address</label><input id="ds-adr" placeholder="1765 Valley View Dr"></div>
+      <div class="f"><label>City, State, ZIP</label><input id="ds-cty" placeholder="Bangor PA 18013"></div>
+      <div class="f"><label>Contact</label><input id="ds-cnt" placeholder="Ryan"></div>
+      <div class="f"><label>Phone</label><input type="tel" id="ds-ph" placeholder="610-599-3628"></div>
+      <div class="f"><label>Dealer Email</label><input type="email" id="ds-em" placeholder="dealer@company.com"></div>
+    </div>
+    <div class="sec"><span>👤</span><h3>Driver Info <span class="abadge">⚡ Auto</span></h3></div>
+    <div class="g2">
+      <div class="f"><label>Driver Name</label><input id="ds-drv" readonly placeholder="Auto from Geotab"></div>
+      <div class="f"><label>Driver Group</label><input id="ds-grp" readonly placeholder="Auto"></div>
+      <div class="f"><label>Vehicle ID</label><input id="ds-vid" readonly placeholder="Auto"></div>
+      <div class="f"><label>Vehicle Name</label><input id="ds-vnm" readonly placeholder="Auto"></div>
+    </div>
+    <div class="sec"><span>💰</span><h3>Payment</h3></div>
+    <div class="g2">
+      <div class="f"><label>C.O.D. Amount ($)</label><input type="number" id="ds-cod" placeholder="0.00" step="0.01"></div>
+      <div class="f"><label>Type</label>
+        <div class="cg">
+          <label class="ci"><input type="checkbox" id="ck-cod" checked> C.O.D.</label>
+          <label class="ci"><input type="checkbox" id="ck-fp"> Floor Plan</label>
+          <label class="ci"><input type="checkbox" id="ck-pt"> Parts</label>
+          <label class="ci"><input type="checkbox" id="ck-rv"> Return to Vendor</label>
+          <label class="ci"><input type="checkbox" id="ck-wn"> Warranty</label>
+        </div>
+      </div>
+    </div>
+    <div class="sec"><span>🔧</span><h3>Parts Condition</h3></div>
+    <div class="tw">
+      <table><thead><tr><th>Part</th><th>Model</th><th class="tc">Dmg</th><th class="tc">Short</th><th>Notes</th></tr></thead>
+      <tbody id="ptb"></tbody></table>
+    </div>
+    <div class="notice notice-mb">
+      <label class="ci ci-lg"><input type="checkbox" id="ck-ac"> ACCEPTED — product accepted as is, except where noted.</label>
+    </div>
+    <div class="bk-box">
+      <div class="bk-lbl">Received "You and Your Trailer" booklets?</div>
+      <div class="pills">
+        <div class="pill" id="py">✅ Yes</div>
+        <div class="pill" id="pn">❌ No</div>
+      </div>
+    </div>
+    <div class="f mb14"><label>Comments</label><textarea id="ds-cm" placeholder="Any notes..."></textarea></div>
+    <div class="sec"><span>✍️</span><h3>Signatures</h3></div>
+    <div class="g2">
+      <div>
+        <div class="sig-lbl">Driver</div>
+        <div class="sw" id="sig-driver-wrap">
+          <canvas id="sig-driver"></canvas>
+          <div class="sph" id="sig-driver-ph">Sign here ✍️</div>
+          <button class="scl" id="clr-driver">Clear</button>
+          <div class="sok" id="sig-driver-ok">✓ Signed</div>
+        </div>
+      </div>
+      <div>
+        <div class="sig-lbl">Consignee (Dealer)</div>
+        <div class="sw" id="sig-consignee-wrap">
+          <canvas id="sig-consignee"></canvas>
+          <div class="sph" id="sig-consignee-ph">Sign here ✍️</div>
+          <button class="scl" id="clr-consignee">Clear</button>
+          <div class="sok" id="sig-consignee-ok">✓ Signed</div>
+        </div>
+      </div>
+    </div>
+    <div class="sa">
+      <button class="btn bs" id="btnDraft">💾 Draft</button>
+      <button class="btn bp" id="subbtn">📤 Submit &amp; Send to Dealer</button>
+    </div>
+  </div>
+
+  <!-- TAB 1: INVOICE -->
+  <div id="t1" class="tab-hidden">
+    <div class="inv-hdr">
+      <div><div class="inv-company">VENTURE TRAILERS, INC.</div><div class="inv-addr">5301 North Point Blvd • Baltimore MD 21219</div></div>
+      <div class="inv-badge">INVOICE</div>
+    </div>
+    <div class="g2">
+      <div class="f"><label>Acct No.</label><input id="ia" value="3818"></div>
+      <div class="f"><label>Date</label><input type="date" id="id"></div>
+      <div class="f fc"><label>Invoice #</label><input id="ino" placeholder="132993"></div>
+    </div>
+    <div class="g2 mt10">
+      <div class="f"><label>Bill To</label><textarea id="ibt" placeholder="Company&#10;Address&#10;City, State ZIP"></textarea></div>
+      <div class="f"><label>Ship To</label><textarea id="ist" placeholder="Company&#10;Address&#10;City, State ZIP"></textarea></div>
+    </div>
+    <div class="g2 mt10">
+      <div class="f"><label>PO #</label><input id="ipo"></div>
+      <div class="f"><label>Terms</label><input id="itr" value="Due on receipt"></div>
+      <div class="f"><label>Sales Order</label><input id="iso"></div>
+      <div class="f"><label>Shipping Method</label><input id="ism" placeholder="Marine Freight LLC"></div>
+    </div>
+    <div class="sec"><span>📦</span><h3>Line Items</h3></div>
+    <div class="tw"><table><thead><tr><th>Item</th><th>Qty</th><th>Description</th><th>Unit Price</th><th>Total</th><th></th></tr></thead><tbody id="itb"></tbody></table></div>
+    <button class="btn-add" id="btnAddIR">+ Add Line</button>
+    <div class="totals-wrap">
+      <div class="totals-box">
+        <div class="totals-row"><span>Shipping</span><input id="ish" class="ish-input"></div>
+        <div class="totals-due"><span>Amount Due</span><span id="itot">$0.00</span></div>
+      </div>
+    </div>
+    <div class="sa"><button class="btn bs">💾 Draft</button><button class="btn bp" id="btnSubInv">📤 Submit Invoice</button></div>
+  </div>
+
+  <!-- TAB 2: LOOSE PARTS -->
+  <div id="t2" class="tab-hidden">
+    <div class="lp-hdr">
+      <div class="lp-company">VENTURE TRAILERS</div>
+      <div class="lp-sub">LOOSE PARTS CHECK-IN</div>
+    </div>
+    <div class="g2">
+      <div class="f"><label>Sales Order #</label><input id="ls"></div>
+      <div class="f"><label>Invoice #</label><input id="li"></div>
+      <div class="f"><label>PL#</label><input id="lpl"></div>
+      <div class="f"><label>TRK#</label><input id="lt"></div>
+      <div class="f"><label>Dealer</label><input id="ld"></div>
+      <div class="f"><label>Date</label><input type="date" id="ldt"></div>
+    </div>
+    <div class="sec"><span>🔩</span><h3>Parts List</h3></div>
+    <div class="tw"><table><thead><tr><th>Loc</th><th>Qty</th><th>Part</th><th class="tc">Pulled</th><th class="tc">Loaded</th><th class="tc">N/C</th><th class="tc">COD</th><th></th></tr></thead><tbody id="ltb"></tbody></table></div>
+    <button class="btn-add" id="btnAddLR">+ Add Row</button>
+    <div class="f mb14"><label>Comments</label><textarea id="lc"></textarea></div>
+    <div class="notice nred notice-center">⚠️ MUST BE COMPLETED AT TIME OF DELIVERY</div>
+    <div class="sec mt14"><span>✍️</span><h3>Signatures</h3></div>
+    <div class="g2">
+      <div>
+        <div class="sig-lbl">Driver</div>
+        <div class="sw" id="sig-lpd-wrap">
+          <canvas id="sig-lpd"></canvas>
+          <div class="sph" id="sig-lpd-ph">Sign here ✍️</div>
+          <button class="scl" id="clr-lpd">Clear</button>
+          <div class="sok" id="sig-lpd-ok">✓ Signed</div>
+        </div>
+      </div>
+      <div>
+        <div class="sig-lbl">Authorized Receiver</div>
+        <div class="sw" id="sig-lpr-wrap">
+          <canvas id="sig-lpr"></canvas>
+          <div class="sph" id="sig-lpr-ph">Sign here ✍️</div>
+          <button class="scl" id="clr-lpr">Clear</button>
+          <div class="sok" id="sig-lpr-ok">✓ Signed</div>
+        </div>
+      </div>
+    </div>
+    <div class="sa"><button class="btn bs">💾 Draft</button><button class="btn bp" id="btnSubParts">📤 Submit Parts Form</button></div>
+  </div>
+
+</div><!-- /card -->
+
+</div><!-- /vt-app -->
+
+</body>
+</html>
