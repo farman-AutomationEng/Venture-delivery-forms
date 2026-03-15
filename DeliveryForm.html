@@ -70,12 +70,12 @@
     <div class="g2">
       <div class="f"><label>C.O.D. Amount ($)</label><input type="number" id="ds-cod" placeholder="0.00" step="0.01"></div>
       <div class="f"><label>Type</label>
-        <div class="cg">
-          <label class="ci"><input type="checkbox" id="ck-cod" checked> C.O.D.</label>
-          <label class="ci"><input type="checkbox" id="ck-fp"> Floor Plan</label>
-          <label class="ci"><input type="checkbox" id="ck-pt"> Parts</label>
-          <label class="ci"><input type="checkbox" id="ck-rv"> Return to Vendor</label>
-          <label class="ci"><input type="checkbox" id="ck-wn"> Warranty</label>
+        <div class="cg" id="payment-types">
+          <div class="ci-row" id="row-cod"><input type="checkbox" id="ck-cod" checked class="cbt"> <span>C.O.D.</span></div>
+          <div class="ci-row" id="row-fp"><input type="checkbox" id="ck-fp" class="cbt"> <span>Floor Plan</span></div>
+          <div class="ci-row" id="row-pt"><input type="checkbox" id="ck-pt" class="cbt"> <span>Parts</span></div>
+          <div class="ci-row" id="row-rv"><input type="checkbox" id="ck-rv" class="cbt"> <span>Return to Vendor</span></div>
+          <div class="ci-row" id="row-wn"><input type="checkbox" id="ck-wn" class="cbt"> <span>Warranty</span></div>
         </div>
       </div>
     </div>
