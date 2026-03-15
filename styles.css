@@ -312,3 +312,69 @@ tr.row-link:hover td{background:#EFF6FF !important}
   .sw canvas { height: 160px !important; }
   .card { max-width: 880px; }
 }
+
+/* ══════════════════════════════════════════
+   RESPONSIVE OVERHAUL v5.5
+   All tabs fit to screen properly
+   ══════════════════════════════════════════ */
+
+/* ── Base: all inputs full width ── */
+.f input, .f select, .f textarea { width: 100% !important; min-width: 0 !important; box-sizing: border-box; }
+
+/* ── Grid: 2-col on tablet+, 1-col on mobile ── */
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.fc { grid-column: 1 / -1; }
+
+@media (max-width: 520px) {
+  .g2 { grid-template-columns: 1fr !important; }
+  .fc { grid-column: 1; }
+}
+
+/* ── Invoice tab: fix Acct No tiny width ── */
+#ia { min-width: 70px; }
+
+/* ── Invoice g2 — 3 col row for PO/Terms/Sales/Shipping ── */
+.inv-grid-4 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (max-width: 520px) { .inv-grid-4 { grid-template-columns: 1fr; } }
+
+/* ── Parts tab: all fields full width ── */
+.lr-loc, .lr-qty, .lr-part { width: 100% !important; min-width: 0 !important; }
+
+/* ── Table: horizontal scroll on small screens ── */
+.tw { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* Parts table min widths */
+.tw table { min-width: 400px; }
+
+/* ── Signature boxes: equal height, full width ── */
+.sig-wrap-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.sw { width: 100%; box-sizing: border-box; }
+.sw canvas { width: 100% !important; display: block; }
+
+@media (max-width: 400px) {
+  .sig-wrap-row { grid-template-columns: 1fr; }
+}
+
+/* ── Card padding responsive ── */
+@media (max-width: 480px) {
+  .card { padding: 14px 12px 24px; }
+  .tabs-wrap { padding: 0 10px; }
+  .tab { font-size: 11px; padding: 9px 4px 8px; }
+  .ti { font-size: 14px; }
+  .hdr { padding: 0 12px; }
+}
+
+/* ── Invoice header responsive ── */
+@media (max-width: 480px) {
+  .inv-hdr { flex-direction: column; gap: 8px; }
+  .inv-company { font-size: 14px; }
+  .inv-badge { font-size: 16px; align-self: flex-start; }
+}
+
+/* ── Buttons full width on mobile ── */
+@media (max-width: 480px) {
+  .sa { flex-direction: column; }
+  .sa .btn { flex: none; width: 100%; }
+  .bp { order: 1; }
+  .bs { order: 2; }
+}
