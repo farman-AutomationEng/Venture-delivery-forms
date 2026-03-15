@@ -21,29 +21,10 @@ geotab.addin.ventureDelivery = function() {
 
     initialize: function(api, state, callback) {
       _api = api;
-
-      // Try Drive native API first (mobile), fallback to web API
-      if (api.mobile && api.mobile.exists && api.mobile.exists()) {
-        api.mobile.user.get().then(function(drivers) {
-          if (drivers && drivers.length) {
-            var d = drivers[0];
-            var info = {
-              name: ((d.firstName||"")+" "+(d.lastName||"")).trim() || d.name || "",
-              userId: d.id||"", email: d.name||"",
-              groups: (d.companyGroups||[]).map(function(g){return g.id;}),
-              groupId: (d.companyGroups&&d.companyGroups[0]) ? d.companyGroups[0].id : "",
-              groupName: "",
-              vehicleId: (state&&state.device) ? state.device : "",
-              vehicleName: "", plate: ""
-            };
-            loadGroupAndFinish(api, info, callback);
-          } else {
-            fallbackWebApi(api, callback);
-          }
-        }).catch(function() { fallbackWebApi(api, callback); });
-      } else {
-        fallbackWebApi(api, callback);
-      }
+      // ✅ Always use getSession → Get User
+      // api.mobile.user.get() returns ALL drivers (random) — wrong approach
+      // getSession gives us the LOGGED-IN user only
+      fallbackWebApi(api, callback);
     },
 
     focus: function(api, state) {
