@@ -167,17 +167,20 @@ function fixCheckboxes() {
   var labels = document.querySelectorAll("label.ci");
   for (var i=0; i<labels.length; i++) {
     (function(lbl) {
+      var touched = false;
+      // touchend: manually toggle + block subsequent click
       lbl.addEventListener("touchend", function(e) {
         e.preventDefault();
+        e.stopPropagation();
+        touched = true;
         var cb = lbl.querySelector('input[type="checkbox"]');
-        if (cb) {
-          cb.checked = !cb.checked;
-          // Trigger change event so any listeners fire
-          var evt = document.createEvent("Event");
-          evt.initEvent("change", true, true);
-          cb.dispatchEvent(evt);
-        }
+        if (cb) cb.checked = !cb.checked;
+        setTimeout(function(){ touched = false; }, 500);
       }, {passive: false});
+      // block the click that iOS fires after touchend
+      lbl.addEventListener("click", function(e) {
+        if (touched) { e.preventDefault(); e.stopPropagation(); }
+      });
     })(labels[i]);
   }
 }
