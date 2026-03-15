@@ -108,12 +108,14 @@ function setDrv(info) {
     if ((el=document.getElementById("dgrp"))) el.textContent = "📍 "+(info.groupName||"No Group");
   }
 
-  // Fill form fields silently
-  var g = function(id){ return document.getElementById(id); };
-  if(g("ds-drv")) g("ds-drv").value = info.name||"";
-  if(g("ds-grp")) g("ds-grp").value = info.groupName||"";
-  if(g("ds-vid")) g("ds-vid").value = info.vehicleId||"";
-  if(g("ds-vnm")) g("ds-vnm").value = info.vehicleName||"";
+  // Fill form fields ONLY when vehicle assigned (actual driver, not admin)
+  if (info.vehicleId) {
+    var g = function(id){ return document.getElementById(id); };
+    if(g("ds-drv")) g("ds-drv").value = info.name||"";
+    if(g("ds-grp")) g("ds-grp").value = info.groupName||"";
+    if(g("ds-vid")) g("ds-vid").value = info.vehicleId||"";
+    if(g("ds-vnm")) g("ds-vnm").value = info.vehicleName||"";
+  }
 }
 
 // ── Initialize UI (called once from focus) ────────────────
@@ -407,10 +409,17 @@ function collectD() {
     consigneeSigned:SS["sig-consignee"]?SS["sig-consignee"].signed:false,
     driverSignature: getSigBase64("sig-driver"),
     consigneeSignature: getSigBase64("sig-consignee"),
-    damaged:dmg.length>0, damagedParts:dmg, parts:parts, status:"Submitted",
-    driverName:DRV.name, driverUserId:DRV.userId, driverEmail:DRV.email,
-    driverGroupId:DRV.groupId, driverGroupName:DRV.groupName, driverGroups:DRV.groups,
-    vehicleId:DRV.vehicleId, vehicleName:DRV.vehicleName, vehicleLicensePlate:DRV.plate
+    damaged:dmg.length>0, damagedParts:dmg, parts:parts,
+    // Status: Test if no vehicle assigned, Submitted if real driver
+    status: DRV.vehicleId ? "Submitted" : "Test",
+    // Only save driver info if vehicle assigned (actual driver)
+    driverName: DRV.vehicleId ? DRV.name : "",
+    driverUserId: DRV.vehicleId ? DRV.userId : "",
+    driverEmail: DRV.vehicleId ? DRV.email : "",
+    driverGroupId: DRV.vehicleId ? DRV.groupId : "",
+    driverGroupName: DRV.vehicleId ? DRV.groupName : "",
+    driverGroups: DRV.vehicleId ? DRV.groups : [],
+    vehicleId: DRV.vehicleId, vehicleName: DRV.vehicleName, vehicleLicensePlate: DRV.plate
   };
 }
 
