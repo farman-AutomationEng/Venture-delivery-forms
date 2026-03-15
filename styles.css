@@ -181,200 +181,95 @@ tbody td.tc{text-align:center}
 tr.row-link{cursor:pointer}
 tr.row-link:hover td{background:#EFF6FF !important}
 
-/* ════════════════════════════════════════════
-   DeliveryForm — extracted inline styles
-   ════════════════════════════════════════════ */
-
-/* Driver bar flex child */
-.dbar-flex{flex:1}
-
-/* Success screen */
-.succ-title{font-size:22px;margin-bottom:8px;color:#1e293b}
-.succ-sub{color:#64748b;font-size:13px}
-.btn-new{max-width:200px;margin:0 auto;display:block}
-
-/* FROM info box */
-.from-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#475569}
-
-/* Notice variants */
-.notice-mb{margin-bottom:10px}
-.notice-center{text-align:center;font-weight:800}
-
-/* Accepted label */
-.ci-lg{font-size:13px;font-weight:700}
-
-/* Booklets box */
-.bk-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;margin-bottom:14px}
-.bk-lbl{font-size:11px;font-weight:700;color:#64748b;margin-bottom:8px}
-
-/* Utility spacing */
-.mb14{margin-bottom:14px}
-.mt10{margin-top:10px}
-.mt14{margin-top:14px}
-
-/* Signature label */
-.sig-lbl{font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:6px}
-
-/* Tab panels — initial hidden state */
-.tab-hidden{display:none}
-
-/* Parts table name cell */
-.pt-name{padding:5px 7px;font-weight:600;white-space:nowrap;font-size:11px}
-
-/* Remove button (×) */
-.btn-rm{background:transparent;border:none;cursor:pointer;color:#94a3b8;font-size:16px}
-
-/* Add row/line button */
-.btn-add{padding:8px 12px;background:#E8F4FD;border:1.5px dashed #7BBFDB;border-radius:7px;color:#0078D4;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:14px}
-
-/* ── Invoice tab ── */
-.inv-hdr{display:flex;justify-content:space-between;align-items:center;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px 16px;margin-bottom:16px}
-.inv-company{font-weight:900;font-size:16px}
-.inv-addr{font-size:10px;color:#64748b;margin-top:2px}
-.inv-badge{background:white;border:2px solid #e2e8f0;border-radius:8px;padding:8px 14px;font-size:20px;font-weight:900;color:#0078D4}
-.totals-wrap{display:flex;justify-content:flex-end;margin-bottom:14px}
-.totals-box{background:white;border:1.5px solid #e2e8f0;border-radius:10px;padding:14px 16px;min-width:200px}
-.totals-row{display:flex;justify-content:space-between;margin-bottom:8px;font-size:12px;color:#64748b}
-.ish-input{width:80px;text-align:right;padding:3px 6px;border:1.5px solid #e2e8f0;border-radius:5px;font-size:12px}
-.totals-due{border-top:2px solid #1e3a8a;padding-top:8px;display:flex;justify-content:space-between;font-size:15px;font-weight:900;color:#00263E}
-
-/* ── Invoice dynamic row inputs ── */
-.ir-item{width:80px}
-.ir-qty{width:44px}
-.ir-desc{min-width:150px}
-.ir-price{width:80px}
-
-/* ── Loose Parts tab ── */
-.lp-hdr{text-align:center;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin-bottom:16px}
-.lp-company{font-weight:900;font-size:18px;letter-spacing:2px}
-.lp-sub{font-weight:800;font-size:12px;color:#00263E;letter-spacing:2px;margin-top:3px}
-
-/* ── Loose Parts dynamic row inputs ── */
-.lr-loc{width:50px}
-.lr-qty{width:38px}
-.lr-part{min-width:140px}
-
-/* ── Validation error state ── */
-.f input.err,.f select.err,.f textarea.err{border-color:#DE350B !important;box-shadow:0 0 0 3px rgba(222,53,11,.12) !important;background:#FFF8F7}
-
-/* ── iOS WebView touch fix — cursor:pointer enables tap events ── */
-.tab, .btn, .pill, .btn-add, .btn-rm, .scl {
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* ── Payment type rows (iOS WebView checkbox fix) ── */
-.ci-row{display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer;font-size:13px;color:#374151}
-.ci-row span{cursor:pointer;-webkit-tap-highlight-color:transparent}
-.ci-row input[type="checkbox"]{width:18px;height:18px;accent-color:#0078D4;cursor:pointer;flex-shrink:0}
-
-/* ── Payment type rows ── */
-.pay-row{display:flex;align-items:center;gap:10px;padding:6px 2px;font-size:13px;color:#1A2432;cursor:pointer;min-height:36px}
-.pay-row input[type="checkbox"]{width:22px;height:22px;accent-color:#0078D4;cursor:pointer;flex-shrink:0;margin:0}
-
-/* ── Payment type custom toggles ── */
-.ptog{padding:8px 14px;border:2px solid #D1D5DB;border-radius:6px;font-size:13px;color:#9CA3AF;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;background:white;transition:all .15s}
-.ptog.active{border-color:#0078D4;background:#EFF6FF;color:#0078D4;font-weight:600}
-
-/* ── Payment type toggle buttons ── */
-.ptog{padding:10px 14px;border:2px solid #D1D5DB;border-radius:6px;font-size:13px;font-weight:600;color:#9CA3AF;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;background:white;transition:all .15s}
-.ptog.active{background:#0078D4;border-color:#0078D4;color:white}
-
-/* ── Radio buttons override Geotab CSS ── */
-.pay-row input[type="radio"]{width:20px;height:20px;accent-color:#0078D4;cursor:pointer;flex-shrink:0;margin:0;-webkit-appearance:radio;appearance:radio}
-
-/* ── Invoice No field — wider, aligned with Date ── */
-#ds-inv { min-width: 120px; width: 100%; }
-.g2 .f input[type="date"] { width: 100%; }
-
-/* ── Signatures — bigger, side by side, equal size ── */
-.sig-wrap-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 8px; }
-.sw { min-height: 140px; }
-.sw canvas { height: 140px !important; }
-
-/* ── Responsive: auto-resize for all screen sizes ── */
-@media (max-width: 360px) {
-  .g2 { grid-template-columns: 1fr; }
-  .sig-wrap-row { grid-template-columns: 1fr; }
-  .sw canvas { height: 120px !important; }
-  .card { padding: 12px 10px 24px; }
-  .tab { font-size: 10px; padding: 8px 4px; }
-}
-@media (min-width: 361px) and (max-width: 480px) {
-  .sig-wrap-row { grid-template-columns: 1fr 1fr; }
-  .sw canvas { height: 130px !important; }
-}
-@media (min-width: 481px) and (max-width: 768px) {
-  .sw canvas { height: 150px !important; }
-  .card { padding: 16px 14px 28px; }
-}
-@media (min-width: 769px) {
-  .sw canvas { height: 160px !important; }
-  .card { max-width: 880px; }
-}
-
 /* ══════════════════════════════════════════
-   RESPONSIVE OVERHAUL v5.5
-   All tabs fit to screen properly
+   RESPONSIVE — Clean single version
    ══════════════════════════════════════════ */
 
-/* ── Base: all inputs full width ── */
-.f input, .f select, .f textarea { width: 100% !important; min-width: 0 !important; box-sizing: border-box; }
-
-/* ── Grid: 2-col on tablet+, 1-col on mobile ── */
-.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.fc { grid-column: 1 / -1; }
-
-@media (max-width: 520px) {
-  .g2 { grid-template-columns: 1fr !important; }
-  .fc { grid-column: 1; }
+/* ── All inputs full width in their container ── */
+.f { width: 100%; min-width: 0; }
+.f input, .f select, .f textarea {
+  width: 100%; min-width: 0; box-sizing: border-box;
 }
 
-/* ── Invoice tab: fix Acct No tiny width ── */
-#ia { min-width: 70px; }
+/* ── 2-col grid ── */
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.fc { grid-column: 1 / -1; }
+.mt10 { margin-top: 10px; }
+.mt14 { margin-top: 14px; }
+.mb14 { margin-bottom: 14px; }
 
-/* ── Invoice g2 — 3 col row for PO/Terms/Sales/Shipping ── */
-.inv-grid-4 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-@media (max-width: 520px) { .inv-grid-4 { grid-template-columns: 1fr; } }
-
-/* ── Parts tab: all fields full width ── */
-.lr-loc, .lr-qty, .lr-part { width: 100% !important; min-width: 0 !important; }
-
-/* ── Table: horizontal scroll on small screens ── */
-.tw { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-
-/* Parts table min widths */
-.tw table { min-width: 400px; }
-
-/* ── Signature boxes: equal height, full width ── */
-.sig-wrap-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+/* ── Signatures side by side ── */
+.sig-wrap-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .sw { width: 100%; box-sizing: border-box; }
 .sw canvas { width: 100% !important; display: block; }
 
-@media (max-width: 400px) {
-  .sig-wrap-row { grid-template-columns: 1fr; }
-}
+/* ── Payment section ── */
+#payment-types { background: transparent; border: none; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.pay-row { display: flex; align-items: center; gap: 10px; padding: 5px 2px; font-size: 13px; color: #1A2432; min-height: 34px; white-space: nowrap; }
+.pay-row input[type="radio"] { width: 20px; height: 20px; flex-shrink: 0; margin: 0; accent-color: #0078D4; -webkit-appearance: radio; appearance: radio; cursor: pointer; }
 
-/* ── Card padding responsive ── */
-@media (max-width: 480px) {
+/* ── Invoice ── */
+.inv-hdr { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; }
+.inv-company { font-weight: 900; font-size: 16px; }
+.inv-addr { font-size: 10px; color: #64748b; margin-top: 2px; }
+.inv-badge { background: white; border: 2px solid #e2e8f0; border-radius: 8px; padding: 8px 14px; font-size: 20px; font-weight: 900; color: #0078D4; white-space: nowrap; }
+.inv-grid-4 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.totals-wrap { display: flex; justify-content: flex-end; margin-bottom: 14px; }
+.totals-box { background: white; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 14px 16px; min-width: 200px; }
+.totals-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; color: #64748b; }
+.ish-input { width: 80px; text-align: right; padding: 3px 6px; border: 1.5px solid #e2e8f0; border-radius: 5px; font-size: 12px; }
+.totals-due { border-top: 2px solid #1e3a8a; padding-top: 8px; display: flex; justify-content: space-between; font-size: 15px; font-weight: 900; color: #00263E; }
+.ir-item { width: 80px; } .ir-qty { width: 44px; } .ir-desc { min-width: 0; width: 100%; } .ir-price { width: 80px; }
+
+/* ── Loose Parts ── */
+.lp-hdr { text-align: center; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 16px; }
+.lp-company { font-weight: 900; font-size: 18px; letter-spacing: 2px; }
+.lp-sub { font-weight: 800; font-size: 12px; color: #00263E; letter-spacing: 2px; margin-top: 3px; }
+.lr-loc { width: 100%; } .lr-qty { width: 100%; } .lr-part { width: 100%; }
+
+/* ── Table scroll ── */
+.tw { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 4px; border: 1px solid #E5E7EB; margin-bottom: 12px; }
+.tw table { min-width: 420px; width: 100%; border-collapse: collapse; font-size: 12px; }
+
+/* ── Buttons ── */
+.btn-add { padding: 8px 12px; background: #E8F4FD; border: 1.5px dashed #7BBFDB; border-radius: 7px; color: #0078D4; font-size: 12px; font-weight: 700; cursor: pointer; margin-bottom: 14px; }
+.btn-rm { background: transparent; border: none; cursor: pointer; color: #94a3b8; font-size: 16px; padding: 4px 8px; }
+.btn-new { max-width: 200px; margin: 0 auto; display: block; }
+
+/* ── Misc ── */
+.from-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; font-size: 12px; color: #475569; }
+.bk-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; }
+.bk-lbl { font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 8px; }
+.sig-lbl { font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 6px; }
+.tab-hidden { display: none; }
+.notice-mb { margin-bottom: 10px; }
+.notice-center { text-align: center; font-weight: 800; }
+.ci-lg { font-size: 13px; font-weight: 700; }
+.dbar-flex { flex: 1; }
+.succ-title { font-size: 22px; margin-bottom: 8px; color: #1e293b; }
+.succ-sub { color: #64748b; font-size: 13px; }
+
+/* ── iOS touch ── */
+.tab, .btn, .pill, .btn-add, .btn-rm, .scl, .pay-row { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+
+/* ══ MOBILE (≤520px) ══ */
+@media (max-width: 520px) {
+  .g2 { grid-template-columns: 1fr; }
+  .fc { grid-column: 1; }
+  .inv-grid-4 { grid-template-columns: 1fr; }
   .card { padding: 14px 12px 24px; }
   .tabs-wrap { padding: 0 10px; }
   .tab { font-size: 11px; padding: 9px 4px 8px; }
   .ti { font-size: 14px; }
   .hdr { padding: 0 12px; }
-}
-
-/* ── Invoice header responsive ── */
-@media (max-width: 480px) {
   .inv-hdr { flex-direction: column; gap: 8px; }
-  .inv-company { font-size: 14px; }
-  .inv-badge { font-size: 16px; align-self: flex-start; }
-}
-
-/* ── Buttons full width on mobile ── */
-@media (max-width: 480px) {
   .sa { flex-direction: column; }
-  .sa .btn { flex: none; width: 100%; }
+  .sa .btn { flex: none !important; width: 100%; }
   .bp { order: 1; }
   .bs { order: 2; }
+}
+
+/* ══ SMALL MOBILE (≤380px) ══ */
+@media (max-width: 380px) {
+  .sig-wrap-row { grid-template-columns: 1fr; }
 }
