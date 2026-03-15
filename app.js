@@ -158,30 +158,31 @@ function initUI() {
     initSig("sig-lpr");
   }, 300);
 
-  // ✅ iOS WebView fix: checkboxes inside <label> don't respond to touch
-  // Manually toggle on touchend
-  fixCheckboxes();
+  // ✅ Payment type rows — tap anywhere on row to toggle checkbox
+  fixPaymentRows();
 }
 
-function fixCheckboxes() {
-  var labels = document.querySelectorAll("label.ci");
-  for (var i=0; i<labels.length; i++) {
-    (function(lbl) {
-      var touched = false;
-      // touchend: manually toggle + block subsequent click
-      lbl.addEventListener("touchend", function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        touched = true;
-        var cb = lbl.querySelector('input[type="checkbox"]');
-        if (cb) cb.checked = !cb.checked;
-        setTimeout(function(){ touched = false; }, 500);
-      }, {passive: false});
-      // block the click that iOS fires after touchend
-      lbl.addEventListener("click", function(e) {
-        if (touched) { e.preventDefault(); e.stopPropagation(); }
-      });
-    })(labels[i]);
+function fixPaymentRows() {
+  var rows = document.querySelectorAll(".ci-row");
+  for (var i=0; i<rows.length; i++) {
+    (function(row) {
+      // tap on row text (span) toggles the checkbox
+      var span = row.querySelector("span");
+      if (span) {
+        span.addEventListener("touchend", function(e) {
+          e.preventDefault();
+          var cb = row.querySelector('input[type="checkbox"]');
+          if (cb) {
+            cb.checked = !cb.checked;
+            // Force visual re-render (iOS WebView bug fix)
+            cb.checked = cb.checked;
+          }
+        }, {passive: false});
+        span.addEventListener("click", function(e) {
+          e.preventDefault(); // prevent double toggle
+        });
+      }
+    })(rows[i]);
   }
 }
 
