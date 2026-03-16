@@ -44,6 +44,8 @@ geotab.addin.ventureDelivery = function() {
       // ✅ Hide the add-in (official pattern)
       var app = document.getElementById("vt-app");
       if (app) app.style.display = "none";
+      // Reset form so fresh state when user returns
+      resetF();
     }
   };
 };
@@ -533,10 +535,52 @@ function showSucc(id) {
   window.scrollTo(0,0);
 }
 function resetF() {
+  // ── Hide success screen ──────────────────────────────
   var succ=document.getElementById("succ"); if(succ) succ.style.display="none";
+
+  // ── Switch to tab 0 ──────────────────────────────────
   swT(0);
-  clrS("sig-driver"); clrS("sig-consignee"); clrS("sig-lpd"); clrS("sig-lpr");
-  bklt="";
+
+  // ── Clear all text/number/email/tel inputs ───────────
+  var allInputs = document.querySelectorAll("#t0 input, #t1 input, #t2 input");
+  for (var i=0; i<allInputs.length; i++) {
+    var inp = allInputs[i];
+    // Skip readonly driver fields, radio buttons, checkboxes, date fields
+    if (inp.readOnly) continue;
+    if (inp.type === "radio")    { inp.checked = (inp.value === "COD"); continue; }
+    if (inp.type === "checkbox") { inp.checked = false; continue; }
+    if (inp.type === "date")     { inp.value = new Date().toISOString().split("T")[0]; continue; }
+    inp.value = "";
+  }
+
+  // ── Clear all textareas ──────────────────────────────
+  var allTA = document.querySelectorAll("#t0 textarea, #t1 textarea, #t2 textarea");
+  for (var j=0; j<allTA.length; j++) allTA[j].value = "";
+
+  // ── Reset Invoice default fields ─────────────────────
+  var ia = document.getElementById("ia"); if(ia) ia.value = "3818";
+  var itr = document.getElementById("itr"); if(itr) itr.value = "Due on receipt";
+  var itot = document.getElementById("itot"); if(itot) itot.textContent = "$0.00";
+
+  // ── Clear invoice line items & loose parts rows ──────
+  var itb = document.getElementById("itb"); if(itb) itb.innerHTML = "";
+  var ltb = document.getElementById("ltb"); if(ltb) ltb.innerHTML = "";
+  irc = 0; lrc = 0;
+  addIR(); addIR();
+  for (var k=0; k<10; k++) addLR();
+
+  // ── Clear signatures ─────────────────────────────────
+  clrS("sig-driver"); clrS("sig-consignee");
+  clrS("sig-lpd");    clrS("sig-lpr");
+
+  // ── Reset booklet pills ──────────────────────────────
+  bklt = "";
   var py=document.getElementById("py"); if(py) py.className="pill";
   var pn=document.getElementById("pn"); if(pn) pn.className="pill";
+
+  // ── Rebuild parts condition table ────────────────────
+  buildPT();
+
+  // ── Scroll to top ────────────────────────────────────
+  window.scrollTo(0, 0);
 }
