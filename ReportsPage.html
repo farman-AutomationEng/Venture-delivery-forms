@@ -328,24 +328,19 @@ function openD(id){
 
   // Helper: signature box
   function sigBox(label, base64, signed){
-    let inner="";
-    // Any non-empty string that looks like base64/dataURL = try to show as image
-    const hasImg = base64 && typeof base64 === "string" && base64.length > 30;
+    var inner="";
+    var hasImg = base64 && typeof base64 === "string" && base64.length > 30;
     if(hasImg){
-      // onerror: if image fails to load, replace with signed/not-signed text
-      const fallback = signed
-        ? `this.parentNode.innerHTML='<div style=\\"${S.sigOk}\\">✓ Signed</div>'`
-        : `this.parentNode.innerHTML='<div style=\\"${S.sigNone}\\">— Not Signed —</div>'`;
-      inner=`<img src="${base64}" alt="${label} signature" style="${S.sigImg}" onerror="${fallback}">`;
+      inner='<img src="'+base64+'" alt="'+label+' signature" style="'+S.sigImg+'">';
     }else if(signed){
-      inner=`<div style="${S.sigOk}">✓ Signed</div>`;
+      inner='<div style="'+S.sigOk+'">&#10003; Signed</div>';
     }else{
-      inner=`<div style="${S.sigNone}">— Not Signed —</div>`;
+      inner='<div style="'+S.sigNone+'">&#8212; Not Signed &#8212;</div>';
     }
-    return`<div style="${S.sigBox}">
-      <div style="${S.sigLbl}">${label}</div>
-      ${inner}
-    </div>`;
+    return '<div style="'+S.sigBox+'">'
+      +'<div style="'+S.sigLbl+'">'+label+'</div>'
+      +inner
+      +'</div>';
   }
 
   // ── Build HTML ──
