@@ -233,33 +233,55 @@ function addIR() {
   irc++;
   var id = "ir"+irc;
   var tr = document.createElement("tr"); tr.id = id;
+  // Total column is readonly — auto calculated from Qty x Unit Price
   tr.innerHTML = '<td><input type="text" class="ir-item"></td>'
-    +'<td><input type="number" value="1" class="ir-qty"></td>'
+    +'<td><input type="number" value="1" min="1" class="ir-qty" id="qty-'+id+'"></td>'
     +'<td><input type="text" class="ir-desc"></td>'
-    +'<td><input type="text" class="ir-price" id="p1-'+id+'"></td>'
-    +'<td><input type="text" class="ir-price" id="p2-'+id+'"></td>'
+    +'<td><input type="number" step="0.01" placeholder="0.00" class="ir-price" id="p1-'+id+'"></td>'
+    +'<td><input type="text" class="ir-price" id="p2-'+id+'" readonly '
+      +'style="background:#F9FAFB;color:#374151;font-weight:700;cursor:default"></td>'
     +'<td><button class="btn-rm" id="rm-'+id+'">✕</button></td>';
+
   var tb = document.getElementById("itb");
   if (tb) {
     tb.appendChild(tr);
-    var p1 = document.getElementById("p1-"+id);
-    var p2 = document.getElementById("p2-"+id);
-    if (p1) p1.addEventListener("input", calcT);
-    if (p2) p2.addEventListener("input", calcT);
-    on("rm-"+id, function(){ var r=document.getElementById(id); if(r) r.parentNode.removeChild(r); calcT(); });
+
+    var qtyEl   = document.getElementById("qty-"+id);
+    var priceEl = document.getElementById("p1-"+id);
+    var totEl   = document.getElementById("p2-"+id);
+
+    // Recalculate this row's total then update grand total
+    function recalcRow() {
+      var qty   = parseFloat(qtyEl.value)   || 0;
+      var price = parseFloat(priceEl.value) || 0;
+      var rowTotal = qty * price;
+      totEl.value = rowTotal > 0 ? rowTotal.toFixed(2) : "";
+      calcT();
+    }
+
+    if (qtyEl)   qtyEl.addEventListener("input",   recalcRow);
+    if (priceEl) priceEl.addEventListener("input",  recalcRow);
+
+    on("rm-"+id, function(){
+      var r = document.getElementById(id);
+      if (r) r.parentNode.removeChild(r);
+      calcT();
+    });
   }
 }
 
 function calcT() {
-  var s=0, rows=document.querySelectorAll("#itb tr");
+  // Sum all readonly Total cells (p2-*)
+  var s = 0;
+  var rows = document.querySelectorAll("#itb tr");
   for (var i=0; i<rows.length; i++) {
     var t = rows[i].querySelector("td:nth-child(5) input");
-    if (t) s += parseFloat(t.value)||0;
+    if (t) s += parseFloat(t.value) || 0;
   }
   var ish = document.getElementById("ish");
-  s += ish ? (parseFloat(ish.value)||0) : 0;
+  s += ish ? (parseFloat(ish.value) || 0) : 0;
   var tot = document.getElementById("itot");
-  if (tot) tot.textContent = "$"+s.toFixed(2);
+  if (tot) tot.textContent = "$" + s.toFixed(2);
 }
 
 // ── Loose parts rows ──────────────────────────────────────
