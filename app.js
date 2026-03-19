@@ -84,22 +84,48 @@ function fallbackWebApi(api, callback) {
         groupId: (u.companyGroups&&u.companyGroups[0]) ? u.companyGroups[0].id : "",
         groupName: "", vehicleId: "", vehicleName: "", plate: ""
       };
-      loadGroupAndFinish(api, info, callback);
+
+      // ── Fetch currently assigned vehicle via DeviceStatusInfo ──
+      // driverSearch:{id} returns the device this driver is currently logged into
+      api.call("Get", {typeName:"DeviceStatusInfo", search:{driverSearch:{id:u.id}}},
+        function(dsi) {
+          if (dsi && dsi.length > 0 && dsi[0].device && dsi[0].device.id) {
+            info.vehicleId   = dsi[0].device.id   || "";
+            info.vehicleName = dsi[0].device.name || "";
+            // Fetch full Device to get license plate
+            api.call("Get", {typeName:"Device", search:{id:info.vehicleId}},
+              function(devs) {
+                if (devs && devs[0]) {
+                  info.plate = devs[0].licensePlate || "";
+                }
+                loadGroupAndFinish(api, info, callback);
+              },
+              function() { loadGroupAndFinish(api, info, callback); }
+            );
+          } else {
+            // Driver not currently logged into any vehicle — still show name/group
+            loadGroupAndFinish(api, info, callback);
+          }
+        },
+        function(e) {
+          console.error("DeviceStatusInfo error:", e);
+          loadGroupAndFinish(api, info, callback);
+        }
+      );
+
     }, function(e) { console.error("User load error:", e); callback(); });
   });
 }
 
-// ── Set driver info ───────────────────────────────────────
+// ── Set driver info ───────────────────────────────────────────
 function setDrv(info) {
   DRV.name=info.name||""; DRV.userId=info.userId||""; DRV.email=info.email||"";
   DRV.groupId=info.groupId||""; DRV.groupName=info.groupName||"";
   DRV.groups=info.groups||[]; DRV.vehicleId=info.vehicleId||"";
   DRV.vehicleName=info.vehicleName||""; DRV.plate=info.plate||"";
 
-  // Driver bar + Driver Info section — only show when vehicle assigned
-  var drv_sec = document.getElementById("drv-section");
-  if (info.vehicleId) {
-    if (drv_sec) drv_sec.style.display = "block";
+  // Always show driver bar when we have a name (not just when vehicle assigned)
+  if (info.name) {
     var db = document.getElementById("dbar");
     if (db) db.style.display = "flex";
     var init = info.name.split(" ").map(function(w){return w[0]||"";}).join("").toUpperCase().slice(0,2)||"D";
@@ -110,8 +136,10 @@ function setDrv(info) {
     if ((el=document.getElementById("dgrp"))) el.textContent = "📍 "+(info.groupName||"No Group");
   }
 
-  // Fill form fields ONLY when vehicle assigned (actual driver, not admin)
+  // Driver Info section + form fields — only show/fill when vehicle is assigned
   if (info.vehicleId) {
+    var drv_sec = document.getElementById("drv-section");
+    if (drv_sec) drv_sec.style.display = "block";
     var g = function(id){ return document.getElementById(id); };
     if(g("ds-drv")) g("ds-drv").value = info.name||"";
     if(g("ds-grp")) g("ds-grp").value = info.groupName||"";
