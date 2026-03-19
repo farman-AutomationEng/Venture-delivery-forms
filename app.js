@@ -71,12 +71,29 @@ function fallbackWebApi(api, callback) {
     api.call("Get", {typeName:"User", search:{userName:sess.userName}}, function(us) {
       if (!us||!us.length) { callback(); return; }
       var u = us[0];
-      var fn = ((u.firstName||"")+" "+(u.lastName||"")).trim();
+      // Helper: checks if a name looks like an email-username (no spaces, all lowercase/digits)
+      function looksLikeUsername(s) {
+        return s && !/\s/.test(s) && s === s.toLowerCase() && s.length > 0;
+      }
+      // Helper: format a username into a readable name (split on dots/underscores)
+      function fmtUsername(s) {
+        return s.replace(/[._]/g," ")
+          .replace(/\b\w/g, function(ch){ return ch.toUpperCase(); })
+          .trim();
+      }
+      var rawFirst = (u.firstName||"").trim();
+      var rawLast  = (u.lastName||"").trim();
+      var fn;
+      if (rawFirst || rawLast) {
+        // If firstName looks like an email username, format it nicely
+        if (looksLikeUsername(rawFirst) && !rawLast) {
+          fn = fmtUsername(rawFirst);
+        } else {
+          fn = (rawFirst+" "+rawLast).trim();
+        }
+      }
       if (!fn) {
-        fn = (sess.userName||"").split("@")[0]
-          .replace(/[._]/g," ")
-          .replace(/\b\w/g, function(c){ return c.toUpperCase(); })
-          .trim() || sess.userName;
+        fn = fmtUsername((sess.userName||"").split("@")[0]) || sess.userName;
       }
       var info = {
         name: fn, userId: u.id||"", email: u.name||sess.userName,
