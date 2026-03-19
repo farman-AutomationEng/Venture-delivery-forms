@@ -64,75 +64,116 @@ function loadGroupAndFinish(api, info, callback) {
   }
 }
 
-// ── Fallback: standard MyGeotab web API ──────────────────
+// ── Name helpers ───────────────────────────────────────────
+function looksLikeUsername(s) {
+  return s && !/\s/.test(s) && s === s.toLowerCase() && s.length > 0;
+}
+function fmtUsername(s) {
+  return s.replace(/[._]/g," ").replace(/\b\w/g,function(ch){return ch.toUpperCase();}).trim();
+}
+function buildName(rawFirst, rawLast, fallbackEmail) {
+  var fn;
+  if (rawFirst || rawLast) {
+    fn = (looksLikeUsername(rawFirst) && !rawLast) ? fmtUsername(rawFirst) : (rawFirst+" "+rawLast).trim();
+  }
+  if (!fn) fn = fmtUsername((fallbackEmail||"").split("@")[0]) || fallbackEmail || "";
+  return fn;
+}
+
+// ── Fetch vehicle then finish ──────────────────────────────────
+function fetchVehicleAndFinish(api, info, callback) {
+  api.call("Get", {typeName:"DeviceStatusInfo", search:{driverSearch:{id:info.userId}}},
+    function(dsi) {
+      if (dsi && dsi.length > 0 && dsi[0].device && dsi[0].device.id) {
+        info.vehicleId   = dsi[0].device.id   || "";
+        info.vehicleName = dsi[0].device.name || "";
+        api.call("Get", {typeName:"Device", search:{id:info.vehicleId}},
+          function(devs) {
+            if (devs && devs[0]) info.plate = devs[0].licensePlate || "";
+            loadGroupAndFinish(api, info, callback);
+          },
+          function() { loadGroupAndFinish(api, info, callback); }
+        );
+      } else {
+        loadGroupAndFinish(api, info, callback);
+      }
+    },
+    function(e) { console.error("DeviceStatusInfo error:", e); loadGroupAndFinish(api, info, callback); }
+  );
+}
+
+// ── Main driver fetch ──────────────────────────────────────────
+// Official Geotab Drive SDK (developers.geotab.com/drive/apiReference):
+//   api.mobile.user.get(false)   → Promise → current logged-in driver ONLY
+//   api.mobile.vehicle.get()     → Promise → current vehicle info
+//   api.mobile.exists()          → true = running inside native Drive app
+//
+// getSession() alone is unreliable in Drive — it may return the session of
+// whoever originally set up the vehicle in Drive, not the current driver.
 function fallbackWebApi(api, callback) {
+
+  // ── Path A: Inside Geotab Drive native app ────────────────────
+  if (api.mobile && typeof api.mobile.exists === "function" && api.mobile.exists()) {
+
+    // api.mobile.user.get(false) → includeAllDrivers:false → current driver only
+    // (true/default returns ALL drivers including co-drivers — wrong for us)
+    api.mobile.user.get(false).then(function(drivers) {
+      var drv = (drivers && drivers[0]) ? drivers[0] : null;
+      if (!drv) { webApiFetch(api, callback); return; }
+
+      var fn = buildName((drv.firstName||"").trim(), (drv.lastName||"").trim(), drv.name||"");
+      var info = {
+        name: fn, userId: drv.id||"", email: drv.name||"",
+        groups: (drv.companyGroups||[]).map(function(g){return g.id;}),
+        groupId: (drv.companyGroups&&drv.companyGroups[0]) ? drv.companyGroups[0].id : "",
+        groupName: "", vehicleId: "", vehicleName: "", plate: ""
+      };
+
+      // api.mobile.vehicle.get() → current vehicle (also Promise)
+      api.mobile.vehicle.get().then(function(veh) {
+        if (veh && veh.id) {
+          info.vehicleId   = veh.id   || "";
+          info.vehicleName = veh.name || "";
+          info.plate       = veh.licensePlate || "";
+        }
+        loadGroupAndFinish(api, info, callback);
+      }).catch(function() {
+        // vehicle.get() failed — try DeviceStatusInfo as backup
+        fetchVehicleAndFinish(api, info, callback);
+      });
+
+    }).catch(function(e) {
+      console.error("api.mobile.user.get error:", e);
+      // Fall through to web API
+      webApiFetch(api, callback);
+    });
+
+    return; // handled above
+  }
+
+  // ── Path B: Browser / MyGeotab web context ────────────────────
+  webApiFetch(api, callback);
+}
+
+// Standard web API fetch (for browser/MyGeotab context)
+function webApiFetch(api, callback) {
   api.getSession(function(sess) {
     if (!sess) { callback(); return; }
     api.call("Get", {typeName:"User", search:{userName:sess.userName}}, function(us) {
       if (!us||!us.length) { callback(); return; }
       var u = us[0];
-      // Helper: checks if a name looks like an email-username (no spaces, all lowercase/digits)
-      function looksLikeUsername(s) {
-        return s && !/\s/.test(s) && s === s.toLowerCase() && s.length > 0;
-      }
-      // Helper: format a username into a readable name (split on dots/underscores)
-      function fmtUsername(s) {
-        return s.replace(/[._]/g," ")
-          .replace(/\b\w/g, function(ch){ return ch.toUpperCase(); })
-          .trim();
-      }
-      var rawFirst = (u.firstName||"").trim();
-      var rawLast  = (u.lastName||"").trim();
-      var fn;
-      if (rawFirst || rawLast) {
-        // If firstName looks like an email username, format it nicely
-        if (looksLikeUsername(rawFirst) && !rawLast) {
-          fn = fmtUsername(rawFirst);
-        } else {
-          fn = (rawFirst+" "+rawLast).trim();
-        }
-      }
-      if (!fn) {
-        fn = fmtUsername((sess.userName||"").split("@")[0]) || sess.userName;
-      }
+      var fn = buildName((u.firstName||"").trim(), (u.lastName||"").trim(), u.name||sess.userName);
       var info = {
         name: fn, userId: u.id||"", email: u.name||sess.userName,
         groups: (u.companyGroups||[]).map(function(g){return g.id;}),
         groupId: (u.companyGroups&&u.companyGroups[0]) ? u.companyGroups[0].id : "",
         groupName: "", vehicleId: "", vehicleName: "", plate: ""
       };
-
-      // ── Fetch currently assigned vehicle via DeviceStatusInfo ──
-      // driverSearch:{id} returns the device this driver is currently logged into
-      api.call("Get", {typeName:"DeviceStatusInfo", search:{driverSearch:{id:u.id}}},
-        function(dsi) {
-          if (dsi && dsi.length > 0 && dsi[0].device && dsi[0].device.id) {
-            info.vehicleId   = dsi[0].device.id   || "";
-            info.vehicleName = dsi[0].device.name || "";
-            // Fetch full Device to get license plate
-            api.call("Get", {typeName:"Device", search:{id:info.vehicleId}},
-              function(devs) {
-                if (devs && devs[0]) {
-                  info.plate = devs[0].licensePlate || "";
-                }
-                loadGroupAndFinish(api, info, callback);
-              },
-              function() { loadGroupAndFinish(api, info, callback); }
-            );
-          } else {
-            // Driver not currently logged into any vehicle — still show name/group
-            loadGroupAndFinish(api, info, callback);
-          }
-        },
-        function(e) {
-          console.error("DeviceStatusInfo error:", e);
-          loadGroupAndFinish(api, info, callback);
-        }
-      );
-
+      fetchVehicleAndFinish(api, info, callback);
     }, function(e) { console.error("User load error:", e); callback(); });
   });
 }
+
 
 // ── Set driver info ───────────────────────────────────────────
 function setDrv(info) {
