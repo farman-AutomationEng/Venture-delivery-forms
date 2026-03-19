@@ -1,5 +1,5 @@
 // ============================================================
-// VENTURE TRAILERS — app.js v4.0
+// VENTURE TRAILERS — app.js v5.0 — DEBUG BUILD
 // ✅ Follows official Geotab SDK sample pattern exactly:
 //    - geotab.addin.ventureDelivery lifecycle
 //    - initialize() → load data, call callback
@@ -21,9 +21,7 @@ geotab.addin.ventureDelivery = function() {
 
     initialize: function(api, state, callback) {
       _api = api;
-      // ✅ Always use getSession → Get User
-      // api.mobile.user.get() returns ALL drivers (random) — wrong approach
-      // getSession gives us the LOGGED-IN user only
+      // v5.0: Drive-first using official api.mobile.user.get(false)
       fallbackWebApi(api, callback);
     },
 
@@ -103,75 +101,42 @@ function fetchVehicleAndFinish(api, info, callback) {
 }
 
 // ── Main driver fetch ──────────────────────────────────────────
-// Official Geotab Drive SDK (developers.geotab.com/drive/apiReference):
-//   api.mobile.user.get(false)   → Promise → current logged-in driver ONLY
-//   api.mobile.vehicle.get()     → Promise → current vehicle info
-//   api.mobile.exists()          → true = running inside native Drive app
-//
-// getSession() alone is unreliable in Drive — it may return the session of
-// whoever originally set up the vehicle in Drive, not the current driver.
+// SOURCE: Official Geotab Drive addin sample (github.com/Geotab/addin-drive)
+// Uses api.user directly — this is the current logged-in user\'s username
+// Then does Get User by userName to fetch full profile (name, groups etc.)
 function fallbackWebApi(api, callback) {
+  // api.user is set by Geotab Drive to the currently logged-in user\'s email
+  // This is exactly what the official Geotab addin-drive sample uses
+  var currentUser = api.user || "";
 
-  // ── Path A: Inside Geotab Drive native app ────────────────────
-  if (api.mobile && typeof api.mobile.exists === "function" && api.mobile.exists()) {
-
-    // api.mobile.user.get(false) → includeAllDrivers:false → current driver only
-    // (true/default returns ALL drivers including co-drivers — wrong for us)
-    api.mobile.user.get(false).then(function(drivers) {
-      var drv = (drivers && drivers[0]) ? drivers[0] : null;
-      if (!drv) { webApiFetch(api, callback); return; }
-
-      var fn = buildName((drv.firstName||"").trim(), (drv.lastName||"").trim(), drv.name||"");
-      var info = {
-        name: fn, userId: drv.id||"", email: drv.name||"",
-        groups: (drv.companyGroups||[]).map(function(g){return g.id;}),
-        groupId: (drv.companyGroups&&drv.companyGroups[0]) ? drv.companyGroups[0].id : "",
-        groupName: "", vehicleId: "", vehicleName: "", plate: ""
-      };
-
-      // api.mobile.vehicle.get() → current vehicle (also Promise)
-      api.mobile.vehicle.get().then(function(veh) {
-        if (veh && veh.id) {
-          info.vehicleId   = veh.id   || "";
-          info.vehicleName = veh.name || "";
-          info.plate       = veh.licensePlate || "";
-        }
-        loadGroupAndFinish(api, info, callback);
-      }).catch(function() {
-        // vehicle.get() failed — try DeviceStatusInfo as backup
-        fetchVehicleAndFinish(api, info, callback);
-      });
-
-    }).catch(function(e) {
-      console.error("api.mobile.user.get error:", e);
-      // Fall through to web API
-      webApiFetch(api, callback);
+  if (!currentUser) {
+    // Fallback: getSession as last resort
+    api.getSession(function(sess) {
+      if (sess && sess.userName) {
+        fetchUserByName(api, sess.userName, callback);
+      } else {
+        callback();
+      }
     });
-
-    return; // handled above
+    return;
   }
 
-  // ── Path B: Browser / MyGeotab web context ────────────────────
-  webApiFetch(api, callback);
+  fetchUserByName(api, currentUser, callback);
 }
 
-// Standard web API fetch (for browser/MyGeotab context)
-function webApiFetch(api, callback) {
-  api.getSession(function(sess) {
-    if (!sess) { callback(); return; }
-    api.call("Get", {typeName:"User", search:{userName:sess.userName}}, function(us) {
-      if (!us||!us.length) { callback(); return; }
-      var u = us[0];
-      var fn = buildName((u.firstName||"").trim(), (u.lastName||"").trim(), u.name||sess.userName);
-      var info = {
-        name: fn, userId: u.id||"", email: u.name||sess.userName,
-        groups: (u.companyGroups||[]).map(function(g){return g.id;}),
-        groupId: (u.companyGroups&&u.companyGroups[0]) ? u.companyGroups[0].id : "",
-        groupName: "", vehicleId: "", vehicleName: "", plate: ""
-      };
-      fetchVehicleAndFinish(api, info, callback);
-    }, function(e) { console.error("User load error:", e); callback(); });
-  });
+function fetchUserByName(api, userName, callback) {
+  api.call("Get", {typeName:"User", search:{userName:userName}}, function(us) {
+    if (!us || !us.length) { callback(); return; }
+    var u = us[0];
+    var fn = buildName((u.firstName||"").trim(), (u.lastName||"").trim(), u.name||userName);
+    var info = {
+      name: fn, userId: u.id||"", email: u.name||userName,
+      groups: (u.companyGroups||[]).map(function(g){return g.id;}),
+      groupId: (u.companyGroups&&u.companyGroups[0]) ? u.companyGroups[0].id : "",
+      groupName: "", vehicleId: "", vehicleName: "", plate: ""
+    };
+    fetchVehicleAndFinish(api, info, callback);
+  }, function(e) { console.error("User fetch error:", e); callback(); });
 }
 
 
@@ -181,6 +146,9 @@ function setDrv(info) {
   DRV.groupId=info.groupId||""; DRV.groupName=info.groupName||"";
   DRV.groups=info.groups||[]; DRV.vehicleId=info.vehicleId||"";
   DRV.vehicleName=info.vehicleName||""; DRV.plate=info.plate||"";
+
+  // v5.0 debug: show which path was used
+  console.log("[v5.0] setDrv called:", JSON.stringify({name:info.name, userId:info.userId, email:info.email, vehicleId:info.vehicleId}));
 
   // Always show driver bar when we have a name (not just when vehicle assigned)
   if (info.name) {
