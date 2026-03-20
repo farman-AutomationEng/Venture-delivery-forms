@@ -484,8 +484,13 @@ function mkS(id) {
 }
 function clrS(id) {
   var c=document.getElementById(id); if(!c) return;
-  var dpr=window.devicePixelRatio||1;
-  c.getContext("2d").clearRect(0,0,c.width/dpr,c.height/dpr);
+  // Reset transform first, then clear full physical canvas, then re-apply DPR scale
+  var ctx = c.getContext("2d");
+  var dpr = window.devicePixelRatio||1;
+  ctx.setTransform(1,0,0,1,0,0);          // remove any existing scale
+  ctx.clearRect(0,0,c.width,c.height);    // clear full physical canvas
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.scale(dpr,dpr);                     // re-apply DPR scale for future drawing
   SS[id]={drawing:false,signed:false};
   var wrap=document.getElementById(id+"-wrap"); if(wrap) wrap.className="sw";
   var ok=document.getElementById(id+"-ok"); if(ok) ok.style.display="none";
