@@ -1,5 +1,5 @@
 // ============================================================
-// VENTURE TRAILERS — app.js v5.0 — DEBUG BUILD
+// VENTURE TRAILERS — app.js v4.0
 // ✅ Follows official Geotab SDK sample pattern exactly:
 //    - geotab.addin.ventureDelivery lifecycle
 //    - initialize() → load data, call callback
@@ -9,10 +9,6 @@
 // ============================================================
 
 var ADDIN_ID = "azXOKPvAnSnyIdUK2xZutWA";
-// ── License Server ─────────────────────────────────────────────
-// Replace with your actual GAS Web App URL after deploying
-var LICENSE_SERVER_URL = "https://script.google.com/a/macros/dynastync.com/s/AKfycbx2fyJ1auGqjYlrwGuegVdXvgxWCKLgZ2odY2I_CoT0gZGMc-fqmd7RtziWG7xlbewA/exec";
-var _licenseValid = false;
 var PARTS = ["Tail Light-R","Tail Light-L","Tail Light-Lens","Marker Light","Tag Bracket",
   "Tongue Jack","Winch Stand","Rollers","Bunks","Fenders","Tires","Actuator","Frame Rails","Tongue"];
 var bklt = "", SS = {}, irc = 0, lrc = 0;
@@ -25,37 +21,23 @@ geotab.addin.ventureDelivery = function() {
 
     initialize: function(api, state, callback) {
       _api = api;
-      // ✅ Check license first — then call callback
-      checkLicense(api, function(result) {
-        _licenseValid = result.allowed;
-        if (!result.allowed) {
-          // Show license error screen instead of form
-          showLicenseError(result.reason || "Not licensed.");
-        }
-        callback();
-      });
+      // ✅ Always use getSession → Get User
+      // api.mobile.user.get() returns ALL drivers (random) — wrong approach
+      // getSession gives us the LOGGED-IN user only
+      fallbackWebApi(api, callback);
     },
 
     focus: function(api, state) {
       _api = api;
+      // ✅ Show the add-in (official pattern)
       var app = document.getElementById("vt-app");
       if (app) app.style.display = "block";
-
-      // ✅ If not licensed, show error screen only
-      if (!_licenseValid) {
-        var lk = document.getElementById("lic-screen");
-        if (lk) lk.style.display = "block";
-        var card = document.querySelector(".card");
-        if (card) card.style.display = "none";
-        return;
-      }
 
       // Initialize UI only once
       if (!_initialized) {
         _initialized = true;
         initUI();
       }
-      fetchDriver(api);
     },
 
     blur: function(api, state) {
@@ -82,182 +64,42 @@ function loadGroupAndFinish(api, info, callback) {
   }
 }
 
-// ── Name helpers ───────────────────────────────────────────
-function looksLikeUsername(s) {
-  return s && !/\s/.test(s) && s === s.toLowerCase() && s.length > 0;
-}
-function fmtUsername(s) {
-  return s.replace(/[._]/g," ").replace(/\b\w/g,function(ch){return ch.toUpperCase();}).trim();
-}
-function buildName(rawFirst, rawLast, fallbackEmail) {
-  var fn;
-  if (rawFirst || rawLast) {
-    fn = (looksLikeUsername(rawFirst) && !rawLast) ? fmtUsername(rawFirst) : (rawFirst+" "+rawLast).trim();
-  }
-  if (!fn) fn = fmtUsername((fallbackEmail||"").split("@")[0]) || fallbackEmail || "";
-  return fn;
-}
-
-// ── Fetch vehicle then finish ──────────────────────────────────
-function fetchVehicleAndFinish(api, info, callback) {
-  api.call("Get", {typeName:"DeviceStatusInfo", search:{driverSearch:{id:info.userId}}},
-    function(dsi) {
-      if (dsi && dsi.length > 0 && dsi[0].device && dsi[0].device.id) {
-        info.vehicleId   = dsi[0].device.id   || "";
-        info.vehicleName = dsi[0].device.name || "";
-        api.call("Get", {typeName:"Device", search:{id:info.vehicleId}},
-          function(devs) {
-            if (devs && devs[0]) info.plate = devs[0].licensePlate || "";
-            loadGroupAndFinish(api, info, callback);
-          },
-          function() { loadGroupAndFinish(api, info, callback); }
-        );
-      } else {
-        loadGroupAndFinish(api, info, callback);
-      }
-    },
-    function(e) { console.error("DeviceStatusInfo error:", e); loadGroupAndFinish(api, info, callback); }
-  );
-}
-
-// ── License check ─────────────────────────────────────────────
-function checkLicense(api, callback) {
-  api.getSession(function(sess) {
-    if (!sess || !sess.database) {
-      callback({allowed: true, warning: "No session — dev mode"});
-      return;
-    }
-    var database = sess.database;
-
-    // Fetch user + device counts to report to license server
-    // Use MultiCall to get both in one round trip
-    api.call("Get", {typeName:"User", search:{isActive:true}}, function(users) {
-      var userCount = (users || []).filter(function(u){ return !u.isSystemUser; }).length;
-
-      api.call("Get", {typeName:"Device", search:{activeFrom:"1970-01-01T00:00:00Z"}}, function(devices) {
-        var deviceCount = (devices || []).length;
-
-        sendLicenseRequest(database, userCount, deviceCount, callback);
-
-      }, function() { sendLicenseRequest(database, userCount, 0, callback); });
-    }, function() { sendLicenseRequest(database, 0, 0, callback); });
-  });
-}
-
-function sendLicenseRequest(database, userCount, deviceCount, callback) {
-  // Use GET — GAS GET requests work cross-origin (POST gets CORS blocked)
-  var url = LICENSE_SERVER_URL +
-    "?action=verify" +
-    "&database=" + encodeURIComponent(database) +
-    "&addinId=" + encodeURIComponent(ADDIN_ID) +
-    "&userCount=" + (userCount || 0) +
-    "&deviceCount=" + (deviceCount || 0);
-
-  var xhr = new XMLHttpRequest();
-  xhr.open("GET", url, true);
-  xhr.timeout = 10000;
-  xhr.onload = function() {
-    if (xhr.status === 200) {
-      try { callback(JSON.parse(xhr.responseText)); }
-      catch(e) { callback({allowed: true, warning: "License parse error — offline mode"}); }
-    } else {
-      callback({allowed: true, warning: "License server error — offline mode"});
-    }
-  };
-  xhr.onerror   = function() { callback({allowed: true, warning: "License unreachable — offline mode"}); };
-  xhr.ontimeout = function() { callback({allowed: true, warning: "License timeout — offline mode"}); };
-  xhr.send();
-}
-
-function showLicenseError(reason) {
-  var app = document.getElementById("vt-app");
-  if (app) app.style.display = "block";
-
-  var lk = document.getElementById("lic-screen");
-  if (!lk) {
-    lk = document.createElement("div");
-    lk.id = "lic-screen";
-    lk.style.cssText = "padding:40px 24px;text-align:center;";
-    lk.innerHTML =
-      '<div style="font-size:48px;margin-bottom:16px">🔒</div>' +
-      '<div style="font-size:18px;font-weight:700;color:#00263E;margin-bottom:10px">Access Restricted</div>' +
-      '<div style="font-size:13px;color:#64748b;margin-bottom:24px;max-width:320px;margin-left:auto;margin-right:auto" id="lic-reason">' + reason + '</div>' +
-      '<div style="font-size:13px;color:#374151">Contact <strong>Dynasty Communications</strong><br>' +
-      '<a href="mailto:farman@dynastync.com" style="color:#0078D4">farman@dynastync.com</a></div>';
-    var appDiv = document.getElementById("vt-app");
-    if (appDiv) appDiv.insertBefore(lk, appDiv.firstChild);
-  } else {
-    lk.style.display = "block";
-    var reasonEl = document.getElementById("lic-reason");
-    if (reasonEl) reasonEl.textContent = reason;
-  }
-
-  // Hide the main card
-  var card = document.querySelector(".card");
-  if (card) card.style.display = "none";
-}
-
-// ── Fetch driver (called from focus every time) ────────────────
-// getSession() returns the CURRENT session user in both browser and mobile Drive
-// By calling this in focus() (not initialize()), we always get fresh data
-// even when users switch or the add-in is cached from a previous session
-function fetchDriver(api) {
-  api.getSession(function(sess) {
-    if (!sess || !sess.userName) return;
-    fetchUserByName(api, sess.userName, function(){});
-  });
-}
-
+// ── Fallback: standard MyGeotab web API ──────────────────
 function fallbackWebApi(api, callback) {
   api.getSession(function(sess) {
-    if (!sess || !sess.userName) { callback(); return; }
-    fetchUserByName(api, sess.userName, callback);
+    if (!sess) { callback(); return; }
+    api.call("Get", {typeName:"User", search:{userName:sess.userName}}, function(us) {
+      if (!us||!us.length) { callback(); return; }
+      var u = us[0];
+      var fn = ((u.firstName||"")+" "+(u.lastName||"")).trim();
+      if (!fn) {
+        fn = (sess.userName||"").split("@")[0]
+          .replace(/[._]/g," ")
+          .replace(/\b\w/g, function(c){ return c.toUpperCase(); })
+          .trim() || sess.userName;
+      }
+      var info = {
+        name: fn, userId: u.id||"", email: u.name||sess.userName,
+        groups: (u.companyGroups||[]).map(function(g){return g.id;}),
+        groupId: (u.companyGroups&&u.companyGroups[0]) ? u.companyGroups[0].id : "",
+        groupName: "", vehicleId: "", vehicleName: "", plate: ""
+      };
+      loadGroupAndFinish(api, info, callback);
+    }, function(e) { console.error("User load error:", e); callback(); });
   });
 }
 
-function fetchUserByName(api, userName, callback) {
-  // ✅ CORRECT FIELD: Geotab UserSearch uses "name" not "userName"
-  // "userName" field does not exist in UserSearch — causes wrong user to be returned
-  // "name" field does a wildcard search on User.name (which IS the login email)
-  // No wildcard = exact match on the name field
-  api.call("Get", {typeName:"User", search:{name:userName}}, function(us) {
-    if (!us || !us.length) { callback(); return; }
-
-    // Find exact match — name search may return partial matches
-    var u = null;
-    var lowerTarget = userName.toLowerCase();
-    for (var i = 0; i < us.length; i++) {
-      if ((us[i].name||"").toLowerCase() === lowerTarget) {
-        u = us[i];
-        break;
-      }
-    }
-    // If no exact match found, use first result as fallback
-    if (!u) u = us[0];
-
-    var fn = buildName((u.firstName||"").trim(), (u.lastName||"").trim(), u.name||userName);
-    var info = {
-      name: fn,
-      userId:  u.id   || "",
-      email:   u.name || userName,
-      groups:  (u.companyGroups||[]).map(function(g){return g.id;}),
-      groupId: (u.companyGroups&&u.companyGroups[0]) ? u.companyGroups[0].id : "",
-      groupName: "", vehicleId: "", vehicleName: "", plate: ""
-    };
-    fetchVehicleAndFinish(api, info, callback);
-  }, function(e) { console.error("User fetch error:", e); callback(); });
-}
-
-
-// ── Set driver info ───────────────────────────────────────────
+// ── Set driver info ───────────────────────────────────────
 function setDrv(info) {
   DRV.name=info.name||""; DRV.userId=info.userId||""; DRV.email=info.email||"";
   DRV.groupId=info.groupId||""; DRV.groupName=info.groupName||"";
   DRV.groups=info.groups||[]; DRV.vehicleId=info.vehicleId||"";
   DRV.vehicleName=info.vehicleName||""; DRV.plate=info.plate||"";
 
-  // Always show driver bar when we have a name (not just when vehicle assigned)
-  if (info.name) {
+  // Driver bar + Driver Info section — only show when vehicle assigned
+  var drv_sec = document.getElementById("drv-section");
+  if (info.vehicleId) {
+    if (drv_sec) drv_sec.style.display = "block";
     var db = document.getElementById("dbar");
     if (db) db.style.display = "flex";
     var init = info.name.split(" ").map(function(w){return w[0]||"";}).join("").toUpperCase().slice(0,2)||"D";
@@ -268,10 +110,8 @@ function setDrv(info) {
     if ((el=document.getElementById("dgrp"))) el.textContent = "📍 "+(info.groupName||"No Group");
   }
 
-  // Driver Info section + form fields — only show/fill when vehicle is assigned
+  // Fill form fields ONLY when vehicle assigned (actual driver, not admin)
   if (info.vehicleId) {
-    var drv_sec = document.getElementById("drv-section");
-    if (drv_sec) drv_sec.style.display = "block";
     var g = function(id){ return document.getElementById(id); };
     if(g("ds-drv")) g("ds-drv").value = info.name||"";
     if(g("ds-grp")) g("ds-grp").value = info.groupName||"";
@@ -551,13 +391,8 @@ function mkS(id) {
 }
 function clrS(id) {
   var c=document.getElementById(id); if(!c) return;
-  // Reset transform first, then clear full physical canvas, then re-apply DPR scale
-  var ctx = c.getContext("2d");
-  var dpr = window.devicePixelRatio||1;
-  ctx.setTransform(1,0,0,1,0,0);          // remove any existing scale
-  ctx.clearRect(0,0,c.width,c.height);    // clear full physical canvas
-  ctx.setTransform(1,0,0,1,0,0);
-  ctx.scale(dpr,dpr);                     // re-apply DPR scale for future drawing
+  var dpr=window.devicePixelRatio||1;
+  c.getContext("2d").clearRect(0,0,c.width/dpr,c.height/dpr);
   SS[id]={drawing:false,signed:false};
   var wrap=document.getElementById(id+"-wrap"); if(wrap) wrap.className="sw";
   var ok=document.getElementById(id+"-ok"); if(ok) ok.style.display="none";
@@ -611,7 +446,7 @@ function collectD() {
     formType:"delivery_sheet", invoiceNo:gv("ds-inv"), dealer:gv("ds-dlr"),
     dealerAddress:gv("ds-adr")+" "+gv("ds-cty"), dealerContact:gv("ds-cnt"),
     dealerPhone:gv("ds-ph"), dealerEmail:gv("ds-em"), date:gv("ds-dt"),
-    codAmount:Math.round((parseFloat(gv("ds-cod"))||0)*100)/100, paymentType:pt.join(", "),
+    codAmount:parseFloat(gv("ds-cod"))||0, paymentType:pt.join(", "),
     accepted:gc("ck-ac"), booklets:bklt, comments:gv("ds-cm"),
     driverSigned:SS["sig-driver"]?SS["sig-driver"].signed:false,
     consigneeSigned:SS["sig-consignee"]?SS["sig-consignee"].signed:false,
