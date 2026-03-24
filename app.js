@@ -11,7 +11,7 @@
 var ADDIN_ID = "azXOKPvAnSnyIdUK2xZutWA";
 // ── License Server ─────────────────────────────────────────────
 // Replace with your actual GAS Web App URL after deploying
-var LICENSE_SERVER_URL = "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec";
+var LICENSE_SERVER_URL = "https://script.google.com/a/macros/dynastync.com/s/AKfycbx2fyJ1auGqjYlrwGuegVdXvgxWCKLgZ2odY2I_CoT0gZGMc-fqmd7RtziWG7xlbewA/exec";
 var _licenseValid = false;
 var PARTS = ["Tail Light-R","Tail Light-L","Tail Light-Lens","Marker Light","Tag Bracket",
   "Tongue Jack","Winch Stand","Rollers","Bunks","Fenders","Tires","Actuator","Frame Rails","Tongue"];
