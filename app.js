@@ -70,25 +70,19 @@ function checkLicense(api, callback) {
       var totalCount = (devices || []).length;
 
       // Step 2: Get online devices via DeviceStatusInfo
-      // Online = communicated in last 5 minutes (real-time)
+      // Use isDeviceCommunicating — official Geotab boolean for real-time status
       api.call("Get", {typeName: "DeviceStatusInfo"}, function(dsi) {
         var dsiList = dsi || [];
-        var now     = new Date();
-        var cutoff  = new Date(now.getTime() - 5 * 60 * 1000);
         var onlineCount = 0;
 
         dsiList.forEach(function(item) {
           if (!item.device || !item.device.id) return;
-          // dateTime can be string or Date object
-          if (item.dateTime) {
-            var lastComm = (item.dateTime instanceof Date) ? item.dateTime : new Date(item.dateTime);
-            if (!isNaN(lastComm.getTime()) && lastComm >= cutoff) {
-              onlineCount++;
-            }
+          if (item.isDeviceCommunicating === true) {
+            onlineCount++;
           }
         });
 
-        console.log("[License] DB:", database, "| Total devices:", totalCount, "| DSI entries:", dsiList.length, "| Online (5min):", onlineCount);
+        console.log("[License] DB:", database, "| Total:", totalCount, "| DSI:", dsiList.length, "| Online:", onlineCount);
         sendLicenseRequest(database, onlineCount, totalCount, callback);
 
       }, function(err) {
