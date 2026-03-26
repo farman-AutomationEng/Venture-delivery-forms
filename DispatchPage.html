@@ -194,7 +194,7 @@
 
       <!-- ── DELIVERY ── -->
       <div id="fm-delivery">
-        <div class="section-label">Delivery Information</div>
+        <div class="modal-sec">Delivery Information</div>
         <div class="g2">
           <div class="f-row"><label>Date</label><input type="date" id="fm-date"></div>
           <div class="f-row"><label>Invoice # *</label><input id="fm-inv-no" placeholder="132993"></div>
@@ -229,7 +229,7 @@
             </select>
           </div>
         </div>
-        <div class="section-label" style="margin-top:4px">Parts List
+        <div class="modal-sec" style="margin-top:4px">Parts List
           <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;color:#94a3b8;margin-left:6px">Driver will check condition. Leave empty for default 14 parts.</span>
         </div>
         <table class="mini-tbl" id="fm-parts-tbl">
@@ -241,7 +241,7 @@
 
       <!-- ── INVOICE ── -->
       <div id="fm-invoice" style="display:none">
-        <div class="section-label">Invoice Information</div>
+        <div class="modal-sec">Invoice Information</div>
         <div class="g2">
           <div class="f-row"><label>Date</label><input type="date" id="fm-inv-date"></div>
           <div class="f-row"><label>Invoice # *</label><input id="fm-inv-number" placeholder="132993"></div>
@@ -259,7 +259,7 @@
           <div class="f-row"><label>Sales Order</label><input id="fm-so"></div>
           <div class="f-row"><label>Shipping Method</label><input id="fm-ship-method"></div>
         </div>
-        <div class="section-label" style="margin-top:4px">Line Items</div>
+        <div class="modal-sec" style="margin-top:4px">Line Items</div>
         <table class="mini-tbl">
           <thead><tr><th>Item</th><th style="width:55px">Qty</th><th>Description</th><th style="width:90px">Unit Price</th><th style="width:80px">Total</th><th style="width:30px"></th></tr></thead>
           <tbody id="fm-inv-body"></tbody>
@@ -273,7 +273,7 @@
 
       <!-- ── LOOSE PARTS ── -->
       <div id="fm-parts" style="display:none">
-        <div class="section-label">Check-In Information</div>
+        <div class="modal-sec">Check-In Information</div>
         <div class="g2">
           <div class="f-row"><label>Date</label><input type="date" id="fm-parts-date"></div>
           <div class="f-row"><label>Invoice # *</label><input id="fm-parts-inv"></div>
@@ -284,7 +284,7 @@
           <div class="f-row"><label>TRK#</label><input id="fm-parts-trk"></div>
         </div>
         <div class="f-row"><label>Dealer</label><input id="fm-parts-dealer"></div>
-        <div class="section-label" style="margin-top:4px">Parts List
+        <div class="modal-sec" style="margin-top:4px">Parts List
           <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;color:#94a3b8;margin-left:6px">Driver will check Pulled/Loaded/N-C/COD</span>
         </div>
         <table class="mini-tbl">
@@ -510,12 +510,12 @@ function buildDriverList(){
     return `<div class="driver-row">
       <div class="driver-av">${init}</div>
       <div class="driver-info">
-        <div class="driver-name">${esc(d.name)}</div>
+        <div class="driver-nm">${esc(d.name)}</div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:3px">
           <span class="online-pill ${isOnline?"on":"off"}">
-            <span class="online-dot"></span>${isOnline?"Online":"Offline"}
+            <span class="online-dot-sm"></span>${isOnline?"Online":"Offline"}
           </span>
-          ${pc?`<span class="pending-count">${pc} pending</span>`:""}
+          ${pc?`<span class="pending-pill">${pc} pending</span>`:""}
         </div>
       </div>
       <button class="btn bp bs" onclick="quickAssign('${d.id}','${esc(d.name)}')">+ Assign</button>
