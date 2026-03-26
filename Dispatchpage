@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Venture Trailers — Dispatch</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+/* ── Layout ─────────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#F0F4F8;color:#1A2432;font-size:13px}
+
+/* ── Top bar ─────────────────────────────────────────── */
+.top-bar{background:#00263E;color:white;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.top-bar h1{font-size:16px;font-weight:700;white-space:nowrap}
+.top-bar-sub{font-size:11px;opacity:.6;margin-top:2px}
+.geo-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:middle}
+
+/* ── KPI Row ─────────────────────────────────────────── */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:14px 20px 0}
+.kpi{background:white;border-radius:8px;padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,.07);border-left:4px solid #E2E8F0;cursor:pointer;transition:box-shadow .15s}
+.kpi:hover{box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.kpi.bl{border-left-color:#0078D4}.kpi.gn{border-left-color:#16a34a}
+.kpi.yw{border-left-color:#D97706}.kpi.rd{border-left-color:#DC2626}
+.kpi .kv{font-size:26px;font-weight:700;color:#00263E}
+.kpi .kl{font-size:11px;color:#64748b;margin-top:2px}
+
+/* ── Two-column layout ───────────────────────────────── */
+.main-grid{display:grid;grid-template-columns:1fr 340px;gap:14px;padding:14px 20px 40px}
+@media(max-width:900px){.main-grid{grid-template-columns:1fr}}
+
+/* ── Panels ─────────────────────────────────────────── */
+.panel{background:white;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.07);overflow:hidden}
+.panel-hdr{padding:12px 16px;border-bottom:1px solid #F1F5F9;display:flex;align-items:center;gap:10px}
+.panel-hdr h2{font-size:13px;font-weight:700;flex:1;color:#00263E}
+.panel-body{padding:0}
+
+/* ── Buttons ─────────────────────────────────────────── */
+.btn{padding:7px 14px;border:none;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity .15s}
+.btn:hover{opacity:.88}
+.btn-primary{background:#0078D4;color:white}
+.btn-ghost{background:white;color:#374151;border:1px solid #D1D5DB}
+.btn-danger{background:#DC2626;color:white}
+.btn-warn{background:#D97706;color:white}
+.btn-green{background:#16a34a;color:white}
+.btn-xs{padding:4px 10px;font-size:11px}
+
+/* ── Pending forms table ────────────────────────────── */
+.form-row{display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid #F8FAFC;gap:10px}
+.form-row:last-child{border-bottom:none}
+.form-row:hover{background:#FAFBFC}
+.form-row-info{flex:1;min-width:0}
+.form-inv{font-size:13px;font-weight:700;color:#0078D4}
+.form-dealer{font-size:12px;color:#374151;margin:2px 0}
+.form-meta{font-size:10px;color:#94a3b8;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.form-actions{display:flex;gap:5px;flex-shrink:0}
+.badge{padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
+.b-pending{background:#FEF9C3;color:#CA8A04}
+.b-submitted{background:#DCFCE7;color:#16a34a}
+.b-delivery{background:#DBEAFE;color:#1d4ed8}
+.b-invoice{background:#F1F5F9;color:#374151}
+.b-parts{background:#FEF9C3;color:#CA8A04}
+.empty-state{text-align:center;padding:40px 20px;color:#94a3b8}
+.empty-icon{font-size:32px;margin-bottom:10px}
+
+/* ── Driver list ─────────────────────────────────────── */
+.driver-row{display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid #F8FAFC;gap:10px}
+.driver-row:last-child{border-bottom:none}
+.driver-av{width:34px;height:34px;border-radius:50%;background:#0078D4;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;font-weight:700;flex-shrink:0}
+.driver-name{font-size:13px;font-weight:600;color:#1A2432}
+.driver-grp{font-size:10px;color:#94a3b8;margin-top:2px}
+.driver-info{flex:1;min-width:0}
+.online-pill{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+.online-pill.on{background:#DCFCE7;color:#16a34a}
+.online-pill.off{background:#F1F5F9;color:#94a3b8}
+.online-dot{width:6px;height:6px;border-radius:50%;background:currentColor;display:inline-block}
+.pending-count{font-size:10px;background:#FEF9C3;color:#CA8A04;padding:2px 7px;border-radius:10px;font-weight:700}
+
+/* ── Filter tabs ─────────────────────────────────────── */
+.filter-tabs{display:flex;gap:4px;padding:10px 14px 0}
+.ftab{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #E2E8F0;background:white;color:#64748b;transition:all .15s}
+.ftab.on{background:#00263E;color:white;border-color:#00263E}
+
+/* ── Modal ───────────────────────────────────────────── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:white;border-radius:10px;width:580px;max-width:95vw;margin:auto}
+.modal-hdr{background:#00263E;color:white;padding:15px 20px;border-radius:10px 10px 0 0;display:flex;align-items:center;justify-content:space-between}
+.modal-hdr h3{font-size:14px;font-weight:700}
+.modal-close{background:none;border:none;color:white;font-size:22px;cursor:pointer;line-height:1;padding:0}
+.modal-body{padding:20px}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid #E2E8F0}
+.f{margin-bottom:12px}
+.f label{display:block;font-size:11px;font-weight:700;color:#374151;margin-bottom:3px;text-transform:uppercase;letter-spacing:.4px}
+.f input,.f select,.f textarea{width:100%;padding:8px 10px;border:1px solid #D1D5DB;border-radius:5px;font-size:13px;font-family:inherit;outline:none}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:#0078D4;box-shadow:0 0 0 3px rgba(0,120,212,.1)}
+.f textarea{resize:vertical;min-height:60px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.section-label{font-size:11px;font-weight:700;text-transform:uppercase;color:#64748b;letter-spacing:.5px;padding:10px 0 6px;border-bottom:1px solid #F1F5F9;margin-bottom:10px}
+
+/* ── Parts mini table ────────────────────────────────── */
+.mini-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}
+.mini-table th{padding:6px 8px;text-align:left;background:#F8FAFC;border-bottom:1px solid #E2E8F0;color:#64748b;font-weight:700;text-transform:uppercase;font-size:10px}
+.mini-table td{padding:5px 8px;border-bottom:1px solid #F8FAFC}
+.mini-table input{width:100%;padding:4px 6px;border:1px solid #E2E8F0;border-radius:4px;font-size:12px;font-family:inherit}
+.add-row-btn{font-size:11px;color:#0078D4;background:none;border:none;cursor:pointer;padding:6px 0;font-weight:600}
+.del-row-btn{background:none;border:none;color:#DC2626;cursor:pointer;font-size:14px;padding:0 4px}
+
+/* ── Reassign modal ──────────────────────────────────── */
+.toast{position:fixed;bottom:20px;right:20px;background:#1A2432;color:white;padding:12px 16px;border-radius:8px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:opacity .3s;max-width:300px;pointer-events:none}
+.toast.show{opacity:1}
+.toast.ok{background:#16a34a}.toast.er{background:#DC2626}
+.sp{width:22px;height:22px;border:3px solid #E2E8F0;border-top-color:#0078D4;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="top-bar">
+  <div>
+    <h1>Venture Trailers — Dispatch Console</h1>
+    <div class="top-bar-sub"><span id="geo-dot" class="geo-dot" style="background:#F59E0B"></span><span id="geo-txt">Connecting...</span></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <span id="today-badge" style="background:rgba(255,255,255,.12);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600"></span>
+    <button class="btn btn-primary btn-xs" onclick="openNewForm()">+ New Form</button>
+    <button class="btn btn-ghost btn-xs" onclick="loadAll()">↺ Refresh</button>
+  </div>
+</div>
+
+<!-- KPIs -->
+<div class="kpi-row">
+  <div class="kpi bl" onclick="setFilter('all')">
+    <div class="kv" id="k-total">—</div>
+    <div class="kl">Today's Forms</div>
+  </div>
+  <div class="kpi yw" onclick="setFilter('Pending')">
+    <div class="kv" id="k-pending">—</div>
+    <div class="kl">Pending</div>
+  </div>
+  <div class="kpi gn" onclick="setFilter('Submitted')">
+    <div class="kv" id="k-submitted">—</div>
+    <div class="kl">Submitted</div>
+  </div>
+  <div class="kpi bl" onclick="focusDriverPanel()">
+    <div class="kv" id="k-online">—</div>
+    <div class="kl">Drivers Online</div>
+  </div>
+</div>
+
+<!-- Main Grid -->
+<div class="main-grid">
+
+  <!-- LEFT: Forms Panel -->
+  <div class="panel">
+    <div class="panel-hdr">
+      <h2>Assigned Forms</h2>
+      <div style="display:flex;gap:6px">
+        <input id="srch" placeholder="Search invoice, dealer..." style="padding:5px 10px;border:1px solid #D1D5DB;border-radius:5px;font-size:12px;width:180px" oninput="renderForms()">
+        <button class="btn btn-primary btn-xs" onclick="openNewForm()">+ New</button>
+      </div>
+    </div>
+    <div class="filter-tabs">
+      <div class="ftab on" id="ft-all" onclick="setFilter('all')">All</div>
+      <div class="ftab" id="ft-Pending" onclick="setFilter('Pending')">Pending</div>
+      <div class="ftab" id="ft-Submitted" onclick="setFilter('Submitted')">Submitted</div>
+    </div>
+    <div style="height:10px"></div>
+    <div id="forms-list" class="panel-body"></div>
+  </div>
+
+  <!-- RIGHT: Drivers Panel -->
+  <div class="panel" id="driver-panel">
+    <div class="panel-hdr">
+      <h2>Drivers</h2>
+      <span id="drivers-count" style="font-size:11px;color:#64748b"></span>
+    </div>
+    <div id="drivers-list" class="panel-body">
+      <div class="empty-state"><div class="sp"></div> Loading drivers...</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ NEW FORM MODAL ══════════════════════════════════════ -->
+<div class="modal-overlay" id="form-modal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <h3 id="form-modal-title">Create New Form</h3>
+      <button class="modal-close" onclick="closeFormModal()">×</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Common: Driver + Type -->
+      <div class="g2">
+        <div class="f">
+          <label>Assign to Driver *</label>
+          <select id="fm-driver">
+            <option value="">-- Select Driver --</option>
+          </select>
+        </div>
+        <div class="f">
+          <label>Form Type *</label>
+          <select id="fm-type" onchange="switchFormType(this.value)">
+            <option value="delivery_sheet">Delivery Sheet</option>
+            <option value="invoice">Invoice</option>
+            <option value="loose_parts">Loose Parts</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ── DELIVERY ── -->
+      <div id="fm-delivery">
+        <div class="section-label">Delivery Information</div>
+        <div class="g2">
+          <div class="f"><label>Date</label><input type="date" id="fm-date"></div>
+          <div class="f"><label>Invoice # *</label><input id="fm-inv-no" placeholder="132993"></div>
+        </div>
+        <div class="g2">
+          <div class="f"><label>Dealer Name</label><input id="fm-dealer" placeholder="Blue Mountain Marine"></div>
+          <div class="f"><label>Dealer Email</label><input type="email" id="fm-email" placeholder="dealer@company.com"></div>
+        </div>
+        <div class="f"><label>Address</label><input id="fm-address" placeholder="1765 Valley View Dr, Bangor PA 18013"></div>
+        <div class="g3">
+          <div class="f"><label>Contact</label><input id="fm-contact" placeholder="Ryan"></div>
+          <div class="f"><label>Phone</label><input id="fm-phone" placeholder="610-599-3628"></div>
+          <div class="f"><label>COD Amount ($)</label><input type="text" id="fm-cod" placeholder="0.00"></div>
+        </div>
+        <div class="g2">
+          <div class="f">
+            <label>Payment Type</label>
+            <select id="fm-payment">
+              <option value="COD">C.O.D.</option>
+              <option value="Floor Plan">Floor Plan</option>
+              <option value="Parts">Parts</option>
+              <option value="Return to Vendor">Return to Vendor</option>
+              <option value="Warranty">Warranty</option>
+            </select>
+          </div>
+          <div class="f">
+            <label>Booklets</label>
+            <select id="fm-booklets">
+              <option value="">--</option>
+              <option value="Y">Yes</option>
+              <option value="N">No</option>
+            </select>
+          </div>
+        </div>
+        <div class="section-label" style="margin-top:4px">Parts List
+          <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;color:#94a3b8;margin-left:6px">Driver will check condition. Leave empty for default 14 parts.</span>
+        </div>
+        <table class="mini-table" id="fm-parts-tbl">
+          <thead><tr><th>Part Name</th><th>Model</th><th style="width:30px"></th></tr></thead>
+          <tbody id="fm-parts-body"></tbody>
+        </table>
+        <button class="add-row-btn" onclick="addDeliveryPart()">+ Add Part</button>
+      </div>
+
+      <!-- ── INVOICE ── -->
+      <div id="fm-invoice" style="display:none">
+        <div class="section-label">Invoice Information</div>
+        <div class="g2">
+          <div class="f"><label>Date</label><input type="date" id="fm-inv-date"></div>
+          <div class="f"><label>Invoice # *</label><input id="fm-inv-number" placeholder="132993"></div>
+        </div>
+        <div class="g2">
+          <div class="f"><label>Acct No.</label><input id="fm-acct"></div>
+          <div class="f"><label>PO #</label><input id="fm-po"></div>
+        </div>
+        <div class="g2">
+          <div class="f"><label>Bill To</label><textarea id="fm-bill-to" rows="3" placeholder="Company&#10;Address&#10;City, State ZIP"></textarea></div>
+          <div class="f"><label>Ship To</label><textarea id="fm-ship-to" rows="3"></textarea></div>
+        </div>
+        <div class="g3">
+          <div class="f"><label>Terms</label><input id="fm-terms"></div>
+          <div class="f"><label>Sales Order</label><input id="fm-so"></div>
+          <div class="f"><label>Shipping Method</label><input id="fm-ship-method"></div>
+        </div>
+        <div class="section-label" style="margin-top:4px">Line Items</div>
+        <table class="mini-table">
+          <thead><tr><th>Item</th><th style="width:55px">Qty</th><th>Description</th><th style="width:90px">Unit Price</th><th style="width:80px">Total</th><th style="width:30px"></th></tr></thead>
+          <tbody id="fm-inv-body"></tbody>
+        </table>
+        <button class="add-row-btn" onclick="addInvLine()">+ Add Line</button>
+        <div style="display:flex;justify-content:flex-end;margin-top:8px;align-items:center;gap:14px;font-size:13px">
+          <span style="color:#64748b">Shipping: <input id="fm-shipping" type="number" step="0.01" placeholder="0.00" oninput="calcGrand()" style="width:80px;padding:4px 8px;border:1px solid #D1D5DB;border-radius:4px;font-size:12px"></span>
+          <span style="font-weight:700;color:#00263E">Amount Due: <span id="fm-grand">$0.00</span></span>
+        </div>
+      </div>
+
+      <!-- ── LOOSE PARTS ── -->
+      <div id="fm-parts" style="display:none">
+        <div class="section-label">Check-In Information</div>
+        <div class="g2">
+          <div class="f"><label>Date</label><input type="date" id="fm-parts-date"></div>
+          <div class="f"><label>Invoice # *</label><input id="fm-parts-inv"></div>
+        </div>
+        <div class="g3">
+          <div class="f"><label>Sales Order #</label><input id="fm-parts-so"></div>
+          <div class="f"><label>PL#</label><input id="fm-parts-pl"></div>
+          <div class="f"><label>TRK#</label><input id="fm-parts-trk"></div>
+        </div>
+        <div class="f"><label>Dealer</label><input id="fm-parts-dealer"></div>
+        <div class="section-label" style="margin-top:4px">Parts List
+          <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;color:#94a3b8;margin-left:6px">Driver will check Pulled/Loaded/N-C/COD</span>
+        </div>
+        <table class="mini-table">
+          <thead><tr><th>Location</th><th style="width:60px">Qty</th><th>Part Name</th><th style="width:30px"></th></tr></thead>
+          <tbody id="fm-parts-rows"></tbody>
+        </table>
+        <button class="add-row-btn" onclick="addPartsRow()">+ Add Part</button>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeFormModal()">Cancel</button>
+      <button class="btn btn-primary" id="fm-save-btn" onclick="saveForm()">Save & Assign to Driver</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ REASSIGN MODAL ══════════════════════════════════════ -->
+<div class="modal-overlay" id="reassign-modal">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-hdr">
+      <h3>Reassign Form</h3>
+      <button class="modal-close" onclick="closeReassign()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="f">
+        <label>Assign to Driver</label>
+        <select id="ra-driver"></select>
+      </div>
+      <p style="font-size:12px;color:#64748b" id="ra-info"></p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeReassign()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmReassign()">Reassign</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// DISPATCH CONSOLE
+// ============================================================
+const ADDIN_ID = "azXOKPvAnSnyIdUK2xZutWA";
+let _api = null;
+let ALL_FORMS = [];
+let ALL_DRIVERS = [];
+let ALL_DSI = [];
+let FILTER = "all";
+let _reassignFormId = null;
+let _invRowCount = 0;
+
+geotab.addin.ventureDispatch = function() {
+  return {
+    initialize: function(api, state, callback) {
+      _api = api;
+      setGeo("ok", "dynasty_communications");
+      callback();
+    },
+    focus: function(api, state) {
+      _api = api;
+      loadAll();
+    },
+    blur: function() {}
+  };
+};
+
+// ── Load everything ─────────────────────────────────────────
+function loadAll() {
+  setGeo("loading", "Loading...");
+  // Today badge
+  document.getElementById("today-badge").textContent =
+    "📅 " + new Date().toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
+
+  // Load DSI (online status) + Users + Forms in parallel-ish
+  let done = 0;
+  function check() { if(++done===3) { buildDriverList(); renderForms(); updateKPIs(); setGeo("ok","dynasty_communications"); } }
+
+  _api.call("Get",{typeName:"DeviceStatusInfo"}, function(d){
+    ALL_DSI = d||[]; check();
+  }, function(){ ALL_DSI=[]; check(); });
+
+  _api.call("Get",{typeName:"User",search:{isActive:true}}, function(us){
+    ALL_DRIVERS = (us||[]).filter(u=>!u.isSystemUser)
+      .map(u=>({
+        id: u.id,
+        name: ((u.firstName||"")+" "+(u.lastName||"")).trim() || u.name || u.id,
+        email: u.name||"",
+        groups: (u.companyGroups||[]).map(g=>g.id),
+        groupName: ""
+      }))
+      .sort((a,b)=>a.name.localeCompare(b.name));
+    check();
+  }, function(){ ALL_DRIVERS=[]; check(); });
+
+  _api.call("Get",{typeName:"AddInData",search:{addInId:ADDIN_ID}}, function(records){
+    ALL_FORMS = (records||[]).map(r=>{
+      try {
+        const d = typeof r.details==="string" ? JSON.parse(r.details) : r.details;
+        if(d){ d._id=r.id; return d; }
+      } catch(e){}
+      return null;
+    }).filter(Boolean);
+    check();
+  }, function(){ ALL_FORMS=[]; check(); });
+}
+
+function setGeo(s,t){
+  const c={ok:"#22c55e",loading:"#F59E0B",err:"#94a3b8"};
+  document.getElementById("geo-dot").style.background = c[s]||c.err;
+  document.getElementById("geo-txt").textContent = t;
+}
+
+// ── KPIs ─────────────────────────────────────────────────────
+function updateKPIs(){
+  const today = new Date().toISOString().split("T")[0];
+  const todayForms = ALL_FORMS.filter(f=>f.status==="Pending"||f.status==="Submitted");
+  const pending = ALL_FORMS.filter(f=>f.status==="Pending").length;
+  const submitted = ALL_FORMS.filter(f=>f.status==="Submitted").length;
+  const online = ALL_DSI.filter(d=>d.isDeviceCommunicating).length;
+
+  document.getElementById("k-total").textContent = todayForms.length;
+  document.getElementById("k-pending").textContent = pending;
+  document.getElementById("k-submitted").textContent = submitted;
+  document.getElementById("k-online").textContent = online;
+}
+
+// ── Filter tabs ───────────────────────────────────────────────
+function setFilter(f){
+  FILTER = f;
+  ["all","Pending","Submitted"].forEach(k=>{
+    const el=document.getElementById("ft-"+k);
+    if(el) el.className = "ftab"+(k===f?" on":"");
+  });
+  renderForms();
+}
+
+// ── Forms list ────────────────────────────────────────────────
+function renderForms(){
+  const q = (document.getElementById("srch").value||"").toLowerCase();
+  let forms = ALL_FORMS.filter(f=>f.status==="Pending"||f.status==="Submitted");
+
+  if(FILTER==="Pending")   forms = forms.filter(f=>f.status==="Pending");
+  if(FILTER==="Submitted") forms = forms.filter(f=>f.status==="Submitted");
+  if(q) forms = forms.filter(f=>
+    (f.invoiceNo||"").toLowerCase().includes(q) ||
+    (f.dealer||"").toLowerCase().includes(q) ||
+    (f.driverName||"").toLowerCase().includes(q)
+  );
+
+  // Sort: Pending first, then newest
+  forms.sort((a,b)=>{
+    if(a.status==="Pending"&&b.status!=="Pending") return -1;
+    if(b.status==="Pending"&&a.status!=="Pending") return 1;
+    return (b.date||"").localeCompare(a.date||"");
+  });
+
+  const el = document.getElementById("forms-list");
+  if(!forms.length){
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><p>No forms found</p></div>`;
+    return;
+  }
+
+  const typeLabels = {delivery_sheet:"Delivery", invoice:"Invoice", loose_parts:"Parts"};
+  const typeBadge  = {delivery_sheet:"b-delivery", invoice:"b-invoice", loose_parts:"b-parts"};
+
+  el.innerHTML = forms.map(f=>{
+    const tl = typeLabels[f.formType]||f.formType||"Form";
+    const tb = typeBadge[f.formType]||"b-invoice";
+    const driver = f.assignedDriverId
+      ? (ALL_DRIVERS.find(d=>d.id===f.assignedDriverId)||{}).name || "Driver"
+      : (f.driverName||"Unassigned");
+    const isPending = f.status === "Pending";
+
+    return `<div class="form-row">
+      <div class="form-row-info">
+        <div class="form-inv">Invoice #${esc(f.invoiceNo||"—")}
+          <span class="badge ${tb}" style="margin-left:5px">${tl}</span>
+          <span class="badge ${isPending?"b-pending":"b-submitted"}" style="margin-left:4px">${f.status}</span>
+        </div>
+        <div class="form-dealer">${esc(f.dealer||f.billTo||"—")}</div>
+        <div class="form-meta">
+          <span>👤 ${esc(driver)}</span>
+          <span>📅 ${esc(f.date||"")}</span>
+          ${f.codAmount?`<span>💰 $${f.codAmount}</span>`:""}
+          ${f.damaged?`<span style="color:#DC2626;font-weight:700">⚠️ DMG</span>`:""}
+        </div>
+      </div>
+      <div class="form-actions">
+        ${isPending?`<button class="btn btn-warn btn-xs" onclick="openReassign('${f._id}','${esc(driver)}','${esc(f.invoiceNo||"")}')">↻ Reassign</button>`:""}
+        ${isPending?`<button class="btn btn-danger btn-xs" onclick="cancelForm('${f._id}','${esc(f.invoiceNo||"")}')">✕</button>`:""}
+      </div>
+    </div>`;
+  }).join("");
+}
+
+// ── Driver list ───────────────────────────────────────────────
+function buildDriverList(){
+  // Count pending forms per driver
+  const pending = {};
+  ALL_FORMS.filter(f=>f.status==="Pending"&&f.assignedDriverId)
+    .forEach(f=>{ pending[f.assignedDriverId]=(pending[f.assignedDriverId]||0)+1; });
+
+  // Build online lookup by driver
+  const onlineDrivers = new Set();
+  ALL_DSI.forEach(d=>{
+    if(d.isDeviceCommunicating && d.driver && d.driver.id)
+      onlineDrivers.add(d.driver.id);
+  });
+
+  const online = ALL_DRIVERS.filter(d=>onlineDrivers.has(d.id));
+  const offline = ALL_DRIVERS.filter(d=>!onlineDrivers.has(d.id));
+
+  document.getElementById("drivers-count").textContent =
+    online.length + " online / " + ALL_DRIVERS.length + " total";
+
+  const renderDriver = (d, isOnline) => {
+    const init = d.name.split(" ").map(w=>w[0]||"").join("").toUpperCase().slice(0,2)||"?";
+    const pc = pending[d.id] || 0;
+    return `<div class="driver-row">
+      <div class="driver-av">${init}</div>
+      <div class="driver-info">
+        <div class="driver-name">${esc(d.name)}</div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:3px">
+          <span class="online-pill ${isOnline?"on":"off"}">
+            <span class="online-dot"></span>${isOnline?"Online":"Offline"}
+          </span>
+          ${pc?`<span class="pending-count">${pc} pending</span>`:""}
+        </div>
+      </div>
+      <button class="btn btn-primary btn-xs" onclick="quickAssign('${d.id}','${esc(d.name)}')">+ Assign</button>
+    </div>`;
+  };
+
+  document.getElementById("drivers-list").innerHTML =
+    (online.length ? `<div style="padding:6px 14px 2px;font-size:10px;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:.5px">● Online (${online.length})</div>` : "") +
+    online.map(d=>renderDriver(d,true)).join("") +
+    (offline.length ? `<div style="padding:10px 14px 2px;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px">● Offline (${offline.length})</div>` : "") +
+    offline.map(d=>renderDriver(d,false)).join("");
+
+  document.getElementById("k-online").textContent = online.length;
+}
+
+function focusDriverPanel(){
+  document.getElementById("driver-panel").scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+// ── New Form Modal ────────────────────────────────────────────
+function openNewForm(prefillDriverId) {
+  // Reset
+  document.getElementById("fm-type").value = "delivery_sheet";
+  switchFormType("delivery_sheet");
+  const td = new Date().toISOString().split("T")[0];
+  ["fm-date","fm-inv-date","fm-parts-date"].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value=td;
+  });
+  ["fm-inv-no","fm-dealer","fm-email","fm-address","fm-contact","fm-phone","fm-cod",
+   "fm-inv-number","fm-acct","fm-po","fm-bill-to","fm-ship-to","fm-terms","fm-so","fm-ship-method",
+   "fm-parts-inv","fm-parts-so","fm-parts-pl","fm-parts-trk","fm-parts-dealer"].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value="";
+  });
+  document.getElementById("fm-payment").value="COD";
+  document.getElementById("fm-booklets").value="";
+  document.getElementById("fm-grand").textContent="$0.00";
+  document.getElementById("fm-parts-body").innerHTML="";
+  document.getElementById("fm-inv-body").innerHTML="";
+  document.getElementById("fm-parts-rows").innerHTML="";
+  _invRowCount=0;
+
+  // Populate driver dropdown
+  const sel = document.getElementById("fm-driver");
+  sel.innerHTML = '<option value="">-- Select Driver --</option>';
+  ALL_DRIVERS.forEach(d=>{
+    sel.innerHTML += `<option value="${d.id}"${prefillDriverId===d.id?" selected":""}>${esc(d.name)}</option>`;
+  });
+
+  document.getElementById("form-modal-title").textContent = "Create New Form";
+  document.getElementById("form-modal").classList.add("open");
+}
+
+function quickAssign(driverId, driverName) {
+  openNewForm(driverId);
+}
+
+function closeFormModal(){ document.getElementById("form-modal").classList.remove("open"); }
+
+function switchFormType(type){
+  ["fm-delivery","fm-invoice","fm-parts"].forEach(id=>{
+    document.getElementById(id).style.display="none";
+  });
+  const map={delivery_sheet:"fm-delivery",invoice:"fm-invoice",loose_parts:"fm-parts"};
+  document.getElementById(map[type]).style.display="block";
+}
+
+// Parts helpers
+function addDeliveryPart(){
+  const tb=document.getElementById("fm-parts-body");
+  const tr=tb.insertRow();
+  tr.innerHTML='<td><input type="text" placeholder="e.g. Tail Light-R"></td>'
+    +'<td><input type="text" placeholder="Model"></td>'
+    +'<td><button class="del-row-btn" onclick="this.closest(\'tr\').remove()">✕</button></td>';
+}
+function addInvLine(){
+  _invRowCount++;
+  const n=_invRowCount;
+  const tb=document.getElementById("fm-inv-body");
+  const tr=tb.insertRow();
+  tr.innerHTML=`<td><input type="text" placeholder="Item"></td>`
+    +`<td><input type="number" value="1" min="1" id="iq-${n}" oninput="calcInvRow(${n})"></td>`
+    +`<td><input type="text" placeholder="Description"></td>`
+    +`<td><input type="number" step="0.01" placeholder="0.00" id="ip-${n}" oninput="calcInvRow(${n})"></td>`
+    +`<td><input type="text" id="it-${n}" readonly style="background:#F8FAFC;font-weight:700"></td>`
+    +`<td><button class="del-row-btn" onclick="this.closest('tr').remove();calcGrand()">✕</button></td>`;
+}
+function calcInvRow(n){
+  const q=parseFloat((document.getElementById("iq-"+n)||{}).value)||0;
+  const p=parseFloat((document.getElementById("ip-"+n)||{}).value)||0;
+  const t=document.getElementById("it-"+n);
+  if(t) t.value=(q*p)>0?(q*p).toFixed(2):"";
+  calcGrand();
+}
+function calcGrand(){
+  let s=0;
+  document.querySelectorAll("#fm-inv-body tr").forEach(r=>{
+    const t=r.querySelector("td:nth-child(5) input"); if(t) s+=parseFloat(t.value)||0;
+  });
+  s+=parseFloat((document.getElementById("fm-shipping")||{}).value)||0;
+  document.getElementById("fm-grand").textContent="$"+s.toFixed(2);
+}
+function addPartsRow(){
+  const tb=document.getElementById("fm-parts-rows");
+  const tr=tb.insertRow();
+  tr.innerHTML='<td><input type="text" placeholder="Location"></td>'
+    +'<td><input type="text" placeholder="Qty"></td>'
+    +'<td><input type="text" placeholder="Part name"></td>'
+    +'<td><button class="del-row-btn" onclick="this.closest(\'tr\').remove()">✕</button></td>';
+}
+
+// ── Save Form ─────────────────────────────────────────────────
+function saveForm(){
+  const type    = document.getElementById("fm-type").value;
+  const driverId= document.getElementById("fm-driver").value;
+  if(!driverId){ alert("Please select a driver."); return; }
+
+  let invNo="";
+  if(type==="delivery_sheet") invNo=document.getElementById("fm-inv-no").value.trim();
+  else if(type==="invoice")   invNo=document.getElementById("fm-inv-number").value.trim();
+  else                        invNo=document.getElementById("fm-parts-inv").value.trim();
+  if(!invNo){ alert("Invoice # is required."); return; }
+
+  const data = {formType:type, status:"Pending", assignedDriverId:driverId,
+    createdAt:new Date().toISOString(), createdBy:"Dispatch"};
+
+  if(type==="delivery_sheet"){
+    data.date=document.getElementById("fm-date").value;
+    data.invoiceNo=invNo;
+    data.dealer=document.getElementById("fm-dealer").value;
+    data.dealerAddress=document.getElementById("fm-address").value;
+    data.dealerContact=document.getElementById("fm-contact").value;
+    data.dealerPhone=document.getElementById("fm-phone").value;
+    data.dealerEmail=document.getElementById("fm-email").value;
+    data.codAmount=parseFloat(document.getElementById("fm-cod").value)||0;
+    data.paymentType=document.getElementById("fm-payment").value;
+    data.booklets=document.getElementById("fm-booklets").value;
+    data.accepted=false; data.damaged=false; data.shortShipped=false; data.damagedParts=[];
+    // Parts list
+    const pRows=document.querySelectorAll("#fm-parts-body tr");
+    const DEFAULT_PARTS=["Tail Light-R","Tail Light-L","Tail Light-Lens","Marker Light","Tag Bracket",
+      "Tongue Jack","Winch Stand","Rollers","Bunks","Fenders","Tires","Actuator","Frame Rails","Tongue"];
+    let parts=[];
+    pRows.forEach(r=>{
+      const ins=r.querySelectorAll("input");
+      const pn=ins[0]?ins[0].value.trim():"";
+      const md=ins[1]?ins[1].value.trim():"";
+      if(pn) parts.push({part:pn,model:md,damaged:false,shortShipped:false,notes:""});
+    });
+    if(!parts.length) parts=DEFAULT_PARTS.map(p=>({part:p,model:"",damaged:false,shortShipped:false,notes:""}));
+    data.parts=parts;
+
+  } else if(type==="invoice"){
+    data.date=document.getElementById("fm-inv-date").value;
+    data.invoiceNo=invNo;
+    data.acctNo=document.getElementById("fm-acct").value;
+    data.billTo=document.getElementById("fm-bill-to").value;
+    data.shipTo=document.getElementById("fm-ship-to").value;
+    data.po=document.getElementById("fm-po").value;
+    data.terms=document.getElementById("fm-terms").value;
+    data.salesOrder=document.getElementById("fm-so").value;
+    data.shippingMethod=document.getElementById("fm-ship-method").value;
+    data.shipping=document.getElementById("fm-shipping").value;
+    data.grandTotal=document.getElementById("fm-grand").textContent;
+    data.dealer=(document.getElementById("fm-bill-to").value||"").split("\n")[0];
+    const liRows=document.querySelectorAll("#fm-inv-body tr");
+    const items=[];
+    liRows.forEach(r=>{
+      const ins=r.querySelectorAll("input");
+      const item=ins[0]?ins[0].value.trim():"";
+      const qty=ins[1]?ins[1].value:"1";
+      const desc=ins[2]?ins[2].value.trim():"";
+      const up=ins[3]?ins[3].value:"";
+      const tot=ins[4]?ins[4].value:"";
+      if(item||desc) items.push({item,qty,description:desc,unitPrice:up,total:tot});
+    });
+    data.lineItems=items;
+
+  } else {
+    data.date=document.getElementById("fm-parts-date").value;
+    data.invoiceNo=invNo;
+    data.salesOrder=document.getElementById("fm-parts-so").value;
+    data.pl=document.getElementById("fm-parts-pl").value;
+    data.trk=document.getElementById("fm-parts-trk").value;
+    data.dealer=document.getElementById("fm-parts-dealer").value;
+    const pRows=document.querySelectorAll("#fm-parts-rows tr");
+    const pList=[];
+    pRows.forEach(r=>{
+      const ins=r.querySelectorAll("input");
+      const loc=ins[0]?ins[0].value.trim():"";
+      const qty=ins[1]?ins[1].value.trim():"";
+      const prt=ins[2]?ins[2].value.trim():"";
+      if(prt) pList.push({location:loc,qty,part:prt,pulled:false,loaded:false,nc:false,cod:false});
+    });
+    data.parts=pList;
+  }
+
+  const btn=document.getElementById("fm-save-btn");
+  btn.textContent="Saving..."; btn.disabled=true;
+
+  // Get driver groups for scope
+  const driver=ALL_DRIVERS.find(d=>d.id===driverId);
+  const grps=driver&&driver.groups&&driver.groups.length
+    ? driver.groups.map(g=>({id:g}))
+    : [{id:"GroupCompanyId"}];
+
+  _api.call("Add",{typeName:"AddInData",entity:{addInId:ADDIN_ID,groups:grps,details:data}},
+    function(id){
+      btn.textContent="Save & Assign to Driver"; btn.disabled=false;
+      closeFormModal();
+      toast("Form created and assigned!", "ok");
+      loadAll();
+    },
+    function(e){
+      btn.textContent="Save & Assign to Driver"; btn.disabled=false;
+      alert("Error: "+(e.message||e));
+    }
+  );
+}
+
+// ── Cancel form ───────────────────────────────────────────────
+function cancelForm(id, invNo){
+  if(!confirm("Cancel pending form?\nInvoice #"+invNo+"\n\nThis will delete the form.")) return;
+  _api.call("Remove",{typeName:"AddInData",entity:{id:id}},
+    function(){ toast("Form cancelled.", "ok"); loadAll(); },
+    function(e){ alert("Error: "+(e.message||e)); }
+  );
+}
+
+// ── Reassign ──────────────────────────────────────────────────
+function openReassign(id, currentDriver, invNo){
+  _reassignFormId=id;
+  document.getElementById("ra-info").textContent="Invoice #"+invNo+" — currently assigned to "+currentDriver;
+  const sel=document.getElementById("ra-driver");
+  sel.innerHTML='<option value="">-- Select Driver --</option>';
+  ALL_DRIVERS.forEach(d=>{ sel.innerHTML+=`<option value="${d.id}">${esc(d.name)}</option>`; });
+  document.getElementById("reassign-modal").classList.add("open");
+}
+function closeReassign(){ document.getElementById("reassign-modal").classList.remove("open"); _reassignFormId=null; }
+function confirmReassign(){
+  const newDriver=document.getElementById("ra-driver").value;
+  if(!newDriver){ alert("Select a driver."); return; }
+  const form=ALL_FORMS.find(f=>f._id===_reassignFormId);
+  if(!form){ closeReassign(); return; }
+  const updated=Object.assign({},form,{assignedDriverId:newDriver});
+  delete updated._id;
+  const driver=ALL_DRIVERS.find(d=>d.id===newDriver);
+  const grps=driver&&driver.groups&&driver.groups.length?driver.groups.map(g=>({id:g})):[{id:"GroupCompanyId"}];
+  _api.call("Set",{typeName:"AddInData",entity:{id:_reassignFormId,addInId:ADDIN_ID,groups:grps,details:updated}},
+    function(){ closeReassign(); toast("Reassigned!", "ok"); loadAll(); },
+    function(e){ alert("Error: "+(e.message||e)); }
+  );
+}
+
+// ── Helpers ───────────────────────────────────────────────────
+function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function toast(msg,type){
+  const t=document.getElementById("toast");
+  t.textContent=msg; t.className="toast show "+(type||"");
+  setTimeout(()=>t.className="toast",3200);
+}
+
+window.onload=function(){
+  document.getElementById("today-badge").textContent=
+    "📅 "+new Date().toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
+  if(typeof geotab==="undefined"){
+    document.getElementById("geo-txt").textContent="Dev Mode";
+    document.getElementById("geo-dot").style.background="#22c55e";
+  }
+};
+</script>
+</body>
+</html>
