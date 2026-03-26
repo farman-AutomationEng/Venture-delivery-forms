@@ -229,8 +229,17 @@ function fetchPendingForms() {
         try {
           var d = typeof r.details === "string" ? JSON.parse(r.details) : r.details;
           if (!d || d.status !== "Pending") return false;
+
+          // Match by assigned driver ID
           if (d.assignedDriverId && DRV.userId && d.assignedDriverId === DRV.userId) return true;
-          if (d.assignedGroupId && DRV.groups && DRV.groups.indexOf(d.assignedGroupId) >= 0) return true;
+
+          // Match by assigned group ID
+          if (d.assignedGroupId && DRV.groups && DRV.groups.length &&
+              DRV.groups.indexOf(d.assignedGroupId) >= 0) return true;
+
+          // Dev/test mode — no driver loaded — show all pending
+          if (!DRV.userId && !d.assignedDriverId) return true;
+
           return false;
         } catch(e) { return false; }
       });
@@ -322,6 +331,13 @@ function openForm(recordId) {
   var succ = document.getElementById("succ"); if (succ) succ.style.display = "none";
 
   var ft = _currentForm.formType;
+
+  // Show/hide correct submit button per form type
+  var subbtn    = document.getElementById("subbtn");
+  var subparts  = document.getElementById("btnSubParts");
+  if (subbtn)   subbtn.style.display   = (ft === "delivery_sheet") ? "block" : "none";
+  if (subparts) subparts.style.display = (ft === "loose_parts")    ? "block" : "none";
+
   if (ft === "delivery_sheet") {
     populateDelivery(_currentForm);
     swT(0);
@@ -489,7 +505,10 @@ function collectDriverEdits() {
       driverSigned: SS["sig-driver"] ? SS["sig-driver"].signed : false,
       consigneeSigned: SS["sig-consignee"] ? SS["sig-consignee"].signed : false,
       driverSignature: getSigBase64("sig-driver"),
-      consigneeSignature: getSigBase64("sig-consignee")
+      consigneeSignature: getSigBase64("sig-consignee"),
+      // Preserve original COD and payment from admin form
+      codAmount: _currentForm.codAmount,
+      paymentType: _currentForm.paymentType
     };
   } else if (ft === "invoice") {
     return {}; // nothing editable
@@ -524,6 +543,12 @@ function collectDriverEdits() {
 function submitDriverForm() {
   if (!_currentFormId || !_currentForm || !_api) {
     alert("No form selected.");
+    return;
+  }
+
+  // Invoice is view-only — driver cannot submit
+  if (_currentForm.formType === "invoice") {
+    alert("Invoice is view-only. No submission needed.");
     return;
   }
 
@@ -562,6 +587,8 @@ function submitDriverForm() {
   },
   function() {
     if (btn) { btn.textContent = "Submit"; btn.disabled = false; }
+    // Remove from local pending list so it doesn't show again
+    _pendingForms = _pendingForms.filter(function(f){ return f.id !== fid; });
     _currentFormId = null;
     _currentForm = null;
     showSucc();
