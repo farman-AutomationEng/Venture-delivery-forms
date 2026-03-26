@@ -536,7 +536,7 @@ function collectD() {
     formType:"delivery_sheet", invoiceNo:gv("ds-inv"), dealer:gv("ds-dlr"),
     dealerAddress:gv("ds-adr")+" "+gv("ds-cty"), dealerContact:gv("ds-cnt"),
     dealerPhone:gv("ds-ph"), dealerEmail:gv("ds-em"), date:gv("ds-dt"),
-    codAmount:Math.round((parseFloat(gv("ds-cod"))||0)*100)/100, paymentType:pt.join(", "),
+    codAmount:parseFloat(gv("ds-cod"))||0, paymentType:pt.join(", "),
     accepted:gc("ck-ac"), booklets:bklt, comments:gv("ds-cm"),
     driverSigned:SS["sig-driver"]?SS["sig-driver"].signed:false,
     consigneeSigned:SS["sig-consignee"]?SS["sig-consignee"].signed:false,
