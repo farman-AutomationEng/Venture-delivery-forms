@@ -79,7 +79,7 @@
 <div class="hdr">
   <div>
     <h1>Dispatch Console</h1>
-    <p id="geo-txt"><span class="geo-dot loading"></span>Connecting...</p>
+    <p id="geo-txt"><span class="geo-dot loading" id="geo-dot"></span>Connecting...</p>
   </div>
   <div style="display:flex;align-items:center;gap:8px">
     <span id="today-badge" style="background:rgba(255,255,255,.12);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600"></span>
@@ -374,8 +374,10 @@ function loadAll() {
 
 function setGeo(s,t){
   const c={ok:"#22c55e",loading:"#F59E0B",err:"#94a3b8"};
-  document.getElementById("geo-dot").style.background = c[s]||c.err;
-  document.getElementById("geo-txt").textContent = t;
+  var dot = document.getElementById("geo-dot");
+  var txt = document.getElementById("geo-txt");
+  if(dot) dot.style.background = c[s]||c.err;
+  if(txt) txt.innerHTML = '<span class="geo-dot" id="geo-dot" style="background:' + (c[s]||c.err) + '"></span>' + t;
 }
 
 // ── KPIs ─────────────────────────────────────────────────────
@@ -758,8 +760,7 @@ window.onload=function(){
   document.getElementById("today-badge").textContent=
     "📅 "+new Date().toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
   if(typeof geotab==="undefined"){
-    document.getElementById("geo-txt").textContent="Dev Mode";
-    document.getElementById("geo-dot").style.background="#22c55e";
+    setGeo("ok","Dev Mode");
   }
 };
 </script>
