@@ -6,160 +6,120 @@
 <title>Venture Trailers — Dispatch</title>
 <link rel="stylesheet" href="styles.css">
 <style>
-/* ── Layout ─────────────────────────────────────────── */
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',Arial,sans-serif;background:#F0F4F8;color:#1A2432;font-size:13px}
-
-/* ── Top bar ─────────────────────────────────────────── */
-.top-bar{background:#00263E;color:white;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.top-bar h1{font-size:16px;font-weight:700;white-space:nowrap}
-.top-bar-sub{font-size:11px;opacity:.6;margin-top:2px}
-.geo-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:middle}
-
-/* ── KPI Row ─────────────────────────────────────────── */
-.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:14px 20px 0}
-.kpi{background:white;border-radius:8px;padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,.07);border-left:4px solid #E2E8F0;cursor:pointer;transition:box-shadow .15s}
-.kpi:hover{box-shadow:0 2px 8px rgba(0,0,0,.12)}
-.kpi.bl{border-left-color:#0078D4}.kpi.gn{border-left-color:#16a34a}
-.kpi.yw{border-left-color:#D97706}.kpi.rd{border-left-color:#DC2626}
-.kpi .kv{font-size:26px;font-weight:700;color:#00263E}
-.kpi .kl{font-size:11px;color:#64748b;margin-top:2px}
+/* Uses styles.css base — dispatch-specific overrides only */
 
 /* ── Two-column layout ───────────────────────────────── */
-.main-grid{display:grid;grid-template-columns:1fr 340px;gap:14px;padding:14px 20px 40px}
-@media(max-width:900px){.main-grid{grid-template-columns:1fr}}
+.dispatch-grid{display:grid;grid-template-columns:1fr 320px;gap:14px;padding:14px 20px 40px}
+@media(max-width:900px){.dispatch-grid{grid-template-columns:1fr}}
 
-/* ── Panels ─────────────────────────────────────────── */
-.panel{background:white;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.07);overflow:hidden}
-.panel-hdr{padding:12px 16px;border-bottom:1px solid #F1F5F9;display:flex;align-items:center;gap:10px}
-.panel-hdr h2{font-size:13px;font-weight:700;flex:1;color:#00263E}
-.panel-body{padding:0}
+/* ── Filter tabs ─────────────────────────────────────── */
+.ftab{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #E2E8F0;background:white;color:#64748b;transition:all .15s;font-family:inherit}
+.ftab.on{background:#00263E;color:white;border-color:#00263E}
+.ftab-row{display:flex;gap:6px;padding:10px 14px 0;flex-wrap:wrap}
 
-/* ── Buttons ─────────────────────────────────────────── */
-.btn{padding:7px 14px;border:none;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity .15s}
-.btn:hover{opacity:.88}
-.btn-primary{background:#0078D4;color:white}
-.btn-ghost{background:white;color:#374151;border:1px solid #D1D5DB}
-.btn-danger{background:#DC2626;color:white}
-.btn-warn{background:#D97706;color:white}
-.btn-green{background:#16a34a;color:white}
-.btn-xs{padding:4px 10px;font-size:11px}
-
-/* ── Pending forms table ────────────────────────────── */
-.form-row{display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid #F8FAFC;gap:10px}
+/* ── Form rows ───────────────────────────────────────── */
+.form-row{display:flex;align-items:center;padding:11px 14px;border-bottom:1px solid #F1F5F9;gap:10px}
 .form-row:last-child{border-bottom:none}
 .form-row:hover{background:#FAFBFC}
 .form-row-info{flex:1;min-width:0}
-.form-inv{font-size:13px;font-weight:700;color:#0078D4}
-.form-dealer{font-size:12px;color:#374151;margin:2px 0}
+.form-inv{font-size:13px;font-weight:700;color:#0078D4;margin-bottom:2px}
+.form-dealer{font-size:12px;color:#374151;margin-bottom:4px}
 .form-meta{font-size:10px;color:#94a3b8;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .form-actions{display:flex;gap:5px;flex-shrink:0}
-.badge{padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
-.b-pending{background:#FEF9C3;color:#CA8A04}
-.b-submitted{background:#DCFCE7;color:#16a34a}
-.b-delivery{background:#DBEAFE;color:#1d4ed8}
-.b-invoice{background:#F1F5F9;color:#374151}
-.b-parts{background:#FEF9C3;color:#CA8A04}
-.empty-state{text-align:center;padding:40px 20px;color:#94a3b8}
-.empty-icon{font-size:32px;margin-bottom:10px}
 
-/* ── Driver list ─────────────────────────────────────── */
-.driver-row{display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid #F8FAFC;gap:10px}
+/* ── Driver rows ─────────────────────────────────────── */
+.driver-row{display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid #F1F5F9;gap:10px}
 .driver-row:last-child{border-bottom:none}
+.driver-row:hover{background:#FAFBFC}
 .driver-av{width:34px;height:34px;border-radius:50%;background:#0078D4;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;font-weight:700;flex-shrink:0}
-.driver-name{font-size:13px;font-weight:600;color:#1A2432}
-.driver-grp{font-size:10px;color:#94a3b8;margin-top:2px}
+.driver-nm{font-size:13px;font-weight:600;color:#1A2432}
+.driver-sub{font-size:10px;color:#94a3b8;margin-top:2px;display:flex;align-items:center;gap:6px}
 .driver-info{flex:1;min-width:0}
-.online-pill{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+.online-pill{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
 .online-pill.on{background:#DCFCE7;color:#16a34a}
 .online-pill.off{background:#F1F5F9;color:#94a3b8}
-.online-dot{width:6px;height:6px;border-radius:50%;background:currentColor;display:inline-block}
-.pending-count{font-size:10px;background:#FEF9C3;color:#CA8A04;padding:2px 7px;border-radius:10px;font-weight:700}
+.online-dot-sm{width:6px;height:6px;border-radius:50%;background:currentColor;display:inline-block}
+.pending-pill{font-size:10px;background:#FEF9C3;color:#CA8A04;padding:2px 7px;border-radius:10px;font-weight:700}
 
-/* ── Filter tabs ─────────────────────────────────────── */
-.filter-tabs{display:flex;gap:4px;padding:10px 14px 0}
-.ftab{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #E2E8F0;background:white;color:#64748b;transition:all .15s}
-.ftab.on{background:#00263E;color:white;border-color:#00263E}
+/* ── Section header inside panel ────────────────────── */
+.sec-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:6px 14px 4px;color:#94a3b8;border-top:1px solid #F1F5F9;margin-top:4px}
+.sec-lbl:first-child{border-top:none;margin-top:0}
+
+/* ── Mini table for modal ────────────────────────────── */
+.mini-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.mini-tbl th{padding:6px 8px;text-align:left;background:#F8FAFC;border-bottom:1px solid #E2E8F0;color:#64748b;font-weight:700;text-transform:uppercase;font-size:10px}
+.mini-tbl td{padding:5px 8px;border-bottom:1px solid #F8FAFC}
+.mini-tbl input{width:100%;padding:4px 6px;border:1px solid #E2E8F0;border-radius:4px;font-size:12px;font-family:inherit;outline:none}
+.mini-tbl input:focus{border-color:#0078D4}
+.add-row-btn{font-size:11px;color:#0078D4;background:none;border:none;cursor:pointer;padding:6px 0;font-weight:600;font-family:inherit}
+.del-row-btn{background:none;border:none;color:#DC2626;cursor:pointer;font-size:14px;padding:0 4px}
 
 /* ── Modal ───────────────────────────────────────────── */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px}
 .modal-overlay.open{display:flex}
-.modal{background:white;border-radius:10px;width:580px;max-width:95vw;margin:auto}
-.modal-hdr{background:#00263E;color:white;padding:15px 20px;border-radius:10px 10px 0 0;display:flex;align-items:center;justify-content:space-between}
-.modal-hdr h3{font-size:14px;font-weight:700}
+.modal-box{background:white;border-radius:8px;width:580px;max-width:95vw;margin:auto;box-shadow:0 8px 32px rgba(0,0,0,.18)}
+.modal-hdr{background:#00263E;color:white;padding:14px 18px;border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:space-between}
+.modal-hdr h3{font-size:14px;font-weight:700;margin:0}
 .modal-close{background:none;border:none;color:white;font-size:22px;cursor:pointer;line-height:1;padding:0}
-.modal-body{padding:20px}
-.modal-footer{display:flex;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid #E2E8F0}
-.f{margin-bottom:12px}
-.f label{display:block;font-size:11px;font-weight:700;color:#374151;margin-bottom:3px;text-transform:uppercase;letter-spacing:.4px}
-.f input,.f select,.f textarea{width:100%;padding:8px 10px;border:1px solid #D1D5DB;border-radius:5px;font-size:13px;font-family:inherit;outline:none}
-.f input:focus,.f select:focus,.f textarea:focus{border-color:#0078D4;box-shadow:0 0 0 3px rgba(0,120,212,.1)}
-.f textarea{resize:vertical;min-height:60px}
+.modal-body{padding:18px}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;padding:12px 18px;border-top:1px solid #E2E8F0}
+.f-row{margin-bottom:12px}
+.f-row label{display:block;font-size:11px;font-weight:700;color:#374151;margin-bottom:3px;text-transform:uppercase;letter-spacing:.4px}
+.f-row input,.f-row select,.f-row textarea{width:100%;padding:8px 10px;border:1px solid #D1D5DB;border-radius:5px;font-size:13px;font-family:inherit;outline:none}
+.f-row input:focus,.f-row select:focus,.f-row textarea:focus{border-color:#0078D4;box-shadow:0 0 0 3px rgba(0,120,212,.1)}
+.f-row textarea{resize:vertical;min-height:60px}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-.section-label{font-size:11px;font-weight:700;text-transform:uppercase;color:#64748b;letter-spacing:.5px;padding:10px 0 6px;border-bottom:1px solid #F1F5F9;margin-bottom:10px}
-
-/* ── Parts mini table ────────────────────────────────── */
-.mini-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}
-.mini-table th{padding:6px 8px;text-align:left;background:#F8FAFC;border-bottom:1px solid #E2E8F0;color:#64748b;font-weight:700;text-transform:uppercase;font-size:10px}
-.mini-table td{padding:5px 8px;border-bottom:1px solid #F8FAFC}
-.mini-table input{width:100%;padding:4px 6px;border:1px solid #E2E8F0;border-radius:4px;font-size:12px;font-family:inherit}
-.add-row-btn{font-size:11px;color:#0078D4;background:none;border:none;cursor:pointer;padding:6px 0;font-weight:600}
-.del-row-btn{background:none;border:none;color:#DC2626;cursor:pointer;font-size:14px;padding:0 4px}
-
-/* ── Reassign modal ──────────────────────────────────── */
-.toast{position:fixed;bottom:20px;right:20px;background:#1A2432;color:white;padding:12px 16px;border-radius:8px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:opacity .3s;max-width:300px;pointer-events:none}
-.toast.show{opacity:1}
-.toast.ok{background:#16a34a}.toast.er{background:#DC2626}
-.sp{width:22px;height:22px;border:3px solid #E2E8F0;border-top-color:#0078D4;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:8px}
-@keyframes spin{to{transform:rotate(360deg)}}
+.modal-sec{font-size:11px;font-weight:700;text-transform:uppercase;color:#64748b;letter-spacing:.5px;padding:8px 0 6px;border-bottom:1px solid #F1F5F9;margin-bottom:10px}
 </style>
 </head>
 <body>
 
 <!-- Top Bar -->
-<div class="top-bar">
+<div class="hdr">
   <div>
-    <h1>Venture Trailers — Dispatch Console</h1>
-    <div class="top-bar-sub"><span id="geo-dot" class="geo-dot" style="background:#F59E0B"></span><span id="geo-txt">Connecting...</span></div>
+    <h1>Dispatch Console</h1>
+    <p id="geo-txt"><span class="geo-dot loading"></span>Connecting...</p>
   </div>
   <div style="display:flex;align-items:center;gap:8px">
     <span id="today-badge" style="background:rgba(255,255,255,.12);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600"></span>
-    <button class="btn btn-primary btn-xs" onclick="openNewForm()">+ New Form</button>
-    <button class="btn btn-ghost btn-xs" onclick="loadAll()">↺ Refresh</button>
+    <button class="btn bp bs" onclick="openNewForm()">+ New Form</button>
+    <button class="btn bg2 bs" onclick="loadAll()">↺ Refresh</button>
   </div>
 </div>
 
 <!-- KPIs -->
-<div class="kpi-row">
-  <div class="kpi bl" onclick="setFilter('all')">
+<div class="kpis">
+  <div class="kpi" onclick="setFilter('all')">
     <div class="kv" id="k-total">—</div>
     <div class="kl">Today's Forms</div>
   </div>
-  <div class="kpi yw" onclick="setFilter('Pending')">
+  <div class="kpi y" onclick="setFilter('Pending')">
     <div class="kv" id="k-pending">—</div>
     <div class="kl">Pending</div>
   </div>
-  <div class="kpi gn" onclick="setFilter('Submitted')">
+  <div class="kpi g" onclick="setFilter('Submitted')">
     <div class="kv" id="k-submitted">—</div>
     <div class="kl">Submitted</div>
   </div>
-  <div class="kpi bl" onclick="focusDriverPanel()">
+  <div class="kpi" onclick="focusDriverPanel()">
     <div class="kv" id="k-online">—</div>
     <div class="kl">Drivers Online</div>
   </div>
 </div>
 
+<div class="err-box" id="errbox" style="display:none"></div>
+
 <!-- Main Grid -->
-<div class="main-grid">
+<div class="dispatch-grid">
 
   <!-- LEFT: Forms Panel -->
-  <div class="panel">
-    <div class="panel-hdr">
-      <h2>Assigned Forms</h2>
+  <div class="tbl-wrap">
+    <div class="tbl-head">
+      <h2>Assigned Forms <span id="forms-count" style="font-weight:400;color:#64748b"></span></h2>
       <div style="display:flex;gap:6px">
         <input id="srch" placeholder="Search invoice, dealer..." style="padding:5px 10px;border:1px solid #D1D5DB;border-radius:5px;font-size:12px;width:180px" oninput="renderForms()">
-        <button class="btn btn-primary btn-xs" onclick="openNewForm()">+ New</button>
+        <button class="btn bp bs" onclick="openNewForm()">+ New</button>
       </div>
     </div>
     <div class="filter-tabs">
@@ -172,8 +132,8 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#F0F4F8;color:#1A2432;fo
   </div>
 
   <!-- RIGHT: Drivers Panel -->
-  <div class="panel" id="driver-panel">
-    <div class="panel-hdr">
+  <div class="tbl-wrap" id="driver-panel">
+    <div class="tbl-head">
       <h2>Drivers</h2>
       <span id="drivers-count" style="font-size:11px;color:#64748b"></span>
     </div>
@@ -186,7 +146,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#F0F4F8;color:#1A2432;fo
 
 <!-- ══ NEW FORM MODAL ══════════════════════════════════════ -->
 <div class="modal-overlay" id="form-modal">
-  <div class="modal">
+  <div class="modal-box">
     <div class="modal-hdr">
       <h3 id="form-modal-title">Create New Form</h3>
       <button class="modal-close" onclick="closeFormModal()">×</button>
@@ -195,13 +155,13 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#F0F4F8;color:#1A2432;fo
 
       <!-- Common: Driver + Type -->
       <div class="g2">
-        <div class="f">
+        <div class="f-row">
           <label>Assign to Driver *</label>
           <select id="fm-driver">
             <option value="">-- Select Driver --</option>
           </select>
         </div>
-        <div class="f">
+        <div class="f-row">
           <label>Form Type *</label>
           <select id="fm-type" onchange="switchFormType(this.value)">
             <option value="delivery_sheet">Delivery Sheet</option>
@@ -215,21 +175,21 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#F0F4F8;color:#1A2432;fo
       <div id="fm-delivery">
         <div class="section-label">Delivery Information</div>
         <div class="g2">
-          <div class="f"><label>Date</label><input type="date" id="fm-date"></div>
-          <div class="f"><label>Invoice # *</label><input id="fm-inv-no" placeholder="132993"></div>
+          <div class="f-row"><label>Date</label><input type="date" id="fm-date"></div>
+          <div class="f-row"><label>Invoice # *</label><input id="fm-inv-no" placeholder="132993"></div>
         </div>
         <div class="g2">
-          <div class="f"><label>Dealer Name</label><input id="fm-dealer" placeholder="Blue Mountain Marine"></div>
-          <div class="f"><label>Dealer Email</label><input type="email" id="fm-email" placeholder="dealer@company.com"></div>
+          <div class="f-row"><label>Dealer Name</label><input id="fm-dealer" placeholder="Blue Mountain Marine"></div>
+          <div class="f-row"><label>Dealer Email</label><input type="email" id="fm-email" placeholder="dealer@company.com"></div>
         </div>
-        <div class="f"><label>Address</label><input id="fm-address" placeholder="1765 Valley View Dr, Bangor PA 18013"></div>
+        <div class="f-row"><label>Address</label><input id="fm-address" placeholder="1765 Valley View Dr, Bangor PA 18013"></div>
         <div class="g3">
-          <div class="f"><label>Contact</label><input id="fm-contact" placeholder="Ryan"></div>
-          <div class="f"><label>Phone</label><input id="fm-phone" placeholder="610-599-3628"></div>
-          <div class="f"><label>COD Amount ($)</label><input type="text" id="fm-cod" placeholder="0.00"></div>
+          <div class="f-row"><label>Contact</label><input id="fm-contact" placeholder="Ryan"></div>
+          <div class="f-row"><label>Phone</label><input id="fm-phone" placeholder="610-599-3628"></div>
+          <div class="f-row"><label>COD Amount ($)</label><input type="text" id="fm-cod" placeholder="0.00"></div>
         </div>
         <div class="g2">
-          <div class="f">
+          <div class="f-row">
             <label>Payment Type</label>
             <select id="fm-payment">
               <option value="COD">C.O.D.</option>
@@ -239,7 +199,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#F0F4F8;color:#1A2432;fo
               <option value="Warranty">Warranty</option>
             </select>
           </div>
-          <div class="f">
+          <div class="f-row">
             <label>Booklets</label>
             <select id="fm-booklets">
               <option value="">--</option>
@@ -251,7 +211,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#F0F4F8;color:#1A2432;fo
         <div class="section-label" style="margin-top:4px">Parts List
           <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;color:#94a3b8;margin-left:6px">Driver will check condition. Leave empty for default 14 parts.</span>
         </div>
-        <table class="mini-table" id="fm-parts-tbl">
+        <table class="mini-tbl" id="fm-parts-tbl">
           <thead><tr><th>Part Name</th><th>Model</th><th style="width:30px"></th></tr></thead>
           <tbody id="fm-parts-body"></tbody>
         </table>
@@ -262,24 +222,24 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#F0F4F8;color:#1A2432;fo
       <div id="fm-invoice" style="display:none">
         <div class="section-label">Invoice Information</div>
         <div class="g2">
-          <div class="f"><label>Date</label><input type="date" id="fm-inv-date"></div>
-          <div class="f"><label>Invoice # *</label><input id="fm-inv-number" placeholder="132993"></div>
+          <div class="f-row"><label>Date</label><input type="date" id="fm-inv-date"></div>
+          <div class="f-row"><label>Invoice # *</label><input id="fm-inv-number" placeholder="132993"></div>
         </div>
         <div class="g2">
-          <div class="f"><label>Acct No.</label><input id="fm-acct"></div>
-          <div class="f"><label>PO #</label><input id="fm-po"></div>
+          <div class="f-row"><label>Acct No.</label><input id="fm-acct"></div>
+          <div class="f-row"><label>PO #</label><input id="fm-po"></div>
         </div>
         <div class="g2">
-          <div class="f"><label>Bill To</label><textarea id="fm-bill-to" rows="3" placeholder="Company&#10;Address&#10;City, State ZIP"></textarea></div>
-          <div class="f"><label>Ship To</label><textarea id="fm-ship-to" rows="3"></textarea></div>
+          <div class="f-row"><label>Bill To</label><textarea id="fm-bill-to" rows="3" placeholder="Company&#10;Address&#10;City, State ZIP"></textarea></div>
+          <div class="f-row"><label>Ship To</label><textarea id="fm-ship-to" rows="3"></textarea></div>
         </div>
         <div class="g3">
-          <div class="f"><label>Terms</label><input id="fm-terms"></div>
-          <div class="f"><label>Sales Order</label><input id="fm-so"></div>
-          <div class="f"><label>Shipping Method</label><input id="fm-ship-method"></div>
+          <div class="f-row"><label>Terms</label><input id="fm-terms"></div>
+          <div class="f-row"><label>Sales Order</label><input id="fm-so"></div>
+          <div class="f-row"><label>Shipping Method</label><input id="fm-ship-method"></div>
         </div>
         <div class="section-label" style="margin-top:4px">Line Items</div>
-        <table class="mini-table">
+        <table class="mini-tbl">
           <thead><tr><th>Item</th><th style="width:55px">Qty</th><th>Description</th><th style="width:90px">Unit Price</th><th style="width:80px">Total</th><th style="width:30px"></th></tr></thead>
           <tbody id="fm-inv-body"></tbody>
         </table>
@@ -294,19 +254,19 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#F0F4F8;color:#1A2432;fo
       <div id="fm-parts" style="display:none">
         <div class="section-label">Check-In Information</div>
         <div class="g2">
-          <div class="f"><label>Date</label><input type="date" id="fm-parts-date"></div>
-          <div class="f"><label>Invoice # *</label><input id="fm-parts-inv"></div>
+          <div class="f-row"><label>Date</label><input type="date" id="fm-parts-date"></div>
+          <div class="f-row"><label>Invoice # *</label><input id="fm-parts-inv"></div>
         </div>
         <div class="g3">
-          <div class="f"><label>Sales Order #</label><input id="fm-parts-so"></div>
-          <div class="f"><label>PL#</label><input id="fm-parts-pl"></div>
-          <div class="f"><label>TRK#</label><input id="fm-parts-trk"></div>
+          <div class="f-row"><label>Sales Order #</label><input id="fm-parts-so"></div>
+          <div class="f-row"><label>PL#</label><input id="fm-parts-pl"></div>
+          <div class="f-row"><label>TRK#</label><input id="fm-parts-trk"></div>
         </div>
-        <div class="f"><label>Dealer</label><input id="fm-parts-dealer"></div>
+        <div class="f-row"><label>Dealer</label><input id="fm-parts-dealer"></div>
         <div class="section-label" style="margin-top:4px">Parts List
           <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;color:#94a3b8;margin-left:6px">Driver will check Pulled/Loaded/N-C/COD</span>
         </div>
-        <table class="mini-table">
+        <table class="mini-tbl">
           <thead><tr><th>Location</th><th style="width:60px">Qty</th><th>Part Name</th><th style="width:30px"></th></tr></thead>
           <tbody id="fm-parts-rows"></tbody>
         </table>
@@ -315,29 +275,29 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#F0F4F8;color:#1A2432;fo
 
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeFormModal()">Cancel</button>
-      <button class="btn btn-primary" id="fm-save-btn" onclick="saveForm()">Save & Assign to Driver</button>
+      <button class="btn bg2" onclick="closeFormModal()">Cancel</button>
+      <button class="btn bp" id="fm-save-btn" onclick="saveForm()">Save & Assign to Driver</button>
     </div>
   </div>
 </div>
 
 <!-- ══ REASSIGN MODAL ══════════════════════════════════════ -->
 <div class="modal-overlay" id="reassign-modal">
-  <div class="modal" style="max-width:360px">
+  <div class="modal-box" style="max-width:360px">
     <div class="modal-hdr">
       <h3>Reassign Form</h3>
       <button class="modal-close" onclick="closeReassign()">×</button>
     </div>
     <div class="modal-body">
-      <div class="f">
+      <div class="f-row">
         <label>Assign to Driver</label>
         <select id="ra-driver"></select>
       </div>
       <p style="font-size:12px;color:#64748b" id="ra-info"></p>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeReassign()">Cancel</button>
-      <button class="btn btn-primary" onclick="confirmReassign()">Reassign</button>
+      <button class="btn bg2" onclick="closeReassign()">Cancel</button>
+      <button class="btn bp" onclick="confirmReassign()">Reassign</button>
     </div>
   </div>
 </div>
@@ -494,8 +454,8 @@ function renderForms(){
         </div>
       </div>
       <div class="form-actions">
-        ${isPending?`<button class="btn btn-warn btn-xs" onclick="openReassign('${f._id}','${esc(driver)}','${esc(f.invoiceNo||"")}')">↻ Reassign</button>`:""}
-        ${isPending?`<button class="btn btn-danger btn-xs" onclick="cancelForm('${f._id}','${esc(f.invoiceNo||"")}')">✕</button>`:""}
+        ${isPending?`<button class="btn bw bs" onclick="openReassign('${f._id}','${esc(driver)}','${esc(f.invoiceNo||"")}')">↻ Reassign</button>`:""}
+        ${isPending?`<button class="btn bd bs" onclick="cancelForm('${f._id}','${esc(f.invoiceNo||"")}')">✕</button>`:""}
       </div>
     </div>`;
   }).join("");
@@ -535,7 +495,7 @@ function buildDriverList(){
           ${pc?`<span class="pending-count">${pc} pending</span>`:""}
         </div>
       </div>
-      <button class="btn btn-primary btn-xs" onclick="quickAssign('${d.id}','${esc(d.name)}')">+ Assign</button>
+      <button class="btn bp bs" onclick="quickAssign('${d.id}','${esc(d.name)}')">+ Assign</button>
     </div>`;
   };
 
