@@ -536,7 +536,7 @@ function collectD() {
     formType:"delivery_sheet", invoiceNo:gv("ds-inv"), dealer:gv("ds-dlr"),
     dealerAddress:gv("ds-adr")+" "+gv("ds-cty"), dealerContact:gv("ds-cnt"),
     dealerPhone:gv("ds-ph"), dealerEmail:gv("ds-em"), date:gv("ds-dt"),
-    codAmount:parseFloat(gv("ds-cod"))||0, paymentType:pt.join(", "),
+    codAmount:parseFloat((parseFloat(gv("ds-cod"))||0).toFixed(2)), paymentType:pt.join(", "),
     accepted:gc("ck-ac"), booklets:bklt, comments:gv("ds-cm"),
     driverSigned:SS["sig-driver"]?SS["sig-driver"].signed:false,
     consigneeSigned:SS["sig-consignee"]?SS["sig-consignee"].signed:false,
@@ -544,12 +544,12 @@ function collectD() {
     consigneeSignature: getSigBase64("sig-consignee"),
     damaged:dmg.length>0, damagedParts:dmg, parts:parts,
     status: DRV.vehicleId ? "Submitted" : "Test",
-    driverName: DRV.vehicleId ? DRV.name : "",
-    driverUserId: DRV.vehicleId ? DRV.userId : "",
-    driverEmail: DRV.vehicleId ? DRV.email : "",
-    driverGroupId: DRV.vehicleId ? DRV.groupId : "",
-    driverGroupName: DRV.vehicleId ? DRV.groupName : "",
-    driverGroups: DRV.vehicleId ? DRV.groups : [],
+    driverName:      DRV.name      || "",
+    driverUserId:    DRV.userId    || "",
+    driverEmail:     DRV.email     || "",
+    driverGroupId:   DRV.groupId   || "",
+    driverGroupName: DRV.groupName || "",
+    driverGroups:    DRV.groups    || [],
     vehicleId: DRV.vehicleId, vehicleName: DRV.vehicleName, vehicleLicensePlate: DRV.plate
   };
 }
