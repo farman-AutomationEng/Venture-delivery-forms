@@ -466,6 +466,8 @@
     if(phoneEl){ phoneEl.removeEventListener("input",_phoneHandler); phoneEl.addEventListener("input",_phoneHandler); }
     var typeEl = document.getElementById("fm-type");
     if(typeEl){ typeEl.removeEventListener("change",_typeHandler); typeEl.addEventListener("change",_typeHandler); }
+    // Reset totals on open
+    calcGrand();
     var addInvBtn = document.getElementById("btn-add-inv-line");
     if(addInvBtn){ addInvBtn.replaceWith(addInvBtn.cloneNode(true)); document.getElementById("btn-add-inv-line").addEventListener("click",addInvLine); }
     var addPartBtn = document.getElementById("btn-add-del-part");
@@ -739,6 +741,26 @@
   }
 
   function toast(msg,type){ var t=document.getElementById("toast"); t.textContent=msg; t.className="dc-toast show "+(type||""); setTimeout(function(){t.className="dc-toast";},3200); }
+
+  // ── One-time modal event delegation (CSP-safe, works even for hidden elements) ──
+  (function attachModalDelegation(){
+    var modal = document.getElementById("form-modal");
+    if(!modal) return;
+    modal.addEventListener("click", function(e){
+      var t = e.target;
+      if(!t) return;
+      var id = t.id || "";
+      if(id === "btn-add-inv-line")  { e.preventDefault(); addInvLine(); }
+      if(id === "btn-add-del-part")  { e.preventDefault(); addDeliveryPart(); }
+      if(id === "btn-add-parts-row") { e.preventDefault(); addPartsRow(); }
+    });
+    modal.addEventListener("input", function(e){
+      var t = e.target;
+      if(!t) return;
+      if(t.id === "fm-shipping") calcGrand();
+      if(t.id && t.id.startsWith("fm-phone")) _phoneHandler.call(t);
+    });
+  })();
 
   window.onload=function(){
     var tb=document.getElementById("today-badge"); if(tb) tb.textContent="📅 "+new Date().toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
