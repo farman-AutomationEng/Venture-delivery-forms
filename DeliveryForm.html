@@ -5,376 +5,536 @@
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Venture Trailers — Delivery Form</title>
-<link rel="stylesheet" href="https://farman-automationeng.github.io/Venturedeliveryforms/styles.css?v=65">
 <script src="https://farman-automationeng.github.io/Venturedeliveryforms/app.js?v=61" defer></script>
 <style>
-/* ── Responsive fixes for DeliveryForm ── */
-:root{--blue:#0078D4;--dark:#00263E;--border:#D1D5DB;--bg:#F9FAFB}
-*{box-sizing:border-box}
-body{margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif;background:#F2F5F7;color:#1A2432;-webkit-text-size-adjust:100%}
+/* ══ BASE ══════════════════════════════════════════════════════ */
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:#F2F5F7;font-family:'Segoe UI',Arial,sans-serif;color:#1A2432;-webkit-text-size-adjust:100%}
 
-/* Full-width grid that collapses to single column on small screens */
-.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:12px}
-.fc{grid-column:1/-1!important}
-.f{display:flex;flex-direction:column;gap:4px;min-width:0}
-.f label{font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.6px}
-
-/* 16px on mobile prevents iOS auto-zoom */
-.f input,.f select,.f textarea{
-  padding:11px 13px;border:1.5px solid var(--border);border-radius:6px;
-  font-size:16px;font-family:inherit;color:#1A2432;background:white;
-  width:100%;-webkit-appearance:none;outline:none;transition:border-color .15s;
+/* ══ VARIABLES ════════════════════════════════════════════════ */
+:root{
+  --blue:#0078D4;--dark:#00263E;--border:#D1D5DB;
+  --radius:8px;--shadow:0 1px 6px rgba(0,0,0,.08);
 }
-@media(min-width:480px){.f input,.f select,.f textarea{font-size:14px}}
-.f input:focus,.f select:focus,.f textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,120,212,.12)}
-.f input[readonly]{background:#F9FAFB;color:#9CA3AF}
-.f textarea{resize:vertical;min-height:76px}
 
-/* Date + Invoice row — always 2 col even on mobile */
-.g2-date{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+/* ══ HEADER ═══════════════════════════════════════════════════ */
+.hdr{background:var(--dark);padding:0 16px;height:50px;display:flex;
+  justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.hdr h1{font-size:13px;font-weight:700;color:#fff;letter-spacing:.3px;text-transform:uppercase;margin:0}
+.hdr p{font-size:9px;color:#7BBFDB;letter-spacing:1.5px;margin:2px 0 0;text-transform:uppercase}
+.dbadge{background:rgba(255,255,255,.15);color:#fff;font-size:10px;font-weight:700;
+  padding:3px 10px;border-radius:12px;white-space:nowrap}
 
-/* Card */
-.card{background:white;max-width:680px;margin:0 auto 40px;border-radius:0 0 8px 8px;
-  padding:18px 16px 32px;box-shadow:0 1px 6px rgba(0,0,0,.08);border:1px solid #E5E7EB;border-top:none}
+/* ══ DRIVER BAR ═══════════════════════════════════════════════ */
+.dbar{background:#003554;padding:10px 16px;display:none;align-items:center;gap:12px}
+.dav{width:38px;height:38px;border-radius:50%;background:var(--blue);display:flex;
+  align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:800;
+  flex-shrink:0;text-align:center}
+.dbar-flex{flex:1;min-width:0}
+.dnm{color:#fff;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dmt{color:#7BBFDB;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dgrp{background:rgba(255,255,255,.15);color:#D1FAE5;font-size:10px;font-weight:700;
+  padding:3px 9px;border-radius:12px;flex-shrink:0}
 
-/* Pay grid */
-.pay-g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:400px){.pay-g2{grid-template-columns:1fr}}
-.pay-row{display:flex;align-items:center;gap:8px;padding:8px 0;font-size:14px;color:#374151}
-.pay-row input[type=radio]{width:18px;height:18px;accent-color:var(--blue);flex-shrink:0}
+/* ══ PENDING SCREEN ═══════════════════════════════════════════ */
+#pending-screen{padding:14px 14px 40px}
+.ps-title{font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;
+  letter-spacing:.8px;margin:0 0 12px;padding:0 2px}
+.pl-item{background:#fff;border-radius:var(--radius);border:1px solid #E5E7EB;
+  padding:14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;
+  gap:12px;box-shadow:var(--shadow)}
+.pl-item-left{flex:1;min-width:0}
+.pl-inv{font-size:15px;font-weight:800;color:var(--dark);margin-bottom:4px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl-dealer{font-size:13px;color:#374151;margin-bottom:6px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl-meta{display:flex;align-items:center;flex-wrap:wrap;gap:8px;font-size:11px;color:#64748b}
+.pl-open-btn{background:var(--blue);color:#fff;border:none;border-radius:6px;
+  padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0;
+  font-family:inherit;white-space:nowrap}
+#pl-loading{text-align:center;padding:28px;color:#94a3b8;font-size:13px}
+.pl-spinner{display:inline-block;width:22px;height:22px;border:3px solid #E5E7EB;
+  border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+#pl-empty{text-align:center;padding:56px 24px;display:none}
+.pl-empty-icon{font-size:48px;margin-bottom:12px}
+.pl-empty-txt{font-size:15px;font-weight:700;color:#374151;margin-bottom:6px}
+.pl-empty-sub{font-size:13px;color:#94a3b8}
+.pl-driver-row{background:#EFF6FF;border:1px solid #BFDBFE;border-radius:var(--radius);
+  padding:10px 14px;margin-bottom:14px;font-size:12px;color:#1d4ed8;font-weight:600;
+  display:flex;align-items:center;gap:8px}
 
-/* Table */
-.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:6px;border:1px solid #E5E7EB;margin-bottom:12px}
-.tw table{min-width:420px;width:100%;border-collapse:collapse;font-size:13px}
-.tw th{padding:9px 10px;background:#F8FAFC;font-size:10px;font-weight:700;color:#64748b;
-  text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #E5E7EB;text-align:left}
-.tw td{padding:8px 10px;border-bottom:1px solid #F3F4F6}
-.tw tr:last-child td{border-bottom:none}
+/* ══ BACK BAR ═════════════════════════════════════════════════ */
+#form-back-bar{display:none;align-items:center;gap:10px;padding:10px 14px;
+  background:#fff;border-bottom:1.5px solid #E5E7EB;position:sticky;top:50px;z-index:99}
+.back-btn{background:#fff;border:1px solid var(--border);border-radius:6px;
+  padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;color:#374151;font-family:inherit}
+#form-bar-title{font-size:13px;font-weight:700;color:var(--dark);
+  flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* Section headers */
-.sec{display:flex;align-items:center;gap:8px;margin:20px 0 12px;padding-bottom:8px;border-bottom:1px solid #E5E7EB}
-.sec h3{font-size:11px;font-weight:700;color:var(--dark);text-transform:uppercase;letter-spacing:.8px;margin:0}
-
-/* Tabs */
-.tabs-wrap{background:white;border-bottom:2px solid #E5E7EB;padding:0 16px;max-width:680px;margin:14px auto 0}
+/* ══ FORM AREA ════════════════════════════════════════════════ */
+#form-area{display:none}
+.tabs-wrap{background:#fff;border-bottom:2px solid #E5E7EB;padding:0 14px}
 .tabs{display:flex}
-.tab{flex:1;padding:12px 8px 10px;border:none;border-bottom:3px solid transparent;
-  margin-bottom:-2px;cursor:pointer;font-size:13px;font-weight:600;background:transparent;
-  color:#6B7280;text-align:center;transition:all .15s;white-space:nowrap}
+.tab{flex:1;padding:11px 6px 10px;border:none;border-bottom:3px solid transparent;
+  margin-bottom:-2px;cursor:pointer;font-size:12px;font-weight:600;background:transparent;
+  color:#6B7280;text-align:center;transition:all .15s;white-space:nowrap;font-family:inherit}
 .tab.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:700}
 .tab:hover:not(.active){color:#374151;background:#F9FAFB}
-.ti{display:block;font-size:16px;margin-bottom:2px}
+.ti{display:block;font-size:18px;margin-bottom:2px}
+.tab-hidden{display:none!important}
 
-/* Buttons */
-.sa{display:flex;gap:10px;margin-top:20px}
-.btn{padding:12px 20px;border:none;border-radius:6px;font-size:14px;font-weight:700;
-  cursor:pointer;font-family:inherit;flex:1;text-align:center;transition:all .15s}
-.bp{background:var(--blue);color:white}
-.bp:hover{background:#006BBD}
-.bs{background:#F1F5F9;color:#374151;border:1px solid #D1D5DB}
-.btn-add{background:none;border:1px dashed #D1D5DB;border-radius:6px;padding:9px 16px;
-  font-size:13px;color:#0078D4;font-weight:600;cursor:pointer;width:100%;margin:8px 0;font-family:inherit}
-.btn-add:hover{background:#EFF6FF;border-color:#0078D4}
+/* ══ CARD ═════════════════════════════════════════════════════ */
+.card{background:#fff;padding:16px 14px 40px;border-top:none}
 
-/* Signature */
-.sig-wrap-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
-@media(max-width:400px){.sig-wrap-row{grid-template-columns:1fr}}
-.sig-lbl{font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;
+/* ══ FORM FIELDS ══════════════════════════════════════════════ */
+/* Grid: 2 col on wide, 1 col on narrow */
+.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.g2-auto{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:12px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:400px){.g2{grid-template-columns:1fr}.g3{grid-template-columns:1fr 1fr}}
+.fc{grid-column:1/-1!important}
+.mt12{margin-top:12px}
+
+.f{display:flex;flex-direction:column;gap:4px;min-width:0}
+.f label{font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.6px}
+/* 16px prevents iOS zoom, overridden on larger screens */
+.f input,.f select,.f textarea{
+  padding:11px 12px;border:1.5px solid var(--border);border-radius:6px;
+  font-size:16px;font-family:inherit;color:#1A2432;background:#fff;
+  width:100%;-webkit-appearance:none;outline:none;transition:border-color .15s}
+@media(min-width:480px){.f input,.f select,.f textarea{font-size:14px}}
+.f input:focus,.f select:focus,.f textarea:focus{
+  border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,120,212,.1)}
+.f input[readonly],.f select[readonly],.f textarea[readonly]{background:#F9FAFB;color:#6B7280}
+.f textarea{resize:vertical;min-height:80px}
+
+/* Section headers */
+.sec{display:flex;align-items:center;gap:8px;margin:20px 0 12px;
+  padding-bottom:8px;border-bottom:1px solid #E5E7EB}
+.sec h3{font-size:11px;font-weight:700;color:var(--dark);text-transform:uppercase;
+  letter-spacing:.8px;margin:0}
+.sec span{font-size:16px}
+.abadge{background:var(--blue);color:#fff;font-size:9px;font-weight:700;
+  padding:2px 6px;border-radius:10px;margin-left:6px;vertical-align:middle}
+
+/* Notice boxes */
+.notice{background:#FFFBEB;border:1px solid #FDE68A;border-radius:6px;
+  padding:10px 14px;margin-bottom:14px;font-size:13px;color:#92400E;line-height:1.5}
+.nred{background:#FEF2F2!important;border-color:#FECACA!important;color:#DC2626!important}
+.notice-center{text-align:center;font-weight:700}
+.notice-mb{margin-bottom:14px}
+.from-box{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:6px;
+  padding:10px 14px;margin-bottom:14px;font-size:12px;color:#475569;line-height:1.5}
+
+/* Payment */
+.pay-g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:380px){.pay-g2{grid-template-columns:1fr}}
+.pay-row{display:flex;align-items:center;gap:8px;padding:8px 0;
+  font-size:14px;color:#374151;cursor:pointer}
+.pay-row input[type=radio]{width:18px;height:18px;accent-color:var(--blue);flex-shrink:0}
+
+/* Tables — horizontal scroll on small screens */
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;
+  border-radius:6px;border:1px solid #E5E7EB;margin-bottom:12px}
+.tw table{min-width:400px;width:100%;border-collapse:collapse;font-size:13px}
+.tw th{padding:9px 10px;background:#F8FAFC;font-size:10px;font-weight:700;
+  color:#64748b;text-transform:uppercase;letter-spacing:.5px;
+  border-bottom:1px solid #E5E7EB;text-align:left;white-space:nowrap}
+.tw td{padding:8px 8px;border-bottom:1px solid #F3F4F6;vertical-align:middle}
+.tw tr:last-child td{border-bottom:none}
+.tw td input[type=text],.tw td input[type=number]{
+  border:1.5px solid var(--border);border-radius:4px;padding:5px 7px;
+  font-size:13px;font-family:inherit;color:#1A2432;background:#fff;
+  width:100%;min-width:60px;outline:none}
+.tw td input[type=text]:focus,.tw td input[type=number]:focus{border-color:var(--blue)}
+.tw td input[readonly]{background:#F9FAFB;color:#6B7280}
+.tw td .pt-name{font-weight:600;font-size:12px;min-width:90px}
+.tc{text-align:center!important}
+.cbt{width:18px;height:18px;accent-color:var(--blue);cursor:pointer}
+
+/* Accepted checkbox */
+.ci{display:flex;align-items:flex-start;gap:8px;cursor:pointer}
+.ci input[type=checkbox]{width:18px;height:18px;accent-color:var(--blue);flex-shrink:0;margin-top:1px}
+.ci-lg{font-size:13px;font-weight:600;color:#374151;line-height:1.5}
+
+/* Booklet pills */
+.bk-box{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;
+  padding:12px 14px;margin-bottom:14px}
+.bk-lbl{font-size:12px;font-weight:600;color:#374151;margin-bottom:10px}
+.pills{display:flex;gap:10px}
+.pill{flex:1;padding:12px;text-align:center;border:1.5px solid var(--border);
+  border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;
+  background:#fff;color:#374151;transition:all .15s}
+.pill.gn{border-color:#16a34a;background:#F0FDF4;color:#16a34a}
+.pill.rd{border-color:#DC2626;background:#FEF2F2;color:#DC2626}
+
+/* Signatures */
+.sig-wrap-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+@media(max-width:380px){.sig-wrap-row{grid-template-columns:1fr}}
+.sig-lbl{font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;
   letter-spacing:.6px;margin-bottom:6px}
-.sw{position:relative;border:1.5px solid #D1D5DB;border-radius:8px;overflow:hidden;
-  background:#FAFAFA;touch-action:none}
+.sw{position:relative;border:1.5px solid var(--border);border-radius:8px;
+  overflow:hidden;background:#FAFAFA;touch-action:none}
 .sw canvas{display:block;width:100%;height:130px}
 .sph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
   font-size:13px;color:#9CA3AF;pointer-events:none}
-.scl{position:absolute;top:6px;right:6px;background:#fff;border:1px solid #D1D5DB;
-  border-radius:4px;padding:3px 8px;font-size:11px;font-weight:600;cursor:pointer;color:#374151}
-.sok{position:absolute;inset:0;background:rgba(240,253,244,.9);display:none;
-  align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#00875A}
+.scl{position:absolute;top:6px;right:6px;background:#fff;border:1px solid var(--border);
+  border-radius:4px;padding:3px 8px;font-size:11px;font-weight:600;cursor:pointer;
+  color:#374151;font-family:inherit}
+.sok{position:absolute;inset:0;background:rgba(240,253,244,.92);display:none;
+  align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#16a34a}
 
-/* Notice */
-.notice{background:#FFFBEB;border:1px solid #FDE68A;border-radius:6px;
-  padding:10px 14px;margin-bottom:14px;font-size:13px;color:#92400E}
-.nred{background:#FEF2F2;border-color:#FECACA;color:#DC2626}
-.notice-center{text-align:center;font-weight:700}
-.notice-mb{margin-bottom:14px}
-.ci{display:flex;align-items:flex-start;gap:8px;cursor:pointer}
-.ci input[type=checkbox]{width:18px;height:18px;accent-color:var(--blue);flex-shrink:0;margin-top:1px}
-.ci-lg{font-size:13px;font-weight:600;color:#374151}
-
-/* Booklet pills */
-.bk-box{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:10px 14px;margin-bottom:14px}
-.bk-lbl{font-size:12px;font-weight:600;color:#374151;margin-bottom:8px}
-.pills{display:flex;gap:10px}
-.pill{flex:1;padding:10px;text-align:center;border:1.5px solid #D1D5DB;border-radius:6px;
-  font-size:13px;font-weight:600;cursor:pointer;background:white;color:#374151;transition:all .15s}
-.pill.active{border-color:var(--blue);background:#EFF6FF;color:var(--blue)}
-
-/* From box */
-.from-box{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:6px;
-  padding:10px 14px;margin-bottom:14px;font-size:12px;color:#475569}
-
-/* Success screen */
-.succ{display:none;text-align:center;padding:40px 20px}
-.si{font-size:52px;color:#00875A;margin-bottom:12px}
-.succ-title{font-size:22px;font-weight:800;color:#00263E;margin:0 0 8px}
-.succ-sub{font-size:13px;color:#64748b;margin:0 0 24px}
-
-/* Pending screen */
-.ps{max-width:680px;margin:0 auto;padding:16px}
-.ps-card{background:white;border-radius:10px;border:1px solid #E5E7EB;
-  padding:16px;margin-bottom:12px;cursor:pointer;transition:box-shadow .15s}
-.ps-card:hover{box-shadow:0 2px 12px rgba(0,0,0,.1)}
-.ps-inv{font-size:15px;font-weight:700;color:#00263E}
-.ps-meta{font-size:12px;color:#64748b;margin-top:4px}
-.ps-empty{text-align:center;padding:48px 24px;color:#94a3b8}
-
-/* Driver bar */
-.dbar{background:#00263E;padding:10px 16px;display:flex;align-items:center;
-  gap:12px;max-width:680px;margin:0 auto;border-radius:0}
-.dav{width:36px;height:36px;border-radius:50%;background:#0078D4;display:flex;
-  align-items:center;justify-content:center;color:white;font-size:13px;font-weight:800;
-  flex-shrink:0;text-align:center;line-height:36px}
-.dbar-flex{flex:1;min-width:0}
-.dnm{color:white;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dmt{color:#7BBFDB;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dgrp{background:rgba(255,255,255,.15);color:#D1FAE5;font-size:10px;font-weight:700;
-  padding:3px 8px;border-radius:12px;flex-shrink:0}
-
-/* Header */
-.hdr{background:#00263E;padding:0 16px;height:50px;display:flex;justify-content:space-between;
-  align-items:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 6px rgba(0,0,0,.2)}
-.hdr h1{font-size:13px;font-weight:700;color:white;letter-spacing:.3px;text-transform:uppercase}
-.hdr p{font-size:9px;color:#7BBFDB;letter-spacing:1.8px;margin-top:1px;text-transform:uppercase}
-.dbadge{background:rgba(255,255,255,.15);color:white;font-size:10px;font-weight:700;
-  padding:3px 8px;border-radius:12px}
-
-/* Misc */
-.tab-hidden{display:none}
+/* Action bar */
+.sa{display:flex;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid #E5E7EB}
+.btn{padding:13px 18px;border:none;border-radius:6px;font-size:14px;font-weight:700;
+  cursor:pointer;font-family:inherit;flex:1;text-align:center;transition:all .15s}
+.bp{background:var(--blue);color:#fff}
+.bp:hover{background:#006BBD}
+.bs{background:#F1F5F9;color:#374151;border:1px solid var(--border)}
+.btn-new{margin-top:16px;width:auto;padding:12px 28px;flex:none}
+.btn-add{background:none;border:1px dashed var(--border);border-radius:6px;
+  padding:10px 16px;font-size:13px;color:var(--blue);font-weight:600;
+  cursor:pointer;width:100%;margin:8px 0;font-family:inherit;transition:all .15s}
+.btn-add:hover{background:#EFF6FF;border-color:var(--blue)}
 .mb14{margin-bottom:14px}
-.mt10{margin-top:10px}
-.mt14{margin-top:14px}
-.tc{text-align:center}
-.abadge{background:#0078D4;color:white;font-size:9px;font-weight:700;padding:2px 6px;
-  border-radius:10px;margin-left:6px;vertical-align:middle}
 
 /* Invoice */
 .inv-hdr{display:flex;justify-content:space-between;align-items:center;
   background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:12px 16px;margin-bottom:16px}
-.inv-company{font-size:14px;font-weight:800;color:#00263E}
+.inv-company{font-size:14px;font-weight:800;color:var(--dark)}
 .inv-addr{font-size:11px;color:#64748b;margin-top:2px}
-.inv-badge{background:#00263E;color:white;font-size:12px;font-weight:700;
-  padding:6px 14px;border-radius:4px;letter-spacing:1px}
-.inv-grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px}
+.inv-badge{background:var(--dark);color:#fff;font-size:12px;font-weight:700;
+  padding:6px 14px;border-radius:4px;letter-spacing:1px;flex-shrink:0}
 .totals-wrap{display:flex;justify-content:flex-end;margin-top:8px}
-.totals-box{width:220px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:6px;padding:12px}
+.totals-box{width:min(220px,100%);background:#F8FAFC;border:1px solid #E2E8F0;
+  border-radius:6px;padding:12px}
 .totals-row{display:flex;justify-content:space-between;margin-bottom:8px;
   font-size:12px;color:#64748b}
-.ish-input{width:80px;padding:4px 8px;border:1px solid #D1D5DB;border-radius:4px;
-  font-size:13px;text-align:right}
-.totals-due{border-top:2px solid #00263E;padding-top:8px;display:flex;
-  justify-content:space-between;font-size:15px;font-weight:900;color:#00263E}
+.ish-input{width:80px;padding:5px 8px;border:1px solid var(--border);border-radius:4px;
+  font-size:13px;font-family:inherit;text-align:right}
+.totals-due{border-top:2px solid var(--dark);padding-top:8px;display:flex;
+  justify-content:space-between;font-size:15px;font-weight:900;color:var(--dark)}
+.inv-readonly-note{background:#EFF6FF;border:1px solid #BFDBFE;border-radius:6px;
+  padding:8px 12px;margin-bottom:14px;font-size:12px;color:#1d4ed8;font-weight:600}
 
-/* Loose parts header */
+/* Loose parts */
 .lp-hdr{text-align:center;background:#F8FAFC;border:1px solid #E2E8F0;
   border-radius:8px;padding:12px;margin-bottom:16px}
-.lp-company{font-size:16px;font-weight:800;color:#00263E}
+.lp-company{font-size:16px;font-weight:800;color:var(--dark)}
 .lp-sub{font-size:11px;color:#64748b;letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+
+/* Success */
+.succ{display:none;text-align:center;padding:48px 20px}
+.si{font-size:56px;color:#16a34a;margin-bottom:14px}
+.succ-title{font-size:22px;font-weight:800;color:var(--dark);margin:0 0 8px}
+.succ-sub{font-size:13px;color:#64748b;margin:0 0 24px}
+
+/* Geotab Drive scroll fix */
+#vt-app{min-height:100vh;padding-bottom:env(safe-area-inset-bottom)}
 </style>
 </head>
 <body ontouchstart="">
 
-<!-- ✅ Exactly like official Geotab samples: div hidden by default, shown in focus() -->
 <div id="vt-app" style="display:none">
 
+<!-- Header -->
 <div class="hdr">
   <div><h1>VENTURE TRAILERS</h1><p>ELECTRONIC DELIVERY SYSTEM</p></div>
   <span class="dbadge" id="dbadge"></span>
 </div>
 
+<!-- Driver bar -->
 <div class="dbar" id="dbar">
   <div class="dav" id="dav">?</div>
-  <div class="dbar-flex"><div class="dnm" id="dnm"></div><div class="dmt" id="dmt"></div></div>
+  <div class="dbar-flex">
+    <div class="dnm" id="dnm"></div>
+    <div class="dmt" id="dmt"></div>
+  </div>
   <span class="dgrp" id="dgrp"></span>
 </div>
 
-<div class="tabs-wrap">
-  <div class="tabs">
-    <button class="tab active" id="tab0"><span class="ti">📋</span>Delivery</button>
-    <button class="tab" id="tab1"><span class="ti">🧾</span>Invoice</button>
-    <button class="tab" id="tab2"><span class="ti">🔩</span>Parts</button>
+<!-- ══ PENDING SCREEN ═══════════════════════════════════════ -->
+<div id="pending-screen">
+  <div style="max-width:680px;margin:0 auto;padding:16px 0">
+    <div class="pl-driver-row">
+      👤 <span id="pl-driver-label">Loading driver...</span>
+    </div>
+    <p class="ps-title">Assigned Forms</p>
+    <div id="pl-loading" style="display:none">
+      <span class="pl-spinner"></span>Loading forms...
+    </div>
+    <div id="pl-list"></div>
+    <div id="pl-empty">
+      <div class="pl-empty-icon">📭</div>
+      <div class="pl-empty-txt">No pending forms</div>
+      <div class="pl-empty-sub">Your dispatcher will assign forms here</div>
+    </div>
   </div>
 </div>
 
-<div class="card">
+<!-- ══ FORM AREA ════════════════════════════════════════════ -->
+<div id="form-area">
 
-  <div class="succ" id="succ">
-    <div class="si">✓</div>
-    <h2 class="succ-title">Submitted!</h2>
-    <p class="succ-sub">Saved to MyGeotab • Email will be sent shortly</p>
-    <!-- MyGeotab ID hidden -->
-    <button class="btn bp btn-new" id="btnNew">+ New Form</button>
+  <!-- Back bar -->
+  <div id="form-back-bar">
+    <button class="back-btn" onclick="backToPending()">← Back</button>
+    <span id="form-bar-title"></span>
   </div>
 
-  <!-- TAB 0: DELIVERY -->
-  <div id="t0">
-    <div class="notice">⚠️ <strong>Inspect all merchandise.</strong> Damages not replaced unless noted at delivery.</div>
-    <div class="from-box"><strong>FROM:</strong> Venture Trailers • 5301 North Point Blvd, Baltimore MD 21219</div>
-    <div class="g2-date">
-      <div class="f"><label>Date *</label><input type="date" id="ds-dt"></div>
-      <div class="f"><label>Invoice No. *</label><input id="ds-inv" placeholder="Enter invoice #"></div>
-    </div>
-    <div class="sec"><span>🏪</span><h3>Consigned To</h3></div>
-    <div class="g2">
-      <div class="f fc"><label>Dealer Name *</label><input id="ds-dlr" placeholder="Enter dealer name"></div>
-      <div class="f fc"><label>Address</label><input id="ds-adr" placeholder="Enter street address"></div>
-      <div class="f"><label>City, State, ZIP</label><input id="ds-cty" placeholder="City, State ZIP"></div>
-      <div class="f"><label>Contact</label><input id="ds-cnt" placeholder="Contact name"></div>
-      <div class="f"><label>Phone</label><input type="tel" id="ds-ph" placeholder="(000)-000-0000"></div>
-      <div class="f"><label>Dealer Email</label><input type="email" id="ds-em" placeholder="dealer@email.com"></div>
-    </div>
-    <!-- Driver Info: hidden fields only — section hidden, data saved in background -->
-    <div id="drv-section" style="display:none">
-    <div class="sec"><span>👤</span><h3>Driver Info <span class="abadge">⚡ Auto</span></h3></div>
-    <div class="g2">
-      <div class="f"><label>Driver Name</label><input id="ds-drv" readonly placeholder="Auto from Geotab"></div>
-      <div class="f"><label>Driver Group</label><input id="ds-grp" readonly placeholder="Auto"></div>
-      <div class="f"><label>Vehicle ID</label><input id="ds-vid" readonly placeholder="Auto"></div>
-      <div class="f"><label>Vehicle Name</label><input id="ds-vnm" readonly placeholder="Auto"></div>
-    </div>
-    </div>
-    <div class="sec"><span>💰</span><h3>Payment</h3></div>
-    <div class="pay-g2">
-      <div class="f"><label>C.O.D. Amount ($)</label><input type="number" id="ds-cod" placeholder="0.00" step="0.01"></div>
-      <div class="f"><label>Type</label>
-        <div id="payment-types">
-          <div class="pay-row"><input type="radio" name="paytype" id="ck-cod" value="COD" checked> C.O.D.</div>
-          <div class="pay-row"><input type="radio" name="paytype" id="ck-fp" value="Floor Plan"> Floor Plan</div>
-          <div class="pay-row"><input type="radio" name="paytype" id="ck-pt" value="Parts"> Parts</div>
-          <div class="pay-row"><input type="radio" name="paytype" id="ck-rv" value="Return to Vendor"> Return to Vendor</div>
-          <div class="pay-row"><input type="radio" name="paytype" id="ck-wn" value="Warranty"> Warranty</div>
-        </div>
-      </div>
-    </div>
-    <div class="sec"><span>🔧</span><h3>Parts Condition</h3></div>
-    <div class="tw">
-      <table><thead><tr><th>Part</th><th>Model</th><th class="tc">Dmg</th><th class="tc">Short</th><th>Notes</th></tr></thead>
-      <tbody id="ptb"></tbody></table>
-    </div>
-    <div class="notice notice-mb">
-      <label class="ci ci-lg"><input type="checkbox" id="ck-ac"> ACCEPTED — product accepted as is, except where noted.</label>
-    </div>
-    <div class="bk-box">
-      <div class="bk-lbl">Received "You and Your Trailer" booklets?</div>
-      <div class="pills">
-        <div class="pill" id="py">✅ Yes</div>
-        <div class="pill" id="pn">❌ No</div>
-      </div>
-    </div>
-    <div class="f mb14"><label>Comments</label><textarea id="ds-cm" placeholder="Any notes..."></textarea></div>
-    <div class="sec"><span>✍️</span><h3>Signatures</h3></div>
-    <div class="sig-wrap-row">
-      <div>
-        <div class="sig-lbl">Driver</div>
-        <div class="sw" id="sig-driver-wrap">
-          <canvas id="sig-driver"></canvas>
-          <div class="sph" id="sig-driver-ph">Sign here ✍️</div>
-          <button class="scl" id="clr-driver">Clear</button>
-          <div class="sok" id="sig-driver-ok">✓ Signed</div>
-        </div>
-      </div>
-      <div>
-        <div class="sig-lbl">Consignee (Dealer)</div>
-        <div class="sw" id="sig-consignee-wrap">
-          <canvas id="sig-consignee"></canvas>
-          <div class="sph" id="sig-consignee-ph">Sign here ✍️</div>
-          <button class="scl" id="clr-consignee">Clear</button>
-          <div class="sok" id="sig-consignee-ok">✓ Signed</div>
-        </div>
-      </div>
-    </div>
-    <div class="sa">
-      <button class="btn bs" id="btnDraft">💾 Draft</button>
-      <button class="btn bp" id="subbtn">📤 Submit &amp; Send to Dealer</button>
+  <div class="tabs-wrap">
+    <div class="tabs">
+      <button class="tab active" id="tab0"><span class="ti">📋</span>Delivery</button>
+      <button class="tab" id="tab1"><span class="ti">🧾</span>Invoice</button>
+      <button class="tab" id="tab2"><span class="ti">🔩</span>Parts</button>
     </div>
   </div>
 
-  <!-- TAB 1: INVOICE -->
-  <div id="t1" class="tab-hidden">
-    <div class="inv-hdr">
-      <div><div class="inv-company">VENTURE TRAILERS, INC.</div><div class="inv-addr">5301 North Point Blvd • Baltimore MD 21219</div></div>
-      <div class="inv-badge">INVOICE</div>
-    </div>
-    <div class="g2">
-      <div class="f"><label>Date</label><input type="date" id="id"></div>
-      <div class="f"><label>Acct No.</label><input id="ia" value="3818"></div>
-      <div class="f fc"><label>Invoice #</label><input id="ino" placeholder="Enter invoice #"></div>
-    </div>
-    <div class="g2 mt10">
-      <div class="f"><label>Bill To</label><textarea id="ibt" placeholder="Company&#10;Address&#10;City, State ZIP"></textarea></div>
-      <div class="f"><label>Ship To</label><textarea id="ist" placeholder="Company&#10;Address&#10;City, State ZIP"></textarea></div>
-    </div>
-    <div class="inv-grid-4 mt10">
-      <div class="f"><label>PO #</label><input id="ipo"></div>
-      <div class="f"><label>Terms</label><input id="itr" value="Due on receipt"></div>
-      <div class="f"><label>Sales Order</label><input id="iso"></div>
-      <div class="f"><label>Shipping Method</label><input id="ism" placeholder="Shipping company"></div>
-    </div>
-    <div class="sec"><span>📦</span><h3>Line Items</h3></div>
-    <div class="tw"><table><thead><tr><th>Item</th><th>Qty</th><th>Description</th><th>Unit Price</th><th>Total</th><th></th></tr></thead><tbody id="itb"></tbody></table></div>
-    <button class="btn-add" id="btnAddIR">+ Add Line</button>
-    <div class="totals-wrap">
-      <div class="totals-box">
-        <div class="totals-row"><span>Shipping</span><input id="ish" class="ish-input"></div>
-        <div class="totals-due"><span>Amount Due</span><span id="itot">$0.00</span></div>
-      </div>
-    </div>
-    <div class="sa"><button class="btn bs">💾 Draft</button><button class="btn bp" id="btnSubInv">📤 Submit Invoice</button></div>
-  </div>
+  <div class="card">
 
-  <!-- TAB 2: LOOSE PARTS -->
-  <div id="t2" class="tab-hidden">
-    <div class="lp-hdr">
-      <div class="lp-company">VENTURE TRAILERS</div>
-      <div class="lp-sub">LOOSE PARTS CHECK-IN</div>
+    <!-- Success screen -->
+    <div class="succ" id="succ">
+      <div class="si">✓</div>
+      <h2 class="succ-title">Submitted!</h2>
+      <p class="succ-sub">Saved to MyGeotab • Email will be sent shortly</p>
+      <button class="btn bp btn-new" id="btnNew">+ New Form</button>
     </div>
-    <div class="g2">
-      <div class="f"><label>Sales Order #</label><input id="ls"></div>
-      <div class="f"><label>Invoice #</label><input id="li"></div>
-      <div class="f"><label>PL#</label><input id="lpl"></div>
-      <div class="f"><label>TRK#</label><input id="lt"></div>
-      <div class="f"><label>Dealer</label><input id="ld"></div>
-      <div class="f"><label>Date</label><input type="date" id="ldt"></div>
-    </div>
-    <div class="sec"><span>🔩</span><h3>Parts List</h3></div>
-    <div class="tw"><table><thead><tr><th>Loc</th><th>Qty</th><th>Part</th><th class="tc">Pulled</th><th class="tc">Loaded</th><th class="tc">N/C</th><th class="tc">COD</th><th></th></tr></thead><tbody id="ltb"></tbody></table></div>
-    <button class="btn-add" id="btnAddLR">+ Add Row</button>
-    <div class="f mb14"><label>Comments</label><textarea id="lc"></textarea></div>
-    <div class="notice nred notice-center">⚠️ MUST BE COMPLETED AT TIME OF DELIVERY</div>
-    <div class="sec mt14"><span>✍️</span><h3>Signatures</h3></div>
-    <div class="sig-wrap-row">
-      <div>
-        <div class="sig-lbl">Driver</div>
-        <div class="sw" id="sig-lpd-wrap">
-          <canvas id="sig-lpd"></canvas>
-          <div class="sph" id="sig-lpd-ph">Sign here ✍️</div>
-          <button class="scl" id="clr-lpd">Clear</button>
-          <div class="sok" id="sig-lpd-ok">✓ Signed</div>
+
+    <!-- ══ TAB 0: DELIVERY ════════════════════════════════ -->
+    <div id="t0">
+      <div class="notice">⚠️ <strong>Inspect all merchandise.</strong> Damages not replaced unless noted at delivery.</div>
+      <div class="from-box"><strong>FROM:</strong> Venture Trailers • 5301 North Point Blvd, Baltimore MD 21219</div>
+
+      <!-- Date + Invoice — always 2 col -->
+      <div class="g2">
+        <div class="f"><label>Date *</label><input type="date" id="ds-dt"></div>
+        <div class="f"><label>Invoice No. *</label><input id="ds-inv" placeholder="Enter invoice #"></div>
+      </div>
+
+      <div class="sec"><span>🏪</span><h3>Consigned To</h3></div>
+      <div class="g2-auto">
+        <div class="f fc"><label>Dealer Name *</label><input id="ds-dlr" placeholder="Enter dealer name"></div>
+        <div class="f fc"><label>Address</label><input id="ds-adr" placeholder="Enter street address"></div>
+        <div class="f"><label>City, State, ZIP</label><input id="ds-cty" placeholder="City, State ZIP"></div>
+        <div class="f"><label>Contact</label><input id="ds-cnt" placeholder="Contact name"></div>
+        <div class="f"><label>Phone</label><input type="tel" id="ds-ph" placeholder="(000)-000-0000"></div>
+        <div class="f"><label>Dealer Email</label><input type="email" id="ds-em" placeholder="dealer@email.com"></div>
+      </div>
+
+      <!-- Driver info hidden -->
+      <div id="drv-section" style="display:none">
+        <div class="sec"><span>👤</span><h3>Driver Info <span class="abadge">⚡ Auto</span></h3></div>
+        <div class="g2-auto">
+          <div class="f"><label>Driver Name</label><input id="ds-drv" readonly></div>
+          <div class="f"><label>Driver Group</label><input id="ds-grp" readonly></div>
+          <div class="f"><label>Vehicle ID</label><input id="ds-vid" readonly></div>
+          <div class="f"><label>Vehicle Name</label><input id="ds-vnm" readonly></div>
         </div>
       </div>
-      <div>
-        <div class="sig-lbl">Authorized Receiver</div>
-        <div class="sw" id="sig-lpr-wrap">
-          <canvas id="sig-lpr"></canvas>
-          <div class="sph" id="sig-lpr-ph">Sign here ✍️</div>
-          <button class="scl" id="clr-lpr">Clear</button>
-          <div class="sok" id="sig-lpr-ok">✓ Signed</div>
+
+      <div class="sec"><span>💰</span><h3>Payment</h3></div>
+      <div class="pay-g2">
+        <div class="f">
+          <label>C.O.D. Amount ($)</label>
+          <input type="number" id="ds-cod" placeholder="0.00" step="0.01">
+        </div>
+        <div class="f">
+          <label>Type</label>
+          <div id="payment-types">
+            <div class="pay-row"><input type="radio" name="paytype" id="ck-cod" value="COD" checked> C.O.D.</div>
+            <div class="pay-row"><input type="radio" name="paytype" id="ck-fp" value="Floor Plan"> Floor Plan</div>
+            <div class="pay-row"><input type="radio" name="paytype" id="ck-pt" value="Parts"> Parts</div>
+            <div class="pay-row"><input type="radio" name="paytype" id="ck-rv" value="Return to Vendor"> Return to Vendor</div>
+            <div class="pay-row"><input type="radio" name="paytype" id="ck-wn" value="Warranty"> Warranty</div>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="sa"><button class="btn bs">💾 Draft</button><button class="btn bp" id="btnSubParts">📤 Submit Parts Form</button></div>
-  </div>
 
-</div><!-- /card -->
+      <div class="sec"><span>🔧</span><h3>Parts Condition</h3></div>
+      <div class="tw">
+        <table>
+          <thead><tr>
+            <th>Part</th><th>Model</th>
+            <th class="tc">Dmg</th><th class="tc">Short</th><th>Notes</th>
+          </tr></thead>
+          <tbody id="ptb"></tbody>
+        </table>
+      </div>
+
+      <div class="notice notice-mb">
+        <label class="ci ci-lg">
+          <input type="checkbox" id="ck-ac">
+          ACCEPTED — product accepted as is, except where noted.
+        </label>
+      </div>
+
+      <div class="bk-box">
+        <div class="bk-lbl">Received "You and Your Trailer" booklets?</div>
+        <div class="pills">
+          <div class="pill" id="py">✅ Yes</div>
+          <div class="pill" id="pn">❌ No</div>
+        </div>
+      </div>
+
+      <div class="f mb14"><label>Comments</label>
+        <textarea id="ds-cm" placeholder="Any notes about this delivery..."></textarea>
+      </div>
+
+      <div class="sec"><span>✍️</span><h3>Signatures</h3></div>
+      <div class="sig-wrap-row">
+        <div>
+          <div class="sig-lbl">Driver</div>
+          <div class="sw" id="sig-driver-wrap">
+            <canvas id="sig-driver"></canvas>
+            <div class="sph" id="sig-driver-ph">Sign here ✍️</div>
+            <button class="scl" id="clr-driver">Clear</button>
+            <div class="sok" id="sig-driver-ok">✓ Signed</div>
+          </div>
+        </div>
+        <div>
+          <div class="sig-lbl">Consignee (Dealer)</div>
+          <div class="sw" id="sig-consignee-wrap">
+            <canvas id="sig-consignee"></canvas>
+            <div class="sph" id="sig-consignee-ph">Sign here ✍️</div>
+            <button class="scl" id="clr-consignee">Clear</button>
+            <div class="sok" id="sig-consignee-ok">✓ Signed</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sa">
+        <button class="btn bs" id="btnDraft">💾 Draft</button>
+        <button class="btn bp" id="subbtn">📤 Submit &amp; Send to Dealer</button>
+      </div>
+    </div><!-- /t0 -->
+
+    <!-- ══ TAB 1: INVOICE ═════════════════════════════════ -->
+    <div id="t1" class="tab-hidden">
+      <div class="inv-hdr">
+        <div>
+          <div class="inv-company">VENTURE TRAILERS, INC.</div>
+          <div class="inv-addr">5301 North Point Blvd • Baltimore MD 21219</div>
+        </div>
+        <div class="inv-badge">INVOICE</div>
+      </div>
+      <div class="inv-readonly-note">📋 View only — filled by dispatcher</div>
+
+      <div class="g2">
+        <div class="f"><label>Date</label><input type="date" id="id" readonly></div>
+        <div class="f"><label>Acct No.</label><input id="ia" readonly></div>
+        <div class="f fc"><label>Invoice #</label><input id="ino" readonly></div>
+      </div>
+
+      <div class="g2 mt12">
+        <div class="f"><label>Bill To</label>
+          <textarea id="ibt" placeholder="Company&#10;Address&#10;City, State ZIP" readonly></textarea>
+        </div>
+        <div class="f"><label>Ship To</label>
+          <textarea id="ist" placeholder="Company&#10;Address&#10;City, State ZIP" readonly></textarea>
+        </div>
+      </div>
+
+      <div class="g2-auto mt12">
+        <div class="f"><label>PO #</label><input id="ipo" readonly></div>
+        <div class="f"><label>Terms</label><input id="itr" readonly></div>
+        <div class="f"><label>Sales Order</label><input id="iso" readonly></div>
+        <div class="f"><label>Shipping Method</label><input id="ism" readonly></div>
+      </div>
+
+      <div class="sec"><span>📦</span><h3>Line Items</h3></div>
+      <div class="tw">
+        <table>
+          <thead><tr>
+            <th>Item</th><th>Qty</th><th>Description</th>
+            <th>Unit Price</th><th>Total</th>
+          </tr></thead>
+          <tbody id="itb"></tbody>
+        </table>
+      </div>
+
+      <div class="totals-wrap">
+        <div class="totals-box">
+          <div class="totals-row">
+            <span>Shipping</span>
+            <input id="ish" class="ish-input" readonly>
+          </div>
+          <div class="totals-due">
+            <span>Amount Due</span><span id="itot">$0.00</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sa">
+        <button class="btn bs">💾 Draft</button>
+        <button class="btn bp" id="btnSubInv">📤 Submit Invoice</button>
+      </div>
+    </div><!-- /t1 -->
+
+    <!-- ══ TAB 2: LOOSE PARTS ═════════════════════════════ -->
+    <div id="t2" class="tab-hidden">
+      <div class="lp-hdr">
+        <div class="lp-company">VENTURE TRAILERS</div>
+        <div class="lp-sub">LOOSE PARTS CHECK-IN</div>
+      </div>
+
+      <div class="g2-auto">
+        <div class="f"><label>Sales Order #</label><input id="ls" readonly></div>
+        <div class="f"><label>Invoice #</label><input id="li" readonly></div>
+        <div class="f"><label>PL#</label><input id="lpl" readonly></div>
+        <div class="f"><label>TRK#</label><input id="lt" readonly></div>
+        <div class="f"><label>Dealer</label><input id="ld" readonly></div>
+        <div class="f"><label>Date</label><input type="date" id="ldt" readonly></div>
+      </div>
+
+      <div class="sec"><span>🔩</span><h3>Parts List</h3></div>
+      <div class="tw">
+        <table>
+          <thead><tr>
+            <th>Loc</th><th>Qty</th><th>Part</th>
+            <th class="tc">Pulled</th><th class="tc">Loaded</th>
+            <th class="tc">N/C</th><th class="tc">COD</th>
+          </tr></thead>
+          <tbody id="ltb"></tbody>
+        </table>
+      </div>
+
+      <div class="f mb14"><label>Comments</label>
+        <textarea id="lc" placeholder="Any notes..."></textarea>
+      </div>
+
+      <div class="notice nred notice-center">⚠️ MUST BE COMPLETED AT TIME OF DELIVERY</div>
+
+      <div class="sec mt14"><span>✍️</span><h3>Signatures</h3></div>
+      <div class="sig-wrap-row">
+        <div>
+          <div class="sig-lbl">Driver</div>
+          <div class="sw" id="sig-lpd-wrap">
+            <canvas id="sig-lpd"></canvas>
+            <div class="sph" id="sig-lpd-ph">Sign here ✍️</div>
+            <button class="scl" id="clr-lpd">Clear</button>
+            <div class="sok" id="sig-lpd-ok">✓ Signed</div>
+          </div>
+        </div>
+        <div>
+          <div class="sig-lbl">Authorized Receiver</div>
+          <div class="sw" id="sig-lpr-wrap">
+            <canvas id="sig-lpr"></canvas>
+            <div class="sph" id="sig-lpr-ph">Sign here ✍️</div>
+            <button class="scl" id="clr-lpr">Clear</button>
+            <div class="sok" id="sig-lpr-ok">✓ Signed</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sa">
+        <button class="btn bs">💾 Draft</button>
+        <button class="btn bp" id="btnSubParts">📤 Submit Parts Form</button>
+      </div>
+    </div><!-- /t2 -->
+
+  </div><!-- /card -->
+</div><!-- /form-area -->
 
 </div><!-- /vt-app -->
 
