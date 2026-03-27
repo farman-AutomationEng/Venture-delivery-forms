@@ -172,7 +172,7 @@
           <thead><tr><th>Item</th><th style="width:50px">Qty</th><th>Description</th><th style="width:85px">Unit Price</th><th style="width:75px">Total</th><th style="width:28px"></th></tr></thead>
           <tbody id="fm-inv-body"></tbody>
         </table>
-        <button class="dc-add-row" onclick="VD.addInvLine()">+ Add Line</button>
+        <button class="dc-add-row" id="btn-add-inv-line">+ Add Line</button>
         <div style="display:flex;justify-content:flex-end;margin-top:8px;align-items:center;gap:14px;font-size:13px">
           <span style="color:#64748b">Shipping: <input id="fm-shipping" type="number" step="0.01" placeholder="0.00" oninput="calcGrand()" style="width:80px;padding:4px 8px;border:1px solid #D1D5DB;border-radius:4px;font-size:12px"></span>
           <span style="font-weight:700;color:#00263E">Amount Due: <span id="fm-grand">$0.00</span></span>
@@ -461,18 +461,17 @@
     var si=document.getElementById("fm-driver-search"); if(si) si.value=pre?(ALL_DRIVERS.find(function(d){return d.id===pre;})||{}).name||"":"";
     var hi=document.getElementById("fm-driver");        if(hi) hi.value=pre||"";
     var dl=document.getElementById("fm-driver-list");   if(dl) dl.style.display="none";
-    // Attach phone formatter via addEventListener (CSP-safe)
+    // Attach all modal button listeners (CSP-safe — no inline onclick)
     var phoneEl = document.getElementById("fm-phone");
-    if(phoneEl){
-      phoneEl.removeEventListener("input", _phoneHandler);
-      phoneEl.addEventListener("input", _phoneHandler);
-    }
-    // Attach form type switcher via addEventListener (CSP-safe)
+    if(phoneEl){ phoneEl.removeEventListener("input",_phoneHandler); phoneEl.addEventListener("input",_phoneHandler); }
     var typeEl = document.getElementById("fm-type");
-    if(typeEl){
-      typeEl.removeEventListener("change", _typeHandler);
-      typeEl.addEventListener("change", _typeHandler);
-    }
+    if(typeEl){ typeEl.removeEventListener("change",_typeHandler); typeEl.addEventListener("change",_typeHandler); }
+    var addInvBtn = document.getElementById("btn-add-inv-line");
+    if(addInvBtn){ addInvBtn.replaceWith(addInvBtn.cloneNode(true)); document.getElementById("btn-add-inv-line").addEventListener("click",addInvLine); }
+    var addPartBtn = document.getElementById("btn-add-del-part");
+    if(addPartBtn){ addPartBtn.replaceWith(addPartBtn.cloneNode(true)); document.getElementById("btn-add-del-part").addEventListener("click",addDeliveryPart); }
+    var addPartsRowBtn = document.getElementById("btn-add-parts-row");
+    if(addPartsRowBtn){ addPartsRowBtn.replaceWith(addPartsRowBtn.cloneNode(true)); document.getElementById("btn-add-parts-row").addEventListener("click",addPartsRow); }
     // Re-attach type handler for edit mode too
     var typeEl2 = document.getElementById("fm-type");
     if(typeEl2){
@@ -620,12 +619,22 @@
   function calcInvRow(n){
     var q=parseFloat((document.getElementById("iq-"+n)||{}).value)||0;
     var p=parseFloat((document.getElementById("ip-"+n)||{}).value)||0;
-    var t=document.getElementById("it-"+n); if(t) t.value=(q*p)>0?(q*p).toFixed(2):""; calcGrand();
+    var total=(q*p);
+    var t=document.getElementById("it-"+n);
+    if(t) t.value=total>0?total.toFixed(2):"";
+    calcGrand();
   }
   function calcGrand(){
-    var s=0; document.querySelectorAll("#fm-inv-body tr").forEach(function(r){var t=r.querySelector("td:nth-child(5) input");if(t)s+=parseFloat(t.value)||0;});
-    s+=parseFloat((document.getElementById("fm-shipping")||{}).value)||0;
-    document.getElementById("fm-grand").textContent="$"+s.toFixed(2);
+    var sub=0;
+    document.querySelectorAll("#fm-inv-body tr").forEach(function(r){
+      var t=r.querySelector("td:nth-child(5) input"); if(t) sub+=parseFloat(t.value)||0;
+    });
+    var ship=parseFloat((document.getElementById("fm-shipping")||{}).value)||0;
+    var total=sub+ship;
+    var subEl=document.getElementById("fm-sub-total");
+    if(subEl) subEl.textContent="$"+sub.toFixed(2);
+    var grandEl=document.getElementById("fm-grand");
+    if(grandEl) grandEl.textContent="$"+total.toFixed(2);
   }
 
   function addPartsRow(){
