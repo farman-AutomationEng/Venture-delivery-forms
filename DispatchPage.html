@@ -343,17 +343,36 @@ function buildDrivers(){
     function row(d,isOn){
       var init=d.name.split(" ").map(function(w){ return w[0]||""; }).join("").toUpperCase().slice(0,2)||"?";
       var pc=pending[d.id]||0;
-      return'<div class="dc-driver">'
-        +'<div class="dc-av">'+init+'</div>'
-        +'<div class="dc-dinfo">'
-          +'<span class="dc-dname">'+esc(d.name)+'</span>'
-          +'<span class="dc-dsub">'
-            +'<span class="dc-online '+(isOn?"yes":"no")+'"><span class="dc-dot"></span>'+(isOn?"Online":"Offline")+'</span>'
-            +(pc?'<span class="dc-pcount">'+pc+' pending</span>':"")
-          +'</span>'
-        +'</div>'
-        +'<button class="btn bp" style="padding:4px 12px;font-size:11px" onclick="VD.quickAssign(''+d.id+'')">+ Assign</button>'
-      +'</div>';
+      var wrap=document.createElement("div");
+      wrap.className="dc-driver";
+      var av=document.createElement("div");
+      av.className="dc-av"; av.textContent=init;
+      var info=document.createElement("div");
+      info.className="dc-dinfo";
+      var nm=document.createElement("span");
+      nm.className="dc-dname"; nm.textContent=d.name;
+      var sub=document.createElement("span");
+      sub.className="dc-dsub";
+      var pill=document.createElement("span");
+      pill.className="dc-online "+(isOn?"yes":"no");
+      var dot=document.createElement("span");
+      dot.className="dc-dot";
+      pill.appendChild(dot);
+      pill.appendChild(document.createTextNode(isOn?"Online":"Offline"));
+      sub.appendChild(pill);
+      if(pc){
+        var pcEl=document.createElement("span");
+        pcEl.className="dc-pcount"; pcEl.textContent=pc+" pending";
+        sub.appendChild(pcEl);
+      }
+      info.appendChild(nm); info.appendChild(sub);
+      var btn=document.createElement("button");
+      btn.className="btn bp";
+      btn.style.cssText="padding:4px 12px;font-size:11px";
+      btn.textContent="+ Assign";
+      btn.addEventListener("click",(function(id){ return function(){ VD.quickAssign(id); }; })(d.id));
+      wrap.appendChild(av); wrap.appendChild(info); wrap.appendChild(btn);
+      return wrap.outerHTML;
     }
 
     var onlineCollapsed  = _drvrCollapsed.online;
@@ -530,15 +549,24 @@ window.onload=function(){
     if(!list) return;
     var query=(q||"").toLowerCase();
     var matches=query?ALL_DRIVERS.filter(function(d){return d.name.toLowerCase().includes(query);}):ALL_DRIVERS;
-    list.innerHTML=matches.length
-      ?matches.map(function(d){
-        return'<div onclick="VD.selectDriver(''+d.id+'',''+d.name.replace(/'/g,"&#39;")+'')" '
-          +'style="padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid #F1F5F9;color:#1A2432" '
-          +'onmouseover="this.style.background='#EFF6FF'" onmouseout="this.style.background=''">'+d.name+'</div>';
-      }).join("")
-      :'<div style="padding:10px 12px;color:#94a3b8;font-size:12px;font-style:italic">No drivers found</div>';
+    if(!matches.length){
+      list.innerHTML='<div style="padding:10px 12px;color:#94a3b8;font-size:12px;font-style:italic">No drivers found</div>';
+      list.style.display="block";
+      return;
+    }
+    list.innerHTML="";
+    matches.forEach(function(d){
+      var div=document.createElement("div");
+      div.textContent=d.name;
+      div.style.cssText="padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid #F1F5F9;color:#1A2432";
+      div.addEventListener("mouseover",function(){ this.style.background="#EFF6FF"; });
+      div.addEventListener("mouseout", function(){ this.style.background=""; });
+      div.addEventListener("click",   function(){ VD.selectDriver(d.id,d.name); });
+      list.appendChild(div);
+    });
     list.style.display="block";
   }
+
   function filterDriverDropdown(){
     var q = (document.getElementById("fm-driver-search")||{}).value||"";
     var hidden = document.getElementById("fm-driver");
