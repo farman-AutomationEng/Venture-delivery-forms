@@ -118,7 +118,7 @@
         <div class="dc-field"><label>Address</label><input id="fm-address" placeholder="Enter dealer address"></div>
         <div class="dc-g3">
           <div class="dc-field"><label>Contact</label><input id="fm-contact" placeholder="Enter contact name"></div>
-          <div class="dc-field"><label>Phone</label><input id="fm-phone" placeholder="(365)-655-0276" oninput="VD.fmtPhone(this)"></div>
+          <div class="dc-field"><label>Phone</label><input id="fm-phone" placeholder="(000)-000-0000"></div>
           <div class="dc-field"><label>COD Amount ($)</label><input type="text" id="fm-cod" placeholder="0.00"></div>
         </div>
         <div class="dc-g2">
@@ -461,6 +461,12 @@
     var si=document.getElementById("fm-driver-search"); if(si) si.value=pre?(ALL_DRIVERS.find(function(d){return d.id===pre;})||{}).name||"":"";
     var hi=document.getElementById("fm-driver");        if(hi) hi.value=pre||"";
     var dl=document.getElementById("fm-driver-list");   if(dl) dl.style.display="none";
+    // Attach phone formatter via addEventListener (CSP-safe)
+    var phoneEl = document.getElementById("fm-phone");
+    if(phoneEl){
+      phoneEl.removeEventListener("input", _phoneHandler);
+      phoneEl.addEventListener("input", _phoneHandler);
+    }
     document.getElementById("form-modal").classList.add("open");
   }
   function quickAssign(id){ openNewForm(id); }
@@ -717,6 +723,16 @@
     var tb=document.getElementById("today-badge"); if(tb) tb.textContent="📅 "+new Date().toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
     if(typeof geotab==="undefined") setGeo("ok","Dev Mode");
   };
+
+  function _phoneHandler(){
+    var digits = this.value.replace(/\D/g,"").slice(0,10);
+    var fmt = "";
+    if(digits.length === 0)      fmt = "";
+    else if(digits.length <= 3)  fmt = "("+digits;
+    else if(digits.length <= 6)  fmt = "("+digits.slice(0,3)+")-"+digits.slice(3);
+    else fmt = "("+digits.slice(0,3)+")-"+digits.slice(3,6)+"-"+digits.slice(6);
+    this.value = fmt;
+  }
 
   function fmtPhone(inp){
     var digits = inp.value.replace(/\D/g,"").slice(0,10);
