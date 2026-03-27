@@ -96,7 +96,7 @@
         </div>
         <div class="dc-field">
           <label>Form Type *</label>
-          <select id="fm-type" onchange="switchFormType(this.value)">
+          <select id="fm-type">
             <option value="delivery_sheet">Delivery Sheet</option>
             <option value="invoice">Invoice</option>
             <option value="loose_parts">Loose Parts</option>
@@ -467,6 +467,18 @@
       phoneEl.removeEventListener("input", _phoneHandler);
       phoneEl.addEventListener("input", _phoneHandler);
     }
+    // Attach form type switcher via addEventListener (CSP-safe)
+    var typeEl = document.getElementById("fm-type");
+    if(typeEl){
+      typeEl.removeEventListener("change", _typeHandler);
+      typeEl.addEventListener("change", _typeHandler);
+    }
+    // Re-attach type handler for edit mode too
+    var typeEl2 = document.getElementById("fm-type");
+    if(typeEl2){
+      typeEl2.removeEventListener("change", _typeHandler);
+      typeEl2.addEventListener("change", _typeHandler);
+    }
     document.getElementById("form-modal").classList.add("open");
   }
   function quickAssign(id){ openNewForm(id); }
@@ -723,6 +735,10 @@
     var tb=document.getElementById("today-badge"); if(tb) tb.textContent="📅 "+new Date().toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
     if(typeof geotab==="undefined") setGeo("ok","Dev Mode");
   };
+
+  function _typeHandler(){
+    switchFormType(this.value);
+  }
 
   function _phoneHandler(){
     var digits = this.value.replace(/\D/g,"").slice(0,10);
