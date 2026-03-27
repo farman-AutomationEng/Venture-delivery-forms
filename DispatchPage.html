@@ -109,16 +109,16 @@
         <div class="dc-sec">Delivery Information</div>
         <div class="dc-g2">
           <div class="dc-field"><label>Date</label><input type="date" id="fm-date"></div>
-          <div class="dc-field"><label>Invoice # *</label><input id="fm-inv-no" placeholder="132993"></div>
+          <div class="dc-field"><label>Invoice # *</label><input id="fm-inv-no" placeholder="Enter invoice number"></div>
         </div>
         <div class="dc-g2">
-          <div class="dc-field"><label>Dealer Name</label><input id="fm-dealer" placeholder="Blue Mountain Marine"></div>
-          <div class="dc-field"><label>Dealer Email</label><input type="email" id="fm-email" placeholder="dealer@company.com"></div>
+          <div class="dc-field"><label>Dealer Name</label><input id="fm-dealer" placeholder="Enter dealer name"></div>
+          <div class="dc-field"><label>Dealer Email</label><input type="email" id="fm-email" placeholder="Enter dealer email"></div>
         </div>
-        <div class="dc-field"><label>Address</label><input id="fm-address" placeholder="1765 Valley View Dr, Bangor PA 18013"></div>
+        <div class="dc-field"><label>Address</label><input id="fm-address" placeholder="Enter dealer address"></div>
         <div class="dc-g3">
-          <div class="dc-field"><label>Contact</label><input id="fm-contact" placeholder="Ryan"></div>
-          <div class="dc-field"><label>Phone</label><input id="fm-phone" placeholder="610-599-3628"></div>
+          <div class="dc-field"><label>Contact</label><input id="fm-contact" placeholder="Enter contact name"></div>
+          <div class="dc-field"><label>Phone</label><input id="fm-phone" placeholder="Enter phone number"></div>
           <div class="dc-field"><label>COD Amount ($)</label><input type="text" id="fm-cod" placeholder="0.00"></div>
         </div>
         <div class="dc-g2">
@@ -152,7 +152,7 @@
         <div class="dc-sec">Invoice Information</div>
         <div class="dc-g2">
           <div class="dc-field"><label>Date</label><input type="date" id="fm-inv-date"></div>
-          <div class="dc-field"><label>Invoice # *</label><input id="fm-inv-number" placeholder="132993"></div>
+          <div class="dc-field"><label>Invoice # *</label><input id="fm-inv-number" placeholder="Enter invoice number"></div>
         </div>
         <div class="dc-g2">
           <div class="dc-field"><label>Acct No.</label><input id="fm-acct"></div>
@@ -384,7 +384,7 @@
 
     function makeSection(key,label,color,drivers){
       var collapsed=_drvrCollapsed[key];
-      var tri=el("span",{class:"dc-triangle",style:"transform:rotate("+(collapsed?"-90":"0")+"deg)",text:"▼"}); tri.id="tri-"+key;
+      var tri=el("span",{class:"dc-triangle",text:collapsed?"▶":"▼"}); tri.id="tri-"+key;
       var lbl=el("span",{style:"color:"+color,text:"● "+label+" ("+drivers.length+")"});
       var hdr=el("div",{class:"dc-section-hdr"},[lbl,tri]);
       hdr.addEventListener("click",(function(k){return function(){VD.toggleDriverSection(k);};})(key));
@@ -399,7 +399,7 @@
   function toggleDriverSection(key){
     _drvrCollapsed[key]=!_drvrCollapsed[key];
     var sec=document.getElementById("dsec-"+key); if(sec) sec.style.display=_drvrCollapsed[key]?"none":"block";
-    var tri=document.getElementById("tri-"+key);   if(tri) tri.style.transform=_drvrCollapsed[key]?"rotate(-90deg)":"rotate(0deg)";
+    var tri=document.getElementById("tri-"+key);   if(tri) tri.textContent=_drvrCollapsed[key]?"▶":"▼";
   }
   function focusDriverPanel(){ document.getElementById("driver-panel").scrollIntoView({behavior:"smooth"}); }
 
