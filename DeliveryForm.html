@@ -79,10 +79,14 @@
       <div class="notice">⚠️ <strong>Inspect all merchandise.</strong> Damages not replaced unless noted at delivery.</div>
       <div class="from-box"><strong>FROM:</strong> Venture Trailers • 5301 North Point Blvd, Baltimore MD 21219</div>
 
-      <!-- Date + Invoice — always 2 col -->
-      <div class="g2">
-        <div class="f"><label>Date *</label><input type="date" id="ds-dt"></div>
-        <div class="f"><label>Invoice No. *</label><input id="ds-inv" placeholder="Enter invoice #"></div>
+      <!-- Date + Invoice — fixed 2 col, min-width ensures no cut -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:0">
+        <div class="f"><label>Date *</label>
+          <input type="date" id="ds-dt" style="min-width:0;width:100%;padding:11px 6px">
+        </div>
+        <div class="f"><label>Invoice No. *</label>
+          <input id="ds-inv" placeholder="Invoice #" style="min-width:0;width:100%">
+        </div>
       </div>
 
       <div class="sec"><span>🏪</span><h3>Consigned To</h3></div>
