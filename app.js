@@ -303,6 +303,13 @@ function showPendingLoading(show) {
   if (el) el.style.display = show ? "block" : "none";
 }
 
+function backToPending() {
+  _currentFormId = null;
+  _currentForm = null;
+  showPendingScreen();
+  fetchPendingForms();
+}
+
 function showPendingScreen() {
   var ps = document.getElementById("pending-screen"); if (ps) ps.style.display = "block";
   var fa = document.getElementById("form-area"); if (fa) fa.style.display = "none";
