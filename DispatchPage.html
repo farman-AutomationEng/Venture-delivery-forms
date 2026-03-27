@@ -118,7 +118,7 @@
         <div class="dc-field"><label>Address</label><input id="fm-address" placeholder="Enter dealer address"></div>
         <div class="dc-g3">
           <div class="dc-field"><label>Contact</label><input id="fm-contact" placeholder="Enter contact name"></div>
-          <div class="dc-field"><label>Phone</label><input id="fm-phone" placeholder="Enter phone number"></div>
+          <div class="dc-field"><label>Phone</label><input id="fm-phone" placeholder="(365)-655-0276" oninput="VD.fmtPhone(this)"></div>
           <div class="dc-field"><label>COD Amount ($)</label><input type="text" id="fm-cod" placeholder="0.00"></div>
         </div>
         <div class="dc-g2">
@@ -717,6 +717,16 @@
     var tb=document.getElementById("today-badge"); if(tb) tb.textContent="📅 "+new Date().toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
     if(typeof geotab==="undefined") setGeo("ok","Dev Mode");
   };
+
+  function fmtPhone(inp){
+    var digits = inp.value.replace(/\D/g,"").slice(0,10);
+    var fmt = "";
+    if(digits.length === 0){ fmt = ""; }
+    else if(digits.length <= 3){ fmt = "("+digits; }
+    else if(digits.length <= 6){ fmt = "("+digits.slice(0,3)+")-"+digits.slice(3); }
+    else { fmt = "("+digits.slice(0,3)+")-"+digits.slice(3,6)+"-"+digits.slice(6); }
+    inp.value = fmt;
+  }
 
   VD.loadAll=loadAll; VD.openNewForm=openNewForm; VD.closeFormModal=closeFormModal;
   VD.switchFormType=switchFormType; VD.addDeliveryPart=addDeliveryPart;
